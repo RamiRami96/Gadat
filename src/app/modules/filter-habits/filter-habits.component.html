@@ -1,0 +1,7 @@
+<mat-form-field appearance="outline" class="filter-form">
+  <mat-label>Search</mat-label>
+  <input matInput [formControl]="searchControl" placeholder="Type to search" autocomplete="off" />
+  @if (isLoading) {
+    <mat-spinner class="filter-form__spinner" matSuffix diameter="20"></mat-spinner>
+  }
+</mat-form-field>

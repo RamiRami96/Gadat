@@ -1,0 +1,23 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'variables.css';
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.mt-15 {
+  margin-top: 15px;
+}
+
+h1 {
+  font-size: 48px;
+}
+
+p {
+  font-size: 14px;
+}

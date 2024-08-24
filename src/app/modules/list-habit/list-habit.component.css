@@ -1,0 +1,31 @@
+.card-container {
+  display: grid;
+  overflow-x: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.card-container__item {
+  min-width: 300px;
+}
+
+.card__btn-container {
+  margin: 20px 0;
+
+  > *:not(:last-child) {
+    margin-right: 10px;
+  }
+}
+
+.card__success-text {
+  display: inline-block;
+  color: var(--success);
+}
+
+@media screen and (min-width: 960px) {
+  .card-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

@@ -1,0 +1,27 @@
+<app-filter-habits (searchHabits)="searchHabit($event)"></app-filter-habits>
+@if (habits().length) {
+  <div class="card-container">
+    @for (habit of habits(); track habit.id; let i = $index) {
+      <mat-card class="card-container__item">
+        <mat-card-content>
+          <h2>{{ habit.name }}</h2>
+          <p>sphere: <b>{{ habit.type }}</b></p>
+          <div class="card__btn-container">
+            @if (showCompleteButton(habit)) {
+              <button mat-raised-button (click)="habitService.completeHabit(habit)">Complete</button>
+            } @else {
+              <p class="card__success-text">Completed</p>
+            }
+            <button mat-raised-button (click)="habitService.deleteHabit(habit.id)">Delete</button>
+          </div>
+
+          @for (sprint of habit.sprint; track sprint) {
+            <mat-checkbox [checked]="sprint" disabled></mat-checkbox>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+} @else {
+  <h1>Habits not found</h1>
+}
