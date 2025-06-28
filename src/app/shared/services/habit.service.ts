@@ -47,7 +47,6 @@ export class HabitService {
   }
 
   public searchHabit(value?: string | null): void {
-    console.log(value);
     if (!value) {
       this._updateLocalHabits(this._initialHabits);
     } else {
@@ -63,11 +62,12 @@ export class HabitService {
     const differenceInTime = completeDate.getTime() - startDate.getTime();
     const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
 
-    if (differenceInDays >= 0 && differenceInDays < habit.sprint.length) {
-      habit.sprint[differenceInDays] = true;
+    const updatedSprint = [...habit.sprint];
+    if (differenceInDays >= 0 && differenceInDays < updatedSprint.length) {
+      updatedSprint[differenceInDays] = true;
     }
 
-    return habit;
+    return { ...habit, sprint: updatedSprint };
   }
 
   private _updateHabits(newHabits: Habit[]): void {

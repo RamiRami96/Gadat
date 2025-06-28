@@ -24,11 +24,13 @@ import { FilterHabitsComponent } from '../filter-habits/filter-habits.component'
 })
 export class ListHabitComponent implements OnInit {
   public habits = signal<Habit[]>([]);
+  private today: Date = new Date();
 
   constructor(public habitService: HabitService) {}
 
   ngOnInit() {
-    this.habits = this.habitService.habits;
+    this.habits.set(this.habitService.habits());
+    this.today = new Date();
   }
 
   public searchHabit(event: { value?: string | null }) {
@@ -37,9 +39,8 @@ export class ListHabitComponent implements OnInit {
 
   public showCompleteButton(habit: Habit): boolean {
     const startDate = new Date(habit.start);
-    const today = new Date();
 
-    const differenceInTime = today.getTime() - startDate.getTime();
+    const differenceInTime = this.today.getTime() - startDate.getTime();
     const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
 
     const completedCount = habit.sprint.filter(day => day === true).length;

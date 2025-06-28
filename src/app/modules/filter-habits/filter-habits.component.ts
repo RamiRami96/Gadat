@@ -21,11 +21,11 @@ export class FilterHabitsComponent implements OnInit, OnDestroy {
     this.searchControl.valueChanges
       .pipe(
         takeUntil(this._destroy$),
-        tap(() => (this.isLoading = true)),
         debounceTime(500),
+        tap(() => (this.isLoading = true)),
         tap(value => {
-          this.isLoading = false;
           this.searchHabits.emit({ value });
+          this.isLoading = false;
         })
       )
       .subscribe();

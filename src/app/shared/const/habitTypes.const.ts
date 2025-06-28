@@ -1,4 +1,4 @@
-import { SelectDataModel } from "../models/selectedData.model";
+import { SelectDataModel } from '../models/selectedData.model';
 
 export const habitTypes: SelectDataModel[] = [
   { value: 'Health', viewValue: 'Health' },
@@ -17,6 +17,6 @@ export const jobHabits: SelectDataModel[] = [
 ];
 export const relationshipHabits: SelectDataModel[] = [
   { value: 'Meet new people', viewValue: 'Meet new people' },
-  { value: 'Be confidient', viewValue: 'Be confidient' },
-  { value: 'Practice physical touch', viewValue: 'Practice physical Touch' },
+  { value: 'Be confident', viewValue: 'Be confident' },
+  { value: 'Practice physical touch', viewValue: 'Practice physical touch' },
 ];

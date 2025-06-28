@@ -1,11 +1,18 @@
-<h2 mat-dialog-title>Create new Habbit</h2>
+<h2 mat-dialog-title>Create new Habit</h2>
 <mat-dialog-content>
   <mat-stepper linear #stepper>
     <mat-step>
       <ng-template matStepLabel>Introducing</ng-template>
       <div class="mt-15">
         <h1>Track Your Habits for a Better Tomorrow</h1>
-        <p>Welcome to <b>Gadat app</b>, your personal companion in building and maintaining positive habits. Our intuitive app allows you to easily monitor your daily habits, set goals, and track your progress. Whether you’re looking to develop new routines, improve productivity, or enhance your well-being, HabitTracker provides you with the tools and insights to stay motivated and achieve your goals. Start your journey to a better you today!</p>
+        <p>
+          Welcome to
+          <b>Gadat app</b>
+          , your personal companion in building and maintaining positive habits. Our intuitive app allows you to easily
+          monitor your daily habits, set goals, and track your progress. Whether you’re looking to develop new routines,
+          improve productivity, or enhance your well-being, Gadat app provides you with the tools and insights to stay
+          motivated and achieve your goals. Start your journey to a better you today!
+        </p>
         <button mat-button matStepperNext>Next</button>
       </div>
     </mat-step>
@@ -15,18 +22,18 @@
         <mat-form-field>
           <mat-label>Life sphere</mat-label>
           <mat-select formControlName="type">
-            @for (type of habitTypes; track type.value) {
-              <mat-option [value]="type.value">{{ type.viewValue }}</mat-option>
-            }
+            <mat-option *ngFor="let type of habitTypes; trackBy: trackType" [value]="type.value">
+              {{ type.viewValue }}
+            </mat-option>
           </mat-select>
         </mat-form-field>
         @if (currentHabits.length) {
           <mat-form-field>
             <mat-label>Habit</mat-label>
             <mat-select formControlName="name">
-              @for (habit of currentHabits; track habit) {
-                <mat-option [value]="habit.value">{{ habit.viewValue }}</mat-option>
-              }
+              <mat-option *ngFor="let habit of currentHabits; track: trackHabit" [value]="habit.value">
+                {{ habit.viewValue }}
+              </mat-option>
             </mat-select>
           </mat-form-field>
         }
@@ -36,10 +43,10 @@
     <mat-step>
       <ng-template matStepLabel>Done</ng-template>
       <div class="mt-15">
-        <p>You choosen habit. Good luck!</p>
+        <p>You have chosen a habit. Good luck!</p>
         <div>
           <button mat-button matStepperPrevious>Back</button>
-          <button mat-button (click)="createSprint()">Create sprint</button>
+          <button mat-button (click)="createHabit()">Create sprint</button>
         </div>
       </div>
     </mat-step>

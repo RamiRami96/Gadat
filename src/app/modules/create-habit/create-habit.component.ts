@@ -15,6 +15,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
+import { v4 as uuidv4 } from 'uuid';
 import { SelectDataModel } from '../../shared/models/selectedData.model';
 import { habitTypes, healthHabits, jobHabits, relationshipHabits } from '../../shared/const/habitTypes.const';
 
@@ -54,9 +55,9 @@ export class CreateHabitComponent implements OnInit, OnDestroy {
     });
   }
 
-  createSprint(): void {
+  createHabit(): void {
     const newHabit: Habit = {
-      id: 'id' + Math.random().toString(16).slice(2),
+      id: uuidv4(),
       type: this.form.get('type')?.value,
       name: this.form.get('name')?.value,
       start: new Date(),
@@ -66,8 +67,7 @@ export class CreateHabitComponent implements OnInit, OnDestroy {
     this._habitService.createHabit(newHabit);
     this._dialogRef.close();
   }
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.form
       .get('type')
       ?.valueChanges.pipe(takeUntil(this._destroy$))
@@ -89,7 +89,7 @@ export class CreateHabitComponent implements OnInit, OnDestroy {
       });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
   }
