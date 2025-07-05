@@ -6,12 +6,12 @@ import { canDeactivateGuard } from './shared/guards/can-deactivate.guard';
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./modules/home/home.component').then(m => m.HomeComponent),
+    loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent),
     title: 'Gadat - Home',
   },
   {
     path: 'login',
-    loadComponent: () => import('./modules/auth/login.component').then(m => m.LoginComponent),
+    loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent),
     title: 'Gadat - Login',
   },
   {
@@ -20,18 +20,18 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./modules/habits-page/habits-page.component').then(m => m.HabitsPageComponent),
+        loadComponent: () => import('./features/habits-page/habits-page.component').then(m => m.HabitsPageComponent),
         title: 'Gadat - My Habits',
       },
       {
         path: 'create',
-        loadComponent: () => import('./modules/habit-form/habit-form.component').then(m => m.HabitFormComponent),
+        loadComponent: () => import('./features/habit-form/habit-form.component').then(m => m.HabitFormComponent),
         canDeactivate: [canDeactivateGuard],
         title: 'Gadat - Create Habit',
       },
       {
         path: 'edit/:id',
-        loadComponent: () => import('./modules/habit-form/habit-form.component').then(m => m.HabitFormComponent),
+        loadComponent: () => import('./features/habit-form/habit-form.component').then(m => m.HabitFormComponent),
         canActivate: [habitExistsGuard],
         canDeactivate: [canDeactivateGuard],
         title: 'Gadat - Edit Habit',
