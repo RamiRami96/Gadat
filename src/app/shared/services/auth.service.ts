@@ -1,5 +1,10 @@
 import { Injectable, signal } from '@angular/core';
 
+const MOCK_CREDENTIALS = {
+  username: 'admin',
+  password: 'password'
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -16,7 +21,7 @@ export class AuthService {
   }
 
   login(username: string, password: string): boolean {
-    if (username === 'admin' && password === 'password') {
+    if (username === MOCK_CREDENTIALS.username && password === MOCK_CREDENTIALS.password) {
       this._isAuthenticated.set(true);
       localStorage.setItem('isAuthenticated', 'true');
       return true;
