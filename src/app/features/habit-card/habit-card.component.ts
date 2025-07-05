@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,6 +12,7 @@ import { HabitService } from '../../shared/services/habit.service';
   imports: [MatCardModule, MatCheckboxModule, MatButtonModule],
   templateUrl: './habit-card.component.html',
   styleUrl: './habit-card.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HabitCardComponent {
   @Input({ required: true }) habit!: Habit;

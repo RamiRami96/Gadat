@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, signal, effect } from '@angular/core';
+import { Component, EventEmitter, Output, signal, effect, ChangeDetectionStrategy } from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   imports: [MatInputModule, MatProgressSpinnerModule],
   templateUrl: './filter-habits.component.html',
   styleUrl: './filter-habits.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterHabitsComponent {
   @Output() searchHabits = new EventEmitter<{ value?: string | null }>();

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HabitService } from '../../shared/services/habit.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,6 +11,7 @@ import { HabitCardComponent } from '../habit-card/habit-card.component';
   imports: [ReactiveFormsModule, MatFormFieldModule, FilterHabitsComponent, HabitCardComponent],
   templateUrl: './list-habit.component.html',
   styleUrl: './list-habit.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListHabitComponent {
   public habitService = inject(HabitService);
