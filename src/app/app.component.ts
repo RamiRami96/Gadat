@@ -7,7 +7,7 @@ import { AddHabitBtnComponent } from './modules/add-habit-btn/add-habit-btn.comp
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [LayoutComponent, ListHabitComponent, CreateHabitComponent, AddHabitBtnComponent],
+  imports: [LayoutComponent, ListHabitComponent, AddHabitBtnComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

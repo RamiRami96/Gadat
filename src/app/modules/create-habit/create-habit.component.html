@@ -22,18 +22,22 @@
         <mat-form-field>
           <mat-label>Life sphere</mat-label>
           <mat-select formControlName="type">
-            <mat-option *ngFor="let type of habitTypes; trackBy: trackType" [value]="type.value">
-              {{ type.viewValue }}
-            </mat-option>
+            @for (type of habitTypes; track type.value) {
+              <mat-option [value]="type.value">
+                {{ type.viewValue }}
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
         @if (currentHabits.length) {
           <mat-form-field>
             <mat-label>Habit</mat-label>
             <mat-select formControlName="name">
-              <mat-option *ngFor="let habit of currentHabits; track: trackHabit" [value]="habit.value">
-                {{ habit.viewValue }}
-              </mat-option>
+              @for (habit of currentHabits; track habit.value) {
+                <mat-option [value]="habit.value">
+                  {{ habit.viewValue }}
+                </mat-option>
+              }
             </mat-select>
           </mat-form-field>
         }

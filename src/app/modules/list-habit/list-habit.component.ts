@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Habit } from '../../shared/models/habit.model';
 import { HabitService } from '../../shared/services/habit.service';
@@ -25,8 +25,7 @@ import { FilterHabitsComponent } from '../filter-habits/filter-habits.component'
 export class ListHabitComponent implements OnInit {
   public habits = signal<Habit[]>([]);
   private today: Date = new Date();
-
-  constructor(public habitService: HabitService) {}
+  public habitService = inject(HabitService);
 
   ngOnInit() {
     this.habits.set(this.habitService.habits());

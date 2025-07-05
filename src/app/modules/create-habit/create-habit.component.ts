@@ -1,11 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { FormBuilder, Validators, FormsModule, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
-import { Subject, takeUntil } from 'rxjs';
 import { MatSelectModule } from '@angular/material/select';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HabitService } from '../../shared/services/habit.service';
 import { Habit } from '../../shared/models/habit.model';
 import {
@@ -30,25 +30,22 @@ import { habitTypes, healthHabits, jobHabits, relationshipHabits } from '../../s
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatDialogActions,
-    MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
   ],
   templateUrl: './create-habit.component.html',
   styleUrl: './create-habit.component.css',
 })
-export class CreateHabitComponent implements OnInit, OnDestroy {
+export class CreateHabitComponent implements OnInit {
   public form: FormGroup;
   public habitTypes = habitTypes;
   public currentHabits: SelectDataModel[] = [];
-  private _destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private _dialogRef = inject(MatDialogRef<CreateHabitComponent>);
+  private _formBuilder = inject(FormBuilder);
+  private _habitService = inject(HabitService);
 
-  constructor(
-    private _dialogRef: MatDialogRef<CreateHabitComponent>,
-    private _formBuilder: FormBuilder,
-    private _habitService: HabitService
-  ) {
+  constructor() {
     this.form = this._formBuilder.group({
       type: ['', Validators.required],
       name: ['', Validators.required],
@@ -70,7 +67,7 @@ export class CreateHabitComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.form
       .get('type')
-      ?.valueChanges.pipe(takeUntil(this._destroy$))
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(sphere => {
         switch (sphere) {
           case 'Health':
@@ -82,15 +79,9 @@ export class CreateHabitComponent implements OnInit, OnDestroy {
           case 'Relationships':
             this.currentHabits = relationshipHabits;
             break;
-
           default:
             break;
         }
       });
-  }
-
-  ngOnDestroy(): void {
-    this._destroy$.next();
-    this._destroy$.complete();
   }
 }
