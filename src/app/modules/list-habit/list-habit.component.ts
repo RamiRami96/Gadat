@@ -25,6 +25,4 @@ export class ListHabitComponent{
   public searchHabit(event: { value?: string | null }) {
     this.habitService.searchHabit(event.value);
   }
-
-
 }

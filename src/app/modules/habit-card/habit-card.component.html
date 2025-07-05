@@ -6,7 +6,7 @@
       <b>{{ habit.type }}</b>
     </p>
     <div class="card__btn-container">
-      @if (showCompleteButton) {
+      @if (showCompleteButton(habit)) {
         <button mat-raised-button (click)="habitService.completeHabit(habit)">Complete</button>
       } @else {
         <p class="card__success-text">Completed</p>
