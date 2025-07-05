@@ -23,12 +23,11 @@ import { FilterHabitsComponent } from '../filter-habits/filter-habits.component'
   styleUrl: './list-habit.component.css',
 })
 export class ListHabitComponent implements OnInit {
-  public habits = signal<Habit[]>([]);
-  private today: Date = new Date();
   public habitService = inject(HabitService);
+  public habits = this.habitService.habits;
+  private today: Date = new Date();
 
   ngOnInit() {
-    this.habits.set(this.habitService.habits());
     this.today = new Date();
   }
 

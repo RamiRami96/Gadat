@@ -21,13 +21,13 @@ export class FilterHabitsComponent implements OnInit {
   ngOnInit() {
     this.searchControl.valueChanges
       .pipe(
-        takeUntilDestroyed(this.destroyRef),
         debounceTime(500),
         tap(() => (this.isLoading = true)),
         tap(value => {
           this.searchHabits.emit({ value });
           this.isLoading = false;
-        })
+        }),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe();
   }

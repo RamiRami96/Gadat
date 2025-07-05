@@ -12,11 +12,11 @@ export const healthHabits: SelectDataModel[] = [
 ];
 export const jobHabits: SelectDataModel[] = [
   { value: 'Daily goals', viewValue: 'Daily goals' },
-  { value: 'Learn working skill', viewValue: 'Learn working skill' },
+  { value: 'Learn a new skill', viewValue: 'Learn a new skill' },
   { value: 'Take breaks', viewValue: 'Take breaks' },
 ];
 export const relationshipHabits: SelectDataModel[] = [
   { value: 'Meet new people', viewValue: 'Meet new people' },
   { value: 'Be confident', viewValue: 'Be confident' },
-  { value: 'Practice physical touch', viewValue: 'Practice physical touch' },
+  { value: 'Show appreciation', viewValue: 'Show appreciation' },
 ];

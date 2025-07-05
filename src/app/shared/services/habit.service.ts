@@ -48,10 +48,10 @@ export class HabitService {
 
   public searchHabit(value?: string | null): void {
     if (!value) {
-      this._updateLocalHabits(this._initialHabits);
+      this._habits.set(this._initialHabits);
     } else {
       const searchingHabits = this._initialHabits.filter(habit => habit.name.includes(value.trim())) ?? [];
-      this._updateLocalHabits(searchingHabits);
+      this._habits.set(searchingHabits);
     }
   }
 
@@ -72,10 +72,7 @@ export class HabitService {
 
   private _updateHabits(newHabits: Habit[]): void {
     localStorage.setItem('habits', JSON.stringify(newHabits));
-    this._habits.set(newHabits);
-  }
-
-  private _updateLocalHabits(newHabits: Habit[]): void {
+    this._initialHabits = newHabits;
     this._habits.set(newHabits);
   }
 }
