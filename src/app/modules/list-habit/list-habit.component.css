@@ -1,4 +1,9 @@
-.card-container {
+.habits-list {
+  height: 55vh;
+  overflow-y: auto;
+}
+
+.habits-list__container {
   display: grid;
   overflow-x: auto;
   padding-top: 10px;
@@ -7,25 +12,20 @@
   gap: 20px;
 }
 
-.card-container__item {
-  min-width: 300px;
-}
-
-.card__btn-container {
-  margin: 20px 0;
-
-  > *:not(:last-child) {
-    margin-right: 10px;
-  }
-}
-
-.card__success-text {
-  display: inline-block;
-  color: var(--success);
-}
-
 @media screen and (min-width: 960px) {
-  .card-container {
+  .habits-list__container {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+.habits-list__message {
+  text-align: center;
+}
+
+.habits-list__message--no-search-results {
+  text-align: center;
+}
+
+.habits-list__message--not-found {
+  text-align: center;
 }

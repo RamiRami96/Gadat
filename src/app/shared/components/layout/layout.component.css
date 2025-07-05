@@ -11,3 +11,18 @@
     padding: 0 32px;
   }
 }
+
+.container__wrapper {
+  width: 100%;
+  @media (min-width: 600px) {
+    width: 600px;
+  }
+
+  @media (min-width: 960px) {
+    width: 960px;
+  }
+
+  @media (min-width: 1200px) {
+    width: 1200px;
+  }
+}

@@ -9,7 +9,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix --max-warnings=0",
-    "prettier": "prettier --write src/**/*.{ts,json,css,sass,scss,html}",
+    "prettier": "prettier --write src/**/*",
     "pre-commit": "npm run prettier && npm run lint:fix",
     "pre-push": "npm run test",
     "prepare": "husky"

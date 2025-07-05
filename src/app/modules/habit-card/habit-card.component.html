@@ -11,7 +11,8 @@
       } @else {
         <p class="card__success-text">Completed</p>
       }
-      <button mat-raised-button (click)="habitService.deleteHabit(habit.id)">Delete</button>
+      <button mat-raised-button (click)="editHabit(habit.id)">Edit</button>
+      <button mat-raised-button color="warn" (click)="habitService.deleteHabit(habit.id)">Delete</button>
     </div>
 
     @for (sprint of habit.sprint; let sprintIndex = $index; track sprintIndex) {

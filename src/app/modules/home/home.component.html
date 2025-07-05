@@ -1,0 +1,21 @@
+<div class="home">
+  <mat-card class="home__welcome-card">
+    <mat-card-header class="home__header">
+      <mat-card-title class="home__title">Welcome to Gadat</mat-card-title>
+      <mat-card-subtitle class="home__subtitle">Your Personal Habit Tracker</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="home__content">
+      <div class="home__actions">
+        @if (authService.isAuthenticated()) {
+          <button mat-raised-button color="primary" (click)="navigateToHabits()">Go to My Habits</button>
+        }
+        @if (!authService.isAuthenticated()) {
+          <button mat-raised-button color="primary" (click)="navigateToLogin()">Login</button>
+        }
+        @if (authService.isAuthenticated()) {
+          <button mat-stroked-button (click)="logout()">Logout</button>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,14 @@
+<div class="habits-page">
+  <mat-toolbar color="primary" class="habits-page__toolbar">
+    <span class="habits-page__title">Gadat</span>
+    <span class="habits-page__spacer"></span>
+    <button mat-icon-button (click)="logout()" class="habits-page__logout-btn">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <app-layout class="habits-page__layout">
+    <app-list-habit></app-list-habit>
+    <app-add-habit-btn></app-add-habit-btn>
+  </app-layout>
+</div>

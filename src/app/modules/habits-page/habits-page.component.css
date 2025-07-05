@@ -1,0 +1,27 @@
+.habits-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.habits-page__toolbar {
+  flex-shrink: 0;
+}
+
+.habits-page__title {
+  font-weight: 500;
+  font-size: 1.25rem;
+}
+
+.habits-page__spacer {
+  flex: 1 1 auto;
+}
+
+.habits-page__logout-btn {
+  margin-left: auto;
+}
+
+.habits-page__layout {
+  flex: 1;
+  overflow: auto;
+}

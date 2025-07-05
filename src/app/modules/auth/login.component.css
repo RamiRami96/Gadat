@@ -1,0 +1,44 @@
+.login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login__field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.login__actions {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.login__credentials {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.login__error {
+  color: #f44336;
+  margin: 0;
+}
+
+.login__header {
+  margin-bottom: 24px;
+}

@@ -2,9 +2,34 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.1.4.
 
+## Features
+
+- **Habit Tracking**: Create, edit, and delete habits
+- **Authentication**: Simple login system (demo: admin/password)
+- **Lazy Loading**: Routes are loaded on demand for better performance
+- **Route Guards**: Protected routes and navigation guards
+- **Responsive Design**: Works on desktop and mobile devices
+
+## Guards Implementation
+
+- **Auth Guard**: Protects routes that require authentication
+- **Can Deactivate Guard**: Prevents navigation away from forms with unsaved changes
+- **Habit Exists Guard**: Ensures habit exists before allowing edit operations
+
+## Lazy Loading
+
+All major features are lazy-loaded:
+- Home page
+- Authentication module
+- Habits module (with create/edit forms)
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+
+**Demo Credentials:**
+- Username: `admin`
+- Password: `password`
 
 ## Code scaffolding
 

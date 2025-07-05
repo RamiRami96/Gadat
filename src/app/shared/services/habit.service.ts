@@ -18,6 +18,10 @@ export class HabitService {
     return this._habits;
   }
 
+  public get hasInitialHabits(): boolean {
+    return this._initialHabits.length > 0;
+  }
+
   public getHabit(id: string): Habit | null {
     return this._habits().find(habit => habit.id === id) ?? null;
   }
@@ -50,7 +54,10 @@ export class HabitService {
     if (!value) {
       this._habits.set(this._initialHabits);
     } else {
-      const searchingHabits = this._initialHabits.filter(habit => habit.name.includes(value.trim())) ?? [];
+      const searchingHabits =
+        this._initialHabits.filter(habit =>
+          habit.name.toLocaleLowerCase().includes(value.trim().toLocaleLowerCase())
+        ) ?? [];
       this._habits.set(searchingHabits);
     }
   }

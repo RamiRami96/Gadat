@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CreateHabitComponent } from '../create-habit/create-habit.component';
-import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -12,16 +11,9 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './add-habit-btn.component.css',
 })
 export class AddHabitBtnComponent {
-  public readonly dialog = inject(MatDialog);
+  private _router = inject(Router);
 
-  createHabbit(): void {
-    this.dialog.open(CreateHabitComponent, {
-      maxWidth: '80vw',
-      maxHeight: '80vh',
-      height: '100%',
-      width: '100%',
-      enterAnimationDuration: '5000',
-      exitAnimationDuration: '5000',
-    });
+  public createHabbit(): void {
+    this._router.navigate(['/habits/create']);
   }
 }

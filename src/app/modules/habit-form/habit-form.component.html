@@ -1,0 +1,41 @@
+<div class="habit-form-container">
+  <mat-card class="habit-form-card">
+    <mat-card-header class="habit-form__header">
+      <mat-card-title>{{ isEditing ? 'Edit Habit' : 'Create New Habit' }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Habit Type</mat-label>
+          <mat-select [value]="habitType()" (selectionChange)="onTypeChange($event.value)" required>
+            @for (type of habitTypes; track type.value) {
+              <mat-option [value]="type.value">
+                {{ type.viewValue }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (currentHabits().length > 0) {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Habit Name</mat-label>
+            <mat-select [value]="habitName()" (selectionChange)="onNameChange($event.value)" required>
+              @for (habit of currentHabits(); track habit.value) {
+                <mat-option [value]="habit.value">
+                  {{ habit.viewValue }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="!isFormValid()">
+            {{ isEditing ? 'Update' : 'Create' }} Habit
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
