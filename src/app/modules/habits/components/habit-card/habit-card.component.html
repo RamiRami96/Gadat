@@ -1,0 +1,22 @@
+<mat-card class="card-container__item">
+  <mat-card-content>
+    <h4>{{ habit.name }}</h4>
+    <p>
+      sphere:
+      <b>{{ habit.type }}</b>
+    </p>
+    <div class="card__btn-container">
+      @if (showCompleteButton(habit)) {
+        <button mat-raised-button (click)="habitService.completeHabit(habit)">Complete</button>
+      } @else {
+        <p class="card__success-text">Completed</p>
+      }
+      <button mat-raised-button (click)="editHabit(habit.id)">Edit</button>
+      <button mat-raised-button color="warn" (click)="habitService.deleteHabit(habit.id)">Delete</button>
+    </div>
+
+    @for (sprint of habit.sprint; let sprintIndex = $index; track sprintIndex) {
+      <mat-checkbox [checked]="sprint" disabled></mat-checkbox>
+    }
+  </mat-card-content>
+</mat-card>

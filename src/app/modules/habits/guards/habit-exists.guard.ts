@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { HabitService } from '../../modules/habits/services/habit.service';
+import { HabitService } from '../services/habit.service';
 
 export const habitExistsGuard: CanActivateFn = route => {
   const habitService = inject(HabitService);
