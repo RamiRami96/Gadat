@@ -1,54 +1,197 @@
-# Gadat
+# 🎯 Gadat - Personal Habit Tracker
 
-![Gadat App Image](github_images/github-image.png)
+![Gadat App Screenshot](github_images/github-image.png)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.1.4.
+> A modern Angular application for tracking daily habits
 
-## Features
+## ✨ Features
 
-- **Habit Tracking**: Create, edit, and delete habits
-- **Authentication**: Simple login system (demo: admin/password)
-- **Lazy Loading**: Routes are loaded on demand for better performance
-- **Route Guards**: Protected routes and navigation guards
-- **Responsive Design**: Works on desktop and mobile devices
+### 🔐 **Authentication System**
+- Simple login and registration with form validation
+- Session management with 24-hour expiry
+- Password encoding and user credentials storage
 
-## Guards Implementation
+### 📋 **Habit Management**
+- **Create** new habits with categorization (Health, Job, Relationship)
+- **Track** daily progress with visual sprint indicators
+- **Edit** existing habits with form validation
+- **Delete** individual or all habits
+- **Search** habits by name with real-time filtering
+- **Complete** habits with date tracking
 
-- **Auth Guard**: Protects routes that require authentication
-- **Can Deactivate Guard**: Prevents navigation away from forms with unsaved changes
-- **Habit Exists Guard**: Ensures habit exists before allowing edit operations
+### 🎨 **Modern UI/UX**
+- Angular Material Design components
+- Responsive design for desktop and mobile
+- Real-time search with loading indicators
+- User statistics in the toolbar
 
-## Lazy Loading
+### 🛡️ **Route Protection & Guards**
+- **Auth Guard**: Protects authenticated routes
+- **Can Deactivate Guard**: Prevents data loss on navigation
+- **Habit Exists Guard**: Validates habit existence before editing
 
-All major features are lazy-loaded:
-- Home page
-- Authentication module
-- Habits module (with create/edit forms)
+### ⚡ **Performance Optimizations**
+- Lazy loading for all major modules
+- OnPush change detection strategy
+- Angular Signals for reactive state management
+- Efficient component architecture
 
-## Development server
+## 🏗️ Architecture
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+### 📁 **Project Structure**
+```
+src/app/
+├── layout/                     # Main app layout
+├── modules/
+│   ├── auth/                   # Authentication module
+│   │   ├── components/login/   # Login & registration
+│   │   ├── guards/            # Auth guard
+│   │   ├── models/            # User & auth interfaces
+│   │   └── services/          # Authentication service
+│   ├── habits/                # Habits module
+│   │   ├── components/        # Habit components
+│   │   ├── guards/            # Route guards
+│   │   ├── models/            # Habit interfaces
+│   │   └── services/          # Habit service
+│   └── home/                  # Home module
+└── app.routes.ts              # Lazy-loaded routes
+```
 
-**Demo Credentials:**
-- Username: `admin`
-- Password: `password`
+### 🔧 **Tech Stack**
+- **Framework**: Angular 18.1.4
+- **UI Library**: Angular Material 18.1.4
+- **State Management**: Angular Signals
+- **Routing**: Angular Router with Guards
+- **Forms**: Reactive Forms with Validation
+- **Testing**: Jasmine + Karma
+- **Code Quality**: ESLint + Prettier + Husky
 
-## Code scaffolding
+### 🎯 **Core Services**
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+#### AuthService
+- User authentication and session management
+- Local storage for credentials and sessions
+- Signal-based reactive state
+- Session expiry handling
 
-## Build
+#### HabitService
+- CRUD operations for habits
+- User-specific habit filtering
+- Search functionality
+- Progress tracking and statistics
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## 🚀 Getting Started
 
-## Running unit tests
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- Angular CLI
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Installation
+```bash
+# Clone the repository
+git clone <repository-url>
+cd Gadat
 
-## Running end-to-end tests
+# Install dependencies
+npm install
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+# Start development server
+npm start
+```
 
-## Further help
+### Development Commands
+```bash
+# Start development server
+npm start                # Runs on http://localhost:4200
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+# Run tests
+npm test                # Unit tests with Karma
+
+# Build for production
+npm run build           # Creates dist/ folder
+
+# Code quality
+npm run lint            # ESLint checking
+npm run lint:fix        # Auto-fix ESLint issues
+npm run prettier        # Format code with Prettier
+```
+
+## 🎮 Usage
+
+### Getting Started
+1. **Navigate** to `http://localhost:4200`
+2. **Login** with demo credentials:
+   - Username: `admin`
+   - Password: `password`
+3. **Create** your first habit
+4. **Track** your daily progress
+
+### Demo Credentials
+For testing purposes, use:
+- **Username**: `admin`
+- **Password**: `password`
+
+Or create a new account using the registration tab.
+
+## 🧪 Testing
+
+The application includes comprehensive test coverage:
+
+- **Unit Tests**: Component and service testing with Jasmine
+- **Authentication Tests**: Login/registration flows
+- **Habit Service Tests**: CRUD operations and business logic
+- **Guard Tests**: Route protection validation
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage
+npm run test -- --code-coverage
+```
+
+## 🔒 Security Features
+
+- Password encoding for stored credentials
+- Session-based authentication with expiry
+- Route guards preventing unauthorized access
+- User-specific data isolation
+- Form validation and input sanitization
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Flexible grid layouts
+- Touch-friendly interfaces
+- Adaptive navigation
+- Material Design principles
+
+## 🛠️ Development Highlights
+
+### Modern Angular Patterns
+- **Standalone Components**: No NgModules required
+- **Angular Signals**: Reactive state management
+- **Inject Function**: Dependency injection
+- **OnPush Strategy**: Optimized change detection
+
+### Code Quality
+- **ESLint**: Code linting and best practices
+- **Prettier**: Consistent code formatting
+- **Husky**: Git hooks for pre-commit validation
+- **TypeScript**: Strong typing throughout
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+## 📄 License
+
+This project is for educational and portfolio purposes.
+
+---
+

@@ -34,7 +34,7 @@ export class HabitService {
       ...habit,
       userId: user.id,
       createdBy: user.username,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     const newHabits = [...this._habits(), habitWithUser];
@@ -54,12 +54,10 @@ export class HabitService {
     const habitWithUpdateInfo = {
       ...habit,
       updatedAt: new Date().toISOString(),
-      updatedBy: user.username
+      updatedBy: user.username,
     };
 
-    const updatedHabits = this._habits().map(item => 
-      (item.id === habit.id ? habitWithUpdateInfo : item)
-    );
+    const updatedHabits = this._habits().map(item => (item.id === habit.id ? habitWithUpdateInfo : item));
     this._updateHabits(updatedHabits);
   }
 
@@ -82,9 +80,7 @@ export class HabitService {
     if (!user) return;
 
     // Only delete habits that belong to the current user
-    const updatedHabits = this._habits().filter(habit => 
-      habit.userId && habit.userId !== user.id
-    );
+    const updatedHabits = this._habits().filter(habit => habit.userId && habit.userId !== user.id);
     this._updateHabits(updatedHabits);
   }
 
@@ -116,18 +112,16 @@ export class HabitService {
   public getUserHabitsCount(): number {
     const user = this._authService.currentUser();
     if (!user) return 0;
-    
+
     return this._initialHabits.filter(habit => habit.userId === user.id).length;
   }
 
   public getUserCompletedHabitsCount(): number {
     const user = this._authService.currentUser();
     if (!user) return 0;
-    
-    return this._initialHabits.filter(habit => 
-      habit.userId === user.id && 
-      habit.sprint.some(day => day === true)
-    ).length;
+
+    return this._initialHabits.filter(habit => habit.userId === user.id && habit.sprint.some(day => day === true))
+      .length;
   }
 
   public loadUserHabits(): void {
@@ -139,9 +133,7 @@ export class HabitService {
     }
 
     const allHabits = this._getAllHabitsFromStorage();
-    const userHabits = allHabits.filter(habit => 
-      !habit.userId || habit.userId === user.id
-    );
+    const userHabits = allHabits.filter(habit => !habit.userId || habit.userId === user.id);
 
     this._initialHabits = userHabits;
     this._habits.set(userHabits);
@@ -164,10 +156,10 @@ export class HabitService {
       updatedSprint[differenceInDays] = true;
     }
 
-    return { 
-      ...habit, 
+    return {
+      ...habit,
       sprint: updatedSprint,
-      lastCompletedAt: new Date().toISOString()
+      lastCompletedAt: new Date().toISOString(),
     };
   }
 
@@ -176,15 +168,13 @@ export class HabitService {
     if (!user) return;
 
     const allHabits = this._getAllHabitsFromStorage();
-    
-    const otherUsersHabits = allHabits.filter(habit => 
-      habit.userId && habit.userId !== user.id
-    );
-    
+
+    const otherUsersHabits = allHabits.filter(habit => habit.userId && habit.userId !== user.id);
+
     const updatedAllHabits = [...otherUsersHabits, ...newHabits];
-    
+
     localStorage.setItem('habits', JSON.stringify(updatedAllHabits));
-    
+
     this._initialHabits = newHabits;
     this._habits.set(newHabits);
   }

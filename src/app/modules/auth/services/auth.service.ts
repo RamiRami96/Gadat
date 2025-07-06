@@ -45,7 +45,7 @@ export class AuthService {
 
   private initializeAuthState(): void {
     const session = this.getStoredSession();
-    
+
     if (session && Date.now() < session.expiresAt) {
       this._isAuthenticated.set(true);
       this._currentUser.set(session.user);
@@ -56,13 +56,12 @@ export class AuthService {
   }
 
   login(username: string, password: string): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       // Simulate API delay
       setTimeout(() => {
         const credentials = this.getStoredCredentials();
-        const user = credentials.find(cred => 
-          cred.username === username && 
-          this.decodePassword(cred.encodedPassword) === password
+        const user = credentials.find(
+          cred => cred.username === username && this.decodePassword(cred.encodedPassword) === password
         );
 
         if (user) {
@@ -71,14 +70,14 @@ export class AuthService {
             username: user.username,
             name: user.name,
             createdAt: new Date().toISOString(),
-            lastLoginAt: new Date().toISOString()
+            lastLoginAt: new Date().toISOString(),
           };
 
           const session: AuthSession = {
             user: authUser,
             token: this.generateToken(),
             expiresAt: Date.now() + this.SESSION_DURATION,
-            loginTimestamp: Date.now()
+            loginTimestamp: Date.now(),
           };
 
           this.setAuthSession(session);
@@ -91,7 +90,7 @@ export class AuthService {
   }
 
   register(username: string, password: string, name: string): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setTimeout(() => {
         const credentials = this.getStoredCredentials();
         const existingUser = credentials.find(cred => cred.username === username);
@@ -102,7 +101,7 @@ export class AuthService {
           const newCredentials: StoredCredentials = {
             username,
             encodedPassword: this.encodePassword(password),
-            name
+            name,
           };
 
           credentials.push(newCredentials);
@@ -149,13 +148,13 @@ export class AuthService {
 
     const updatedUser = { ...currentUser, ...updates };
     const session = this.getStoredSession();
-    
+
     if (session) {
       session.user = updatedUser;
       this.setAuthSession(session);
       return true;
     }
-    
+
     return false;
   }
 
@@ -176,7 +175,9 @@ export class AuthService {
   }
 
   private generateUserId(username: string): string {
-    return btoa(username + Date.now().toString()).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+    return btoa(username + Date.now().toString())
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .substring(0, 16);
   }
 
   private setAuthSession(session: AuthSession): void {

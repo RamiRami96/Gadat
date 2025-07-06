@@ -14,14 +14,14 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-login',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    MatFormFieldModule, 
-    MatInputModule, 
-    MatButtonModule, 
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    MatTabsModule
+    MatTabsModule,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
@@ -48,13 +48,12 @@ export class LoginComponent {
       username: new FormControl('', [Validators.required, Validators.minLength(3)]),
       name: new FormControl('', [Validators.required, Validators.minLength(2)]),
       password: new FormControl('', [Validators.required, Validators.minLength(4)]),
-      confirmPassword: new FormControl('', [Validators.required])
+      confirmPassword: new FormControl('', [Validators.required]),
     });
 
-    this.registerForm.get('confirmPassword')?.setValidators([
-      Validators.required,
-      this.passwordMatchValidator.bind(this)
-    ]);
+    this.registerForm
+      .get('confirmPassword')
+      ?.setValidators([Validators.required, this.passwordMatchValidator.bind(this)]);
 
     if (this._authService.isAuthenticated()) {
       this._router.navigate(['/habits']);
@@ -71,13 +70,14 @@ export class LoginComponent {
 
     try {
       const success = await this._authService.login(username, password);
-      
+
       if (success) {
         await this._router.navigate(['/habits']);
       } else {
         this.loginError.set('Invalid username or password');
       }
     } catch (error) {
+      console.error('Login error:', error);
       this.loginError.set('Login failed. Please try again.');
     } finally {
       this.isLoading.set(false);
@@ -95,7 +95,7 @@ export class LoginComponent {
 
     try {
       const success = await this._authService.register(username, password, name);
-      
+
       if (success) {
         this.registerSuccess.set('Registration successful! You can now login.');
         this.registerForm.reset();
@@ -106,18 +106,19 @@ export class LoginComponent {
         this.registerError.set('Username already exists. Please choose a different one.');
       }
     } catch (error) {
+      console.error('Registration error:', error);
       this.registerError.set('Registration failed. Please try again.');
     } finally {
       this.isLoading.set(false);
     }
   }
 
-  private passwordMatchValidator(control: FormControl): {[key: string]: boolean} | null {
+  private passwordMatchValidator(control: FormControl): { [key: string]: boolean } | null {
     const password = this.registerForm?.get('password')?.value;
     const confirmPassword = control.value;
-    
+
     if (password !== confirmPassword) {
-      return { 'passwordMismatch': true };
+      return { passwordMismatch: true };
     }
     return null;
   }

@@ -21,7 +21,7 @@ import { User } from '../modules/auth/models/auth.model';
     MatIconModule,
     MatMenuModule,
     MatCardModule,
-    MatDividerModule
+    MatDividerModule,
   ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.css',
@@ -51,10 +51,7 @@ export class LayoutComponent implements OnInit {
     const user = this._authService.currentUser();
     const habits = this._habitService.habits();
     if (!user) return 0;
-    return habits.filter(habit => 
-      habit.userId === user.id && 
-      habit.sprint.some(day => day === true)
-    ).length;
+    return habits.filter(habit => habit.userId === user.id && habit.sprint.some(day => day === true)).length;
   });
 
   get timeUntilExpiry(): Signal<number> {
@@ -76,7 +73,7 @@ export class LayoutComponent implements OnInit {
   public formatTimeRemaining(ms: number): string {
     const hours = Math.floor(ms / (1000 * 60 * 60));
     const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m`;
     }

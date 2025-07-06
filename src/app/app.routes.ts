@@ -7,7 +7,7 @@ export const routes: Routes = [
   {
     path: '',
     redirectTo: '/habits',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'home',

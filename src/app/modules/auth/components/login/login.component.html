@@ -24,12 +24,13 @@
             </mat-form-field>
 
             <div class="auth__actions">
-              <button 
-                mat-raised-button 
-                color="primary" 
-                type="submit" 
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
                 [disabled]="loginForm.invalid || isLoading()"
-                class="auth__submit-btn">
+                class="auth__submit-btn"
+              >
                 @if (isLoading()) {
                   <mat-spinner diameter="20" class="auth__spinner"></mat-spinner>
                 } @else {
@@ -81,12 +82,13 @@
             </mat-form-field>
 
             <div class="auth__actions">
-              <button 
-                mat-raised-button 
-                color="primary" 
-                type="submit" 
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
                 [disabled]="registerForm.invalid || isLoading()"
-                class="auth__submit-btn">
+                class="auth__submit-btn"
+              >
                 @if (isLoading()) {
                   <mat-spinner diameter="20" class="auth__spinner"></mat-spinner>
                 } @else {

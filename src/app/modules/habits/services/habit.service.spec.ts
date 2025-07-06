@@ -18,12 +18,12 @@ describe('HabitService', () => {
       username: 'testuser',
       name: 'Test User',
       createdAt: '2024-01-01T00:00:00.000Z',
-      lastLoginAt: '2024-01-01T00:00:00.000Z'
+      lastLoginAt: '2024-01-01T00:00:00.000Z',
     };
 
     // Create spy for AuthService
     const authServiceSpy = jasmine.createSpyObj('AuthService', [], {
-      currentUser: signal(mockUser)
+      currentUser: signal(mockUser),
     });
 
     // Setup localStorage spy
@@ -31,10 +31,7 @@ describe('HabitService', () => {
     spyOn(localStorage, 'setItem');
 
     TestBed.configureTestingModule({
-      providers: [
-        HabitService,
-        { provide: AuthService, useValue: authServiceSpy }
-      ]
+      providers: [HabitService, { provide: AuthService, useValue: authServiceSpy }],
     });
 
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
@@ -56,25 +53,27 @@ describe('HabitService', () => {
         type: 'health',
         name: 'digital detox',
         start: new Date('2024-01-01'),
-        sprint: new Array(30).fill(false)
+        sprint: new Array(30).fill(false),
       };
 
       service.createHabit(newHabit);
 
       const habits = service.habits();
       expect(habits.length).toBe(1);
-      expect(habits[0]).toEqual(jasmine.objectContaining({
-        ...newHabit,
-        userId: mockUser.id,
-        createdBy: mockUser.username,
-        createdAt: jasmine.any(String)
-      }));
+      expect(habits[0]).toEqual(
+        jasmine.objectContaining({
+          ...newHabit,
+          userId: mockUser.id,
+          createdBy: mockUser.username,
+          createdAt: jasmine.any(String),
+        })
+      );
     });
 
     it('should not create a habit when user is not authenticated', () => {
       // Mock no authenticated user
       Object.defineProperty(authService, 'currentUser', {
-        get: () => signal(null)
+        get: () => signal(null),
       });
 
       const newHabit: Habit = {
@@ -82,7 +81,7 @@ describe('HabitService', () => {
         type: 'health',
         name: 'digital detox',
         start: new Date('2024-01-01'),
-        sprint: new Array(30).fill(false)
+        sprint: new Array(30).fill(false),
       };
 
       service.createHabit(newHabit);
@@ -100,7 +99,7 @@ describe('HabitService', () => {
         name: 'digital detox',
         start: new Date('2024-01-01'),
         sprint: new Array(30).fill(false),
-        userId: mockUser.id
+        userId: mockUser.id,
       };
 
       const habit2: Habit = {
@@ -109,7 +108,7 @@ describe('HabitService', () => {
         name: 'stay focused',
         start: new Date('2024-01-02'),
         sprint: new Array(30).fill(false),
-        userId: mockUser.id
+        userId: mockUser.id,
       };
 
       service.createHabit(habit1);
@@ -148,7 +147,7 @@ describe('HabitService', () => {
         name: 'digital detox',
         start: new Date('2024-01-01'),
         sprint: new Array(30).fill(false),
-        userId: mockUser.id
+        userId: mockUser.id,
       };
       service.createHabit(existingHabit);
     });
@@ -156,7 +155,7 @@ describe('HabitService', () => {
     it('should update a habit', () => {
       const updatedHabit: Habit = {
         ...existingHabit,
-        name: 'stay focused'
+        name: 'stay focused',
       };
 
       service.updateHabit(updatedHabit);
@@ -171,7 +170,7 @@ describe('HabitService', () => {
       const updatedHabit: Habit = {
         ...existingHabit,
         userId: 'other-user',
-        name: 'stay focused'
+        name: 'stay focused',
       };
 
       spyOn(console, 'warn');
@@ -184,12 +183,12 @@ describe('HabitService', () => {
 
     it('should not update when user is not authenticated', () => {
       Object.defineProperty(authService, 'currentUser', {
-        get: () => signal(null)
+        get: () => signal(null),
       });
 
       const updatedHabit: Habit = {
         ...existingHabit,
-        name: 'stay focused'
+        name: 'stay focused',
       };
 
       service.updateHabit(updatedHabit);
@@ -209,7 +208,7 @@ describe('HabitService', () => {
         name: 'digital detox',
         start: new Date('2024-01-01'),
         sprint: new Array(30).fill(false),
-        userId: mockUser.id
+        userId: mockUser.id,
       };
       service.createHabit(existingHabit);
     });
@@ -230,7 +229,7 @@ describe('HabitService', () => {
         name: 'stay focused',
         start: new Date('2024-01-02'),
         sprint: new Array(30).fill(false),
-        userId: 'other-user'
+        userId: 'other-user',
       };
 
       // Manually add to habits array to simulate existing data
@@ -250,7 +249,7 @@ describe('HabitService', () => {
         name: 'stay focused',
         start: new Date('2024-01-02'),
         sprint: new Array(30).fill(false),
-        userId: mockUser.id
+        userId: mockUser.id,
       };
       service.createHabit(habit2);
 
@@ -272,7 +271,7 @@ describe('HabitService', () => {
         name: 'digital detox',
         start: new Date('2024-01-01'),
         sprint: new Array(30).fill(false),
-        userId: mockUser.id
+        userId: mockUser.id,
       };
       service.createHabit(existingHabit);
     });
@@ -295,7 +294,7 @@ describe('HabitService', () => {
     it('should not complete habit belonging to another user', () => {
       const otherUserHabit: Habit = {
         ...existingHabit,
-        userId: 'other-user'
+        userId: 'other-user',
       };
 
       spyOn(console, 'warn');
@@ -326,7 +325,7 @@ describe('HabitService', () => {
         name: 'digital detox',
         start: new Date('2024-01-01'),
         sprint: new Array(30).fill(false),
-        userId: mockUser.id
+        userId: mockUser.id,
       };
 
       const habit2: Habit = {
@@ -335,7 +334,7 @@ describe('HabitService', () => {
         name: 'stay focused',
         start: new Date('2024-01-02'),
         sprint: new Array(30).fill(false),
-        userId: mockUser.id
+        userId: mockUser.id,
       };
 
       service.createHabit(habit1);
@@ -381,7 +380,7 @@ describe('HabitService', () => {
         name: 'digital detox',
         start: new Date('2024-01-01'),
         sprint: [true, false, true, false, false],
-        userId: mockUser.id
+        userId: mockUser.id,
       };
 
       const habit2: Habit = {
@@ -390,7 +389,7 @@ describe('HabitService', () => {
         name: 'stay focused',
         start: new Date('2024-01-02'),
         sprint: [false, false, false, false, false],
-        userId: mockUser.id
+        userId: mockUser.id,
       };
 
       service.createHabit(habit1);
@@ -409,7 +408,7 @@ describe('HabitService', () => {
 
     it('should return 0 counts when user is not authenticated', () => {
       Object.defineProperty(authService, 'currentUser', {
-        get: () => signal(null)
+        get: () => signal(null),
       });
 
       expect(service.getUserHabitsCount()).toBe(0);
@@ -426,7 +425,7 @@ describe('HabitService', () => {
           name: 'digital detox',
           start: new Date('2024-01-01'),
           sprint: new Array(30).fill(false),
-          userId: mockUser.id
+          userId: mockUser.id,
         },
         {
           id: 'habit-2',
@@ -434,8 +433,8 @@ describe('HabitService', () => {
           name: 'stay focused',
           start: new Date('2024-01-02'),
           sprint: new Array(30).fill(false),
-          userId: 'other-user'
-        }
+          userId: 'other-user',
+        },
       ];
 
       localStorageSpy.and.returnValue(JSON.stringify(mockHabits));
@@ -454,7 +453,7 @@ describe('HabitService', () => {
         name: 'digital detox',
         start: new Date('2024-01-01'),
         sprint: new Array(30).fill(false),
-        userId: mockUser.id
+        userId: mockUser.id,
       };
 
       service.createHabit(habit);
@@ -483,9 +482,9 @@ describe('HabitService', () => {
           type: 'health',
           name: 'digital detox',
           start: new Date('2024-01-01'),
-          sprint: new Array(30).fill(false)
+          sprint: new Array(30).fill(false),
           // No userId - legacy data
-        }
+        },
       ];
 
       localStorageSpy.and.returnValue(JSON.stringify(mockHabits));

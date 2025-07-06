@@ -11,13 +11,7 @@ import { LayoutComponent } from '../../../../layout/layout.component';
 @Component({
   selector: 'app-habits-page',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    LayoutComponent,
-    ListHabitComponent,
-    AddHabitBtnComponent,
-  ],
+  imports: [CommonModule, MatButtonModule, LayoutComponent, ListHabitComponent, AddHabitBtnComponent],
   templateUrl: './habits-page.component.html',
   styleUrl: './habits-page.component.css',
 })
@@ -31,7 +25,7 @@ export class HabitsPageComponent implements OnInit {
       this._router.navigate(['/login']);
       return;
     }
-    
+
     this._habitService.loadUserHabits();
   }
 

@@ -3,7 +3,7 @@
     <mat-toolbar color="primary" class="layout__toolbar">
       <span class="layout__title">Gadat</span>
       <span class="layout__spacer"></span>
-      
+
       <div class="layout__user-info">
         <div class="layout__stats">
           <div class="layout__stat-chip">
@@ -25,9 +25,7 @@
             <div class="layout__user-details">
               <p class="layout__user-name">{{ currentUser()?.name }}</p>
               <p class="layout__user-username">{{ '@' + currentUser()?.username }}</p>
-              <p class="layout__session-info">
-                Session expires in: {{ formatTimeRemaining(timeUntilExpiry()) }}
-              </p>
+              <p class="layout__session-info">Session expires in: {{ formatTimeRemaining(timeUntilExpiry()) }}</p>
             </div>
           </div>
           <mat-divider></mat-divider>

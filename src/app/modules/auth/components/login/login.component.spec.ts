@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -24,7 +24,7 @@ describe('LoginComponent', () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['login', 'register']);
     // Mock isAuthenticated as a property that returns a signal-like function
     authServiceSpy.isAuthenticated = jasmine.createSpy('isAuthenticated').and.returnValue(false);
-    
+
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
@@ -38,19 +38,19 @@ describe('LoginComponent', () => {
         MatCardModule,
         MatProgressSpinnerModule,
         MatTabsModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
       ],
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
-        { provide: Router, useValue: routerSpy }
-      ]
+        { provide: Router, useValue: routerSpy },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    
+
     fixture.detectChanges();
   });
 
@@ -78,7 +78,7 @@ describe('LoginComponent', () => {
 
     expect(cardTitle.nativeElement.textContent).toContain('Welcome to Gadat');
     expect(tabGroup).toBeTruthy();
-    // Note: Material tabs may not render fully in test environment, 
+    // Note: Material tabs may not render fully in test environment,
     // so we just verify the tab group container exists
   });
 
@@ -95,7 +95,7 @@ describe('LoginComponent', () => {
 
   it('should have login submit button disabled when form is invalid', () => {
     const submitButton = fixture.debugElement.query(By.css('button[type="submit"]'));
-    
+
     expect(component.loginForm.invalid).toBeTruthy();
     expect(submitButton.nativeElement.disabled).toBeTruthy();
   });
@@ -103,12 +103,12 @@ describe('LoginComponent', () => {
   it('should enable login submit button when form is valid', () => {
     component.loginForm.patchValue({
       username: 'testuser',
-      password: 'testpass'
+      password: 'testpass',
     });
     fixture.detectChanges();
 
     const submitButton = fixture.debugElement.query(By.css('button[type="submit"]'));
-    
+
     expect(component.loginForm.valid).toBeTruthy();
     expect(submitButton.nativeElement.disabled).toBeFalsy();
   });
@@ -127,10 +127,10 @@ describe('LoginComponent', () => {
 
   it('should call authService.login and navigate on successful login', async () => {
     authService.login.and.returnValue(Promise.resolve(true));
-    
+
     component.loginForm.patchValue({
       username: 'admin',
-      password: 'password'
+      password: 'password',
     });
 
     await component.onLogin();
@@ -142,10 +142,10 @@ describe('LoginComponent', () => {
 
   it('should set loginError on failed login', async () => {
     authService.login.and.returnValue(Promise.resolve(false));
-    
+
     component.loginForm.patchValue({
       username: 'wronguser',
-      password: 'wrongpass'
+      password: 'wrongpass',
     });
 
     await component.onLogin();
@@ -157,10 +157,10 @@ describe('LoginComponent', () => {
 
   it('should handle login service error', async () => {
     authService.login.and.returnValue(Promise.reject('Service error'));
-    
+
     component.loginForm.patchValue({
       username: 'admin',
-      password: 'password'
+      password: 'password',
     });
 
     await component.onLogin();
@@ -170,30 +170,30 @@ describe('LoginComponent', () => {
 
   it('should show loading state during login', async () => {
     authService.login.and.returnValue(new Promise(resolve => setTimeout(() => resolve(true), 100)));
-    
+
     component.loginForm.patchValue({
       username: 'admin',
-      password: 'password'
+      password: 'password',
     });
 
     const loginPromise = component.onLogin();
-    
+
     expect(component.isLoading()).toBe(true);
-    
+
     await loginPromise;
-    
+
     expect(component.isLoading()).toBe(false);
   });
 
   // Registration tests
   it('should call authService.register on successful registration', async () => {
     authService.register.and.returnValue(Promise.resolve(true));
-    
+
     component.registerForm.patchValue({
       username: 'newuser',
       name: 'New User',
       password: 'newpass',
-      confirmPassword: 'newpass'
+      confirmPassword: 'newpass',
     });
 
     await component.onRegister();
@@ -204,12 +204,12 @@ describe('LoginComponent', () => {
 
   it('should set registerError on failed registration', async () => {
     authService.register.and.returnValue(Promise.resolve(false));
-    
+
     component.registerForm.patchValue({
       username: 'existinguser',
       name: 'Existing User',
       password: 'password',
-      confirmPassword: 'password'
+      confirmPassword: 'password',
     });
 
     await component.onRegister();
@@ -222,7 +222,7 @@ describe('LoginComponent', () => {
       username: 'testuser',
       name: 'Test User',
       password: 'password123',
-      confirmPassword: 'different'
+      confirmPassword: 'different',
     });
 
     const confirmPasswordControl = component.registerForm.get('confirmPassword');
@@ -233,11 +233,11 @@ describe('LoginComponent', () => {
   it('should navigate to habits if user is already authenticated', async () => {
     // Reset the TestBed for this specific test
     TestBed.resetTestingModule();
-    
+
     // Create a new spy that returns true for isAuthenticated
     const authenticatedAuthServiceSpy = jasmine.createSpyObj('AuthService', ['login', 'register']);
     authenticatedAuthServiceSpy.isAuthenticated = jasmine.createSpy('isAuthenticated').and.returnValue(true);
-    
+
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
@@ -251,14 +251,14 @@ describe('LoginComponent', () => {
         MatCardModule,
         MatProgressSpinnerModule,
         MatTabsModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
       ],
       providers: [
         { provide: AuthService, useValue: authenticatedAuthServiceSpy },
-        { provide: Router, useValue: routerSpy }
-      ]
+        { provide: Router, useValue: routerSpy },
+      ],
     }).compileComponents();
-    
+
     // Create component which will trigger constructor logic
     const newFixture = TestBed.createComponent(LoginComponent);
     newFixture.detectChanges();
@@ -268,19 +268,19 @@ describe('LoginComponent', () => {
 
   it('should not call onLogin when login form is invalid', async () => {
     spyOn(component, 'onLogin').and.callThrough();
-    
+
     // Form is invalid by default (empty fields)
     await component.onLogin();
-    
+
     expect(authService.login).not.toHaveBeenCalled();
   });
 
   it('should not call onRegister when register form is invalid', async () => {
     spyOn(component, 'onRegister').and.callThrough();
-    
+
     // Form is invalid by default (empty fields)
     await component.onRegister();
-    
+
     expect(authService.register).not.toHaveBeenCalled();
   });
 });
