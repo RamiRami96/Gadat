@@ -6,6 +6,11 @@ import { canDeactivateGuard } from './modules/habits/guards/can-deactivate.guard
 export const routes: Routes = [
   {
     path: '',
+    redirectTo: '/habits',
+    pathMatch: 'full'
+  },
+  {
+    path: 'home',
     loadComponent: () => import('./modules/home').then(m => m.HomeComponent),
     title: 'Gadat - Home',
   },
@@ -40,6 +45,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '',
+    redirectTo: '/habits',
   },
 ];

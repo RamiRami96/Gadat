@@ -1,0 +1,48 @@
+<div class="layout">
+  @if (isAuthenticated()) {
+    <mat-toolbar color="primary" class="layout__toolbar">
+      <span class="layout__title">Gadat - Habit Tracker</span>
+      <span class="layout__spacer"></span>
+      
+      <div class="layout__user-info">
+        <div class="layout__stats">
+          <div class="layout__stat-chip">
+            <mat-icon>track_changes</mat-icon>
+            {{ userHabitsCount() }} habits
+          </div>
+          <div class="layout__stat-chip">
+            <mat-icon>check_circle</mat-icon>
+            {{ userCompletedHabitsCount() }} active
+          </div>
+        </div>
+
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="layout__user-button">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+
+        <mat-menu #userMenu="matMenu">
+          <div class="layout__user-menu-header">
+            <div class="layout__user-details">
+              <p class="layout__user-name">{{ currentUser()?.name }}</p>
+              <p class="layout__user-username">{{ '@' + currentUser()?.username }}</p>
+              <p class="layout__session-info">
+                Session expires in: {{ formatTimeRemaining(timeUntilExpiry()) }}
+              </p>
+            </div>
+          </div>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </mat-toolbar>
+  }
+
+  <div class="layout__content">
+    <div class="layout__wrapper">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

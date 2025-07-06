@@ -1,3 +1,95 @@
+.auth {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 20px;
+}
+
+.auth__form {
+  display: flex;
+  flex-direction: column;
+  padding-top: 16px;
+}
+
+.auth__field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.auth__actions {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.auth__submit-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.auth__spinner {
+  margin-right: 8px;
+}
+
+.auth__error-container {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.auth__error {
+  color: #f44336;
+  margin: 0;
+  font-size: 14px;
+}
+
+.auth__success-container {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.auth__success {
+  color: #4caf50;
+  margin: 0;
+  font-size: 14px;
+}
+
+.auth__header {
+  margin-bottom: 16px;
+}
+
+.auth__demo-info {
+  margin-top: 24px;
+  padding: 16px;
+  background-color: #e3f2fd;
+  border-radius: 4px;
+  border-left: 4px solid #2196f3;
+}
+
+.auth__demo-title {
+  font-weight: 500;
+  margin: 0 0 8px 0;
+  color: #1976d2;
+  font-size: 14px;
+}
+
+.auth__demo-text {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #555;
+}
+
+/* Legacy login styles for backward compatibility */
 .login {
   display: flex;
   justify-content: center;

@@ -8,4 +8,10 @@ export interface Habit {
   name: HabitName;
   start: Date;
   sprint: boolean[];
+  userId?: string;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  lastCompletedAt?: string;
 }

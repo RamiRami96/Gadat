@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -7,6 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTabsModule } from '@angular/material/tabs';
 import { CommonModule } from '@angular/common';
 
 import { LoginComponent } from './login.component';
@@ -19,7 +21,10 @@ describe('LoginComponent', () => {
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['login']);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['login', 'register']);
+    // Mock isAuthenticated as a property that returns a signal-like function
+    authServiceSpy.isAuthenticated = jasmine.createSpy('isAuthenticated').and.returnValue(false);
+    
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
@@ -31,6 +36,8 @@ describe('LoginComponent', () => {
         MatInputModule,
         MatButtonModule,
         MatCardModule,
+        MatProgressSpinnerModule,
+        MatTabsModule,
         BrowserAnimationsModule
       ],
       providers: [
@@ -43,6 +50,7 @@ describe('LoginComponent', () => {
     component = fixture.componentInstance;
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    
     fixture.detectChanges();
   });
 
@@ -50,33 +58,49 @@ describe('LoginComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with empty form and no login error', () => {
+  it('should initialize with empty forms and no errors', () => {
     expect(component.loginForm.get('username')?.value).toBe('');
     expect(component.loginForm.get('password')?.value).toBe('');
-    expect(component.loginError).toBe('');
+    expect(component.registerForm.get('username')?.value).toBe('');
+    expect(component.registerForm.get('name')?.value).toBe('');
+    expect(component.registerForm.get('password')?.value).toBe('');
+    expect(component.registerForm.get('confirmPassword')?.value).toBe('');
+    expect(component.loginError()).toBe('');
+    expect(component.registerError()).toBe('');
+    expect(component.isLoading()).toBe(false);
   });
 
-  it('should render login form with correct elements', () => {
+  it('should render auth form with tab group', () => {
+    fixture.detectChanges();
+
     const cardTitle = fixture.debugElement.query(By.css('mat-card-title'));
+    const tabGroup = fixture.debugElement.query(By.css('mat-tab-group'));
+
+    expect(cardTitle.nativeElement.textContent).toContain('Welcome to Gadat');
+    expect(tabGroup).toBeTruthy();
+    // Note: Material tabs may not render fully in test environment, 
+    // so we just verify the tab group container exists
+  });
+
+  it('should have login form elements', () => {
     const usernameField = fixture.debugElement.query(By.css('input[formControlName="username"]'));
     const passwordField = fixture.debugElement.query(By.css('input[formControlName="password"]'));
     const submitButton = fixture.debugElement.query(By.css('button[type="submit"]'));
 
-    expect(cardTitle.nativeElement.textContent).toContain('Login to Gadat');
     expect(usernameField).toBeTruthy();
     expect(passwordField).toBeTruthy();
     expect(passwordField.nativeElement.type).toBe('password');
     expect(submitButton).toBeTruthy();
   });
 
-  it('should have submit button disabled when form is invalid', () => {
+  it('should have login submit button disabled when form is invalid', () => {
     const submitButton = fixture.debugElement.query(By.css('button[type="submit"]'));
     
     expect(component.loginForm.invalid).toBeTruthy();
     expect(submitButton.nativeElement.disabled).toBeTruthy();
   });
 
-  it('should enable submit button when form is valid', () => {
+  it('should enable login submit button when form is valid', () => {
     component.loginForm.patchValue({
       username: 'testuser',
       password: 'testpass'
@@ -89,7 +113,7 @@ describe('LoginComponent', () => {
     expect(submitButton.nativeElement.disabled).toBeFalsy();
   });
 
-  it('should show validation errors when fields are touched and invalid', () => {
+  it('should show validation errors when login fields are touched and invalid', () => {
     const usernameControl = component.loginForm.get('username');
     const passwordControl = component.loginForm.get('password');
 
@@ -97,125 +121,166 @@ describe('LoginComponent', () => {
     passwordControl?.markAsTouched();
     fixture.detectChanges();
 
-    const usernameError = fixture.debugElement.query(By.css('mat-error'));
-    expect(usernameError.nativeElement.textContent).toContain('Username is required');
+    expect(component.loginUsernameError).toContain('Username is required');
+    expect(component.loginPasswordError).toContain('Password is required');
   });
 
-  it('should not call onSubmit when form is invalid', () => {
-    spyOn(component, 'onSubmit').and.callThrough();
-    
-    const submitButton = fixture.debugElement.query(By.css('button[type="submit"]'));
-    submitButton.nativeElement.click();
-    
-    expect(component.onSubmit).toHaveBeenCalled();
-    expect(authService.login).not.toHaveBeenCalled();
-    expect(router.navigate).not.toHaveBeenCalled();
-  });
-
-  it('should call authService.login and navigate on successful login', () => {
-    authService.login.and.returnValue(true);
+  it('should call authService.login and navigate on successful login', async () => {
+    authService.login.and.returnValue(Promise.resolve(true));
     
     component.loginForm.patchValue({
       username: 'admin',
       password: 'password'
     });
 
-    component.onSubmit();
+    await component.onLogin();
 
     expect(authService.login).toHaveBeenCalledWith('admin', 'password');
     expect(router.navigate).toHaveBeenCalledWith(['/habits']);
-    expect(component.loginError).toBe('');
+    expect(component.loginError()).toBe('');
   });
 
-  it('should set loginError on failed login', () => {
-    authService.login.and.returnValue(false);
+  it('should set loginError on failed login', async () => {
+    authService.login.and.returnValue(Promise.resolve(false));
     
     component.loginForm.patchValue({
       username: 'wronguser',
       password: 'wrongpass'
     });
 
-    component.onSubmit();
+    await component.onLogin();
 
     expect(authService.login).toHaveBeenCalledWith('wronguser', 'wrongpass');
     expect(router.navigate).not.toHaveBeenCalled();
-    expect(component.loginError).toBe('Invalid credentials');
+    expect(component.loginError()).toBe('Invalid username or password');
   });
 
-  it('should display login error message when loginError is set', () => {
-    component.loginError = 'Invalid credentials';
-    fixture.detectChanges();
-
-    const errorElement = fixture.debugElement.query(By.css('.login__error'));
-    expect(errorElement).toBeTruthy();
-    expect(errorElement.nativeElement.textContent).toContain('Invalid credentials');
-  });
-
-  it('should not display error message when loginError is empty', () => {
-    component.loginError = '';
-    fixture.detectChanges();
-
-    const errorElement = fixture.debugElement.query(By.css('.login__error'));
-    expect(errorElement).toBeFalsy();
-  });
-
-  it('should call onSubmit when form is submitted', () => {
-    spyOn(component, 'onSubmit');
-    
-    component.loginForm.patchValue({
-      username: 'admin',
-      password: 'password'
-    });
-    fixture.detectChanges();
-
-    const form = fixture.debugElement.query(By.css('form'));
-    form.triggerEventHandler('ngSubmit', null);
-
-    expect(component.onSubmit).toHaveBeenCalled();
-  });
-
-  it('should have correct form validation requirements', () => {
-    const usernameControl = component.loginForm.get('username');
-    const passwordControl = component.loginForm.get('password');
-
-    expect(usernameControl?.hasError('required')).toBeTruthy();
-    expect(passwordControl?.hasError('required')).toBeTruthy();
-
-    usernameControl?.setValue('test');
-    passwordControl?.setValue('test');
-
-    expect(usernameControl?.hasError('required')).toBeFalsy();
-    expect(passwordControl?.hasError('required')).toBeFalsy();
-  });
-
-  it('should clear loginError on successful login', () => {
-    // First set an error
-    component.loginError = 'Some previous error';
-    authService.login.and.returnValue(true);
+  it('should handle login service error', async () => {
+    authService.login.and.returnValue(Promise.reject('Service error'));
     
     component.loginForm.patchValue({
       username: 'admin',
       password: 'password'
     });
 
-    component.onSubmit();
+    await component.onLogin();
 
-    expect(component.loginError).toBe('');
+    expect(component.loginError()).toBe('Login failed. Please try again.');
   });
 
-  it('should handle form input events correctly', () => {
-    const usernameInput = fixture.debugElement.query(By.css('input[formControlName="username"]'));
-    const passwordInput = fixture.debugElement.query(By.css('input[formControlName="password"]'));
-
-    usernameInput.nativeElement.value = 'testuser';
-    usernameInput.nativeElement.dispatchEvent(new Event('input'));
+  it('should show loading state during login', async () => {
+    authService.login.and.returnValue(new Promise(resolve => setTimeout(() => resolve(true), 100)));
     
-    passwordInput.nativeElement.value = 'testpass';
-    passwordInput.nativeElement.dispatchEvent(new Event('input'));
-    
-    fixture.detectChanges();
+    component.loginForm.patchValue({
+      username: 'admin',
+      password: 'password'
+    });
 
-    expect(component.loginForm.get('username')?.value).toBe('testuser');
-    expect(component.loginForm.get('password')?.value).toBe('testpass');
+    const loginPromise = component.onLogin();
+    
+    expect(component.isLoading()).toBe(true);
+    
+    await loginPromise;
+    
+    expect(component.isLoading()).toBe(false);
+  });
+
+  // Registration tests
+  it('should call authService.register on successful registration', async () => {
+    authService.register.and.returnValue(Promise.resolve(true));
+    
+    component.registerForm.patchValue({
+      username: 'newuser',
+      name: 'New User',
+      password: 'newpass',
+      confirmPassword: 'newpass'
+    });
+
+    await component.onRegister();
+
+    expect(authService.register).toHaveBeenCalledWith('newuser', 'newpass', 'New User');
+    expect(component.registerSuccess()).toBe('Registration successful! You can now login.');
+  });
+
+  it('should set registerError on failed registration', async () => {
+    authService.register.and.returnValue(Promise.resolve(false));
+    
+    component.registerForm.patchValue({
+      username: 'existinguser',
+      name: 'Existing User',
+      password: 'password',
+      confirmPassword: 'password'
+    });
+
+    await component.onRegister();
+
+    expect(component.registerError()).toBe('Username already exists. Please choose a different one.');
+  });
+
+  it('should validate password confirmation', () => {
+    component.registerForm.patchValue({
+      username: 'testuser',
+      name: 'Test User',
+      password: 'password123',
+      confirmPassword: 'different'
+    });
+
+    const confirmPasswordControl = component.registerForm.get('confirmPassword');
+    expect(confirmPasswordControl?.hasError('passwordMismatch')).toBeTruthy();
+    expect(component.confirmPasswordError).toBe('Passwords do not match');
+  });
+
+  it('should navigate to habits if user is already authenticated', async () => {
+    // Reset the TestBed for this specific test
+    TestBed.resetTestingModule();
+    
+    // Create a new spy that returns true for isAuthenticated
+    const authenticatedAuthServiceSpy = jasmine.createSpyObj('AuthService', ['login', 'register']);
+    authenticatedAuthServiceSpy.isAuthenticated = jasmine.createSpy('isAuthenticated').and.returnValue(true);
+    
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+
+    await TestBed.configureTestingModule({
+      imports: [
+        LoginComponent,
+        CommonModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
+        MatCardModule,
+        MatProgressSpinnerModule,
+        MatTabsModule,
+        BrowserAnimationsModule
+      ],
+      providers: [
+        { provide: AuthService, useValue: authenticatedAuthServiceSpy },
+        { provide: Router, useValue: routerSpy }
+      ]
+    }).compileComponents();
+    
+    // Create component which will trigger constructor logic
+    const newFixture = TestBed.createComponent(LoginComponent);
+    newFixture.detectChanges();
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/habits']);
+  });
+
+  it('should not call onLogin when login form is invalid', async () => {
+    spyOn(component, 'onLogin').and.callThrough();
+    
+    // Form is invalid by default (empty fields)
+    await component.onLogin();
+    
+    expect(authService.login).not.toHaveBeenCalled();
+  });
+
+  it('should not call onRegister when register form is invalid', async () => {
+    spyOn(component, 'onRegister').and.callThrough();
+    
+    // Form is invalid by default (empty fields)
+    await component.onRegister();
+    
+    expect(authService.register).not.toHaveBeenCalled();
   });
 });

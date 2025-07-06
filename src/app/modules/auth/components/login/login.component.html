@@ -1,36 +1,114 @@
-<div class="login">
-  <mat-card class="login-card">
-    <mat-card-header class="login__header">
-      <mat-card-title>Login to Gadat</mat-card-title>
+<div class="auth">
+  <mat-card class="auth-card">
+    <mat-card-header class="auth__header">
+      <mat-card-title>Welcome to Gadat</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <form class="login__form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="outline" class="login__field">
-          <mat-label>Username</mat-label>
-          <input matInput formControlName="username" required />
-          @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
-            <mat-error>Username is required</mat-error>
-          }
-        </mat-form-field>
+      <mat-tab-group [selectedIndex]="selectedTabIndex()" (selectedIndexChange)="selectedTabIndex.set($event)">
+        <mat-tab label="Login">
+          <form class="auth__form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+            <mat-form-field appearance="outline" class="auth__field">
+              <mat-label>Username</mat-label>
+              <input matInput formControlName="username" [disabled]="isLoading()" />
+              @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
+                <mat-error>{{ loginUsernameError }}</mat-error>
+              }
+            </mat-form-field>
 
-        <mat-form-field appearance="outline" class="login__field">
-          <mat-label>Password</mat-label>
-          <input matInput type="password" formControlName="password" required />
-          @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-            <mat-error>Password is required</mat-error>
-          }
-        </mat-form-field>
+            <mat-form-field appearance="outline" class="auth__field">
+              <mat-label>Password</mat-label>
+              <input matInput type="password" formControlName="password" [disabled]="isLoading()" />
+              @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                <mat-error>{{ loginPasswordError }}</mat-error>
+              }
+            </mat-form-field>
 
-        <div class="login__actions">
-          <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">Login</button>
-        </div>
+            <div class="auth__actions">
+              <button 
+                mat-raised-button 
+                color="primary" 
+                type="submit" 
+                [disabled]="loginForm.invalid || isLoading()"
+                class="auth__submit-btn">
+                @if (isLoading()) {
+                  <mat-spinner diameter="20" class="auth__spinner"></mat-spinner>
+                } @else {
+                  <span>Login</span>
+                }
+              </button>
+            </div>
 
-        @if (loginError) {
-          <div class="login__credentials">
-            <p class="login__error">{{ loginError }}</p>
-          </div>
-        }
-      </form>
+            @if (loginError()) {
+              <div class="auth__error-container">
+                <p class="auth__error">{{ loginError() }}</p>
+              </div>
+            }
+          </form>
+        </mat-tab>
+
+        <mat-tab label="Register">
+          <form class="auth__form" [formGroup]="registerForm" (ngSubmit)="onRegister()">
+            <mat-form-field appearance="outline" class="auth__field">
+              <mat-label>Username</mat-label>
+              <input matInput formControlName="username" [disabled]="isLoading()" />
+              @if (registerForm.get('username')?.invalid && registerForm.get('username')?.touched) {
+                <mat-error>{{ registerUsernameError }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="auth__field">
+              <mat-label>Full Name</mat-label>
+              <input matInput formControlName="name" [disabled]="isLoading()" />
+              @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
+                <mat-error>{{ registerNameError }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="auth__field">
+              <mat-label>Password</mat-label>
+              <input matInput type="password" formControlName="password" [disabled]="isLoading()" />
+              @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+                <mat-error>{{ registerPasswordError }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="auth__field">
+              <mat-label>Confirm Password</mat-label>
+              <input matInput type="password" formControlName="confirmPassword" [disabled]="isLoading()" />
+              @if (registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched) {
+                <mat-error>{{ confirmPasswordError }}</mat-error>
+              }
+            </mat-form-field>
+
+            <div class="auth__actions">
+              <button 
+                mat-raised-button 
+                color="primary" 
+                type="submit" 
+                [disabled]="registerForm.invalid || isLoading()"
+                class="auth__submit-btn">
+                @if (isLoading()) {
+                  <mat-spinner diameter="20" class="auth__spinner"></mat-spinner>
+                } @else {
+                  <span>Create Account</span>
+                }
+              </button>
+            </div>
+
+            @if (registerError()) {
+              <div class="auth__error-container">
+                <p class="auth__error">{{ registerError() }}</p>
+              </div>
+            }
+
+            @if (registerSuccess()) {
+              <div class="auth__success-container">
+                <p class="auth__success">{{ registerSuccess() }}</p>
+              </div>
+            }
+          </form>
+        </mat-tab>
+      </mat-tab-group>
     </mat-card-content>
   </mat-card>
 </div>
