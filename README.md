@@ -187,16 +187,6 @@ npm run test -- --code-coverage
 - **Husky**: Git hooks for pre-commit validation
 - **TypeScript**: Strong typing throughout
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
-
-## 📄 License
-
 This project is for educational and portfolio purposes.
 
 ---
