@@ -2,7 +2,7 @@
 
 ![Gadat App Screenshot](github_images/github-image.png)
 
-> A modern Angular application for tracking daily habits with a beautiful Material Design interface.
+> A modern Angular application for tracking daily habits
 
 ## 🛠️ Technologies
 
