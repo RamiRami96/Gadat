@@ -187,7 +187,3 @@ npm run test -- --code-coverage
 - **Husky**: Git hooks for pre-commit validation
 - **TypeScript**: Strong typing throughout
 
-This project is for educational and portfolio purposes.
-
----
-
