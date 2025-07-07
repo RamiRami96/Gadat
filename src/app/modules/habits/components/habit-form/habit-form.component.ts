@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, effect } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,7 +13,6 @@ import { HabitService } from '../../services/habit.service';
 import { Habit, HabitType, HabitName } from '../../models/habit.model';
 import { CanDeactivateComponent } from '../../guards/can-deactivate.guard';
 import { v4 as uuidv4 } from 'uuid';
-import { SelectDataModel } from '../../models/selectedData.model';
 import { habitTypes, healthHabits, jobHabits, relationshipHabits } from '../../constants/habitTypes.const';
 
 @Component({
@@ -37,7 +36,22 @@ export class HabitFormComponent implements OnInit, CanDeactivateComponent {
   public habitType = signal<string>('');
   public habitName = signal<string>('');
   public habitTypes = habitTypes;
-  public currentHabits = signal<SelectDataModel[]>([]);
+
+  public currentHabits = computed(() => {
+    const type = this.habitType().toLowerCase();
+
+    switch (type) {
+      case 'health':
+        return healthHabits;
+      case 'job':
+        return jobHabits;
+      case 'relationship':
+        return relationshipHabits;
+      default:
+        return [];
+    }
+  });
+
   public isEditing = false;
   public isDialogMode = false;
   private habitId: string | null = null;
@@ -47,17 +61,7 @@ export class HabitFormComponent implements OnInit, CanDeactivateComponent {
     private router: Router,
     private route: ActivatedRoute,
     private habitService: HabitService
-  ) {
-    effect(
-      () => {
-        const type = this.habitType();
-        if (type) {
-          this.loadHabitsForType(type);
-        }
-      },
-      { allowSignalWrites: true }
-    );
-  }
+  ) {}
 
   ngOnInit(): void {
     this.habitId = this.route.snapshot.paramMap.get('id');
@@ -68,30 +72,10 @@ export class HabitFormComponent implements OnInit, CanDeactivateComponent {
       if (habit) {
         this.habitType.set(habit.type);
         this.habitName.set(habit.name);
-        this.loadHabitsForType(habit.type);
       }
     }
 
     this.originalFormValue.set({ type: this.habitType(), name: this.habitName() });
-  }
-
-  private loadHabitsForType(type: string): void {
-    const normalizedType = type.toLowerCase();
-
-    switch (normalizedType) {
-      case 'health':
-        this.currentHabits.set(healthHabits);
-        break;
-      case 'job':
-        this.currentHabits.set(jobHabits);
-        break;
-      case 'relationship': // Handle both singular and plural
-        this.currentHabits.set(relationshipHabits);
-        break;
-      default:
-        this.currentHabits.set([]);
-        break;
-    }
   }
 
   onSubmit(): void {

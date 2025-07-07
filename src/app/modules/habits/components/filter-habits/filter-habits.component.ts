@@ -17,16 +17,22 @@ export class FilterHabitsComponent {
 
   constructor() {
     effect(
-      () => {
+      onCleanup => {
         const value = this.searchValue();
-        this.isLoading.set(true);
+
+        if (value.trim()) {
+          this.isLoading.set(true);
+        }
 
         const timeoutId = setTimeout(() => {
           this.searchHabits.emit({ value });
           this.isLoading.set(false);
         }, 500);
 
-        return () => clearTimeout(timeoutId);
+        onCleanup(() => {
+          clearTimeout(timeoutId);
+          this.isLoading.set(false);
+        });
       },
       { allowSignalWrites: true }
     );

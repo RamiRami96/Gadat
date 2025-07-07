@@ -1,4 +1,3 @@
-// Components
 export * from './components/habit-card/habit-card.component';
 export * from './components/habit-form/habit-form.component';
 export * from './components/list-habit/list-habit.component';
