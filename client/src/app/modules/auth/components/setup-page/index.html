@@ -1,0 +1,74 @@
+<app-auth-shell>
+  <p class="text-center text-sm font-semibold text-muted">Step {{ step() }} of 3</p>
+  <div class="mt-3 flex gap-2" aria-hidden="true">
+    @for (n of steps; track n) {
+      <span
+        class="h-1.5 flex-1 rounded-full"
+        [class]="n <= step() ? 'bg-accent' : 'bg-track'"
+      ></span>
+    }
+  </div>
+
+  @switch (step()) {
+    @case (1) {
+      <h1 class="mt-6 text-center text-[28px] leading-tight">Set up your fingerprint</h1>
+      <ul class="mt-5 space-y-3">
+        @for (benefit of benefits; track benefit) {
+          <li class="flex items-start gap-3">
+            <span
+              class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-white"
+            >
+              <app-icon name="check" [size]="14" />
+            </span>
+            <span>{{ benefit }}</span>
+          </li>
+        }
+      </ul>
+      @if (error()) {
+        <p
+          role="alert"
+          class="mt-4 rounded-xl bg-error-bg px-3 py-2 text-sm font-medium text-error"
+        >
+          {{ error() }}
+        </p>
+      }
+      <button appButton type="button" class="mt-6 w-full" (click)="start()">
+        Set up fingerprint
+      </button>
+    }
+    @case (2) {
+      <div class="mt-6">
+        <app-fingerprint-circle [state]="circle()" />
+      </div>
+      <div class="mt-6 text-center" aria-live="polite">
+        <h1 class="text-[28px] leading-tight">Waiting for your fingerprint</h1>
+        <p class="mt-2 text-muted">Touch the sensor or look at your device when asked.</p>
+      </div>
+      <button appButton variant="secondary" type="button" class="mt-6 w-full" (click)="cancel()">
+        Cancel
+      </button>
+    }
+    @case (3) {
+      <h1 class="mt-6 text-center text-[28px] leading-tight">Save your recovery code</h1>
+      <p class="mt-2 text-center text-muted">
+        If you lose this device, this code gets your habits back. It is shown only once.
+      </p>
+      <div class="mt-5">
+        <app-recovery-code-box [code]="recoveryCode()" />
+      </div>
+      <label class="mt-5 flex min-h-11 cursor-pointer items-center gap-3 text-sm font-medium">
+        <input
+          #savedBox
+          type="checkbox"
+          class="h-6 w-6 shrink-0 accent-accent"
+          [checked]="saved()"
+          (change)="saved.set(savedBox.checked)"
+        />
+        I saved my recovery code somewhere safe
+      </label>
+      <button appButton type="button" class="mt-4 w-full" [disabled]="!saved()" (click)="open()">
+        Open my habits
+      </button>
+    }
+  }
+</app-auth-shell>

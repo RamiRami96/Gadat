@@ -1,0 +1,86 @@
+<section
+  class="rounded-[24px] border border-line bg-surface p-4 sm:p-6"
+  aria-labelledby="calendar-title"
+>
+  <div class="flex items-center justify-between gap-3">
+    <h2 id="calendar-title" class="text-[28px] leading-tight" aria-live="polite">
+      {{ calendar.title() }}
+    </h2>
+    <div class="flex gap-2">
+      <button
+        type="button"
+        class="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface hover:bg-page disabled:opacity-40"
+        aria-label="Previous month"
+        [disabled]="!store.canGoPrev()"
+        (click)="store.shiftMonth(-1)"
+      >
+        <app-icon name="chevron-left" />
+      </button>
+      <button
+        type="button"
+        class="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface hover:bg-page disabled:opacity-40"
+        aria-label="Next month"
+        [disabled]="!store.canGoNext()"
+        (click)="store.shiftMonth(1)"
+      >
+        <app-icon name="chevron-right" />
+      </button>
+    </div>
+  </div>
+
+  @if (store.status() === 'ready') {
+    <div class="mt-4 flex flex-wrap gap-2" role="group" aria-label="Filter the calendar by habit">
+      <button
+        appChip
+        type="button"
+        [selected]="store.filter() === null"
+        (click)="store.selectFilter(null)"
+      >
+        All habits
+      </button>
+      @for (habit of store.habits(); track habit.id) {
+        <button
+          appChip
+          type="button"
+          [selected]="store.filter() === habit.id"
+          (click)="store.selectFilter(habit.id)"
+        >
+          {{ habit.name }}
+        </button>
+      }
+    </div>
+
+    <div class="-mx-2 mt-4 sm:mx-0">
+      <app-calendar-grid [days]="calendar.days()" (pick)="store.selectDate($event)" />
+    </div>
+
+    <p class="mt-4 text-center text-sm text-muted">
+      Each ring fills as you finish habits. A full circle means all are done.
+    </p>
+
+    <div class="mt-5 border-t border-line pt-4" aria-live="polite">
+      <div class="flex items-baseline justify-between gap-3">
+        <p class="font-display text-lg font-semibold">{{ calendar.summary().label }}</p>
+        <p class="text-sm font-semibold text-muted">
+          @if (calendar.summary().total > 0) {
+            {{ calendar.summary().done }} of {{ calendar.summary().total }} done
+          } @else {
+            Nothing scheduled
+          }
+        </p>
+      </div>
+      <app-progress-bar
+        class="mt-3"
+        [thin]="true"
+        [value]="calendar.summary().done"
+        [max]="calendar.summary().total"
+        label="Habits done on the selected day"
+      />
+    </div>
+  } @else {
+    <div class="mt-5 space-y-4" aria-hidden="true">
+      <div class="skeleton h-11 rounded-full"></div>
+      <div class="skeleton h-72 rounded-[16px]"></div>
+    </div>
+  }
+</section>

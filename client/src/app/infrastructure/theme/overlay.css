@@ -1,0 +1,13 @@
+/* Add-habit dialog: centred on wide screens, a bottom sheet on phones. */
+.cdk-overlay-dark-backdrop {
+  background: rgb(15 23 19 / 0.45);
+}
+@media (max-width: 639.98px) {
+  .cdk-global-overlay-wrapper:has(.sheet-panel) {
+    align-items: flex-end !important;
+  }
+  .sheet-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}

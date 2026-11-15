@@ -1,0 +1,94 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+  class="flex max-h-[92dvh] flex-col overflow-y-auto rounded-t-[24px] bg-surface p-5 shadow-xl sm:rounded-[24px] sm:p-6"
+  aria-labelledby="add-habit-title"
+  novalidate
+>
+  <div class="flex items-center justify-between gap-3">
+    <h2 id="add-habit-title" class="text-[26px] leading-tight">New habit</h2>
+    <button
+      type="button"
+      class="flex h-11 w-11 items-center justify-center rounded-full hover:bg-page"
+      aria-label="Close"
+      (click)="close()"
+    >
+      <app-icon name="x" />
+    </button>
+  </div>
+
+  <div class="mt-5">
+    <div class="flex items-baseline justify-between">
+      <label for="habit-name" class="text-sm font-semibold">Name</label>
+      <span class="text-xs text-muted" aria-live="polite">{{ nameLength() }}/{{ nameMax }}</span>
+    </div>
+    <input
+      id="habit-name"
+      type="text"
+      formControlName="name"
+      class="mt-1.5 min-h-12 w-full rounded-[14px] border border-control bg-surface px-4 text-base placeholder:text-muted"
+      placeholder="For example, Read 20 pages"
+      autocomplete="off"
+      [attr.maxlength]="nameMax"
+    />
+  </div>
+
+  <div class="mt-3" role="group" aria-label="Quick picks">
+    <p class="text-sm font-semibold">Quick picks</p>
+    <div class="mt-1.5 flex flex-wrap gap-2">
+      @for (item of quickPicks; track item) {
+        <button
+          appChip
+          type="button"
+          [selected]="form.controls.name.value === item"
+          (click)="pick(item)"
+        >
+          {{ item }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <div class="flex items-baseline justify-between">
+      <label for="habit-note" class="text-sm font-semibold">
+        Note <span class="font-normal text-muted">(optional)</span>
+      </label>
+      <span class="text-xs text-muted" aria-live="polite">{{ noteLength() }}/{{ noteMax }}</span>
+    </div>
+    <input
+      id="habit-note"
+      type="text"
+      formControlName="note"
+      class="mt-1.5 min-h-12 w-full rounded-[14px] border border-control bg-surface px-4 text-base placeholder:text-muted"
+      placeholder="For example, Before bed"
+      autocomplete="off"
+      [attr.maxlength]="noteMax"
+    />
+  </div>
+
+  <div class="mt-4">
+    <app-days-picker
+      [selected]="form.controls.days.value"
+      (selectedChange)="form.controls.days.setValue($event); form.controls.days.markAsDirty()"
+    />
+  </div>
+
+  <div class="mt-5">
+    <p class="mb-1.5 text-sm font-semibold">Preview</p>
+    <div inert aria-hidden="true">
+      <app-habit-row [name]="previewName()" [note]="previewNote()" [preview]="true" />
+    </div>
+  </div>
+
+  @if (serverError()) {
+    <p role="alert" class="mt-4 rounded-xl bg-error-bg px-3 py-2 text-sm font-medium text-error">
+      {{ serverError() }}
+    </p>
+  }
+
+  <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+    <button appButton variant="secondary" type="button" (click)="close()">Cancel</button>
+    <button appButton type="submit" [disabled]="form.invalid || saving()">Create habit</button>
+  </div>
+</form>
