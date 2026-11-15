@@ -1,0 +1,59 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String        @id @default(uuid())
+  createdAt   DateTime      @default(now())
+  credentials Credential[]
+  recovery    RecoveryCode?
+  habits      Habit[]
+}
+
+model Credential {
+  id         String   @id // WebAuthn credential id, base64url
+  publicKey  Bytes
+  counter    Int      @default(0)
+  transports String[]
+  createdAt  DateTime @default(now())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model RecoveryCode {
+  userId String @id
+  hash   String // SHA-256 of the code; the code itself is never stored
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Habit {
+  id        String    @id @default(uuid())
+  userId    String
+  name      String    @db.VarChar(40)
+  note      String?   @db.VarChar(60)
+  days      Int[] // ISO weekdays: 1 = Mon ... 7 = Sun
+  startDate String    @db.Char(10) // "YYYY-MM-DD", first day it counts
+  endDate   String?   @db.Char(10) // set when archived, last day it counts
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  checkIns  CheckIn[]
+
+  @@index([userId])
+}
+
+model CheckIn {
+  habitId String
+  date    String @db.Char(10) // "YYYY-MM-DD"
+  habit   Habit  @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@id([habitId, date]) // one tick per habit per day, enforced by the database
+}

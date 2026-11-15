@@ -1,0 +1,137 @@
+<app-auth-shell>
+  @switch (view()) {
+    @case ('recovery') {
+      <div class="text-center">
+        <h1 class="text-[28px] leading-tight">Use your recovery code</h1>
+        <p class="mt-2 text-muted">
+          Enter the code you saved when you set up Gӓdӓt. It works once, then you get a new one.
+        </p>
+      </div>
+      <form class="mt-6" (ngSubmit)="restore()">
+        <label for="code" class="mb-2 block text-sm font-semibold">Recovery code</label>
+        <input
+          id="code"
+          name="code"
+          type="text"
+          class="min-h-12 w-full rounded-[14px] border bg-surface px-4 font-mono text-lg uppercase tracking-wider placeholder:text-muted"
+          [class]="message() ? 'border-error' : 'border-control'"
+          placeholder="XXXX-XXXX-XXXX-XXXX"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          maxlength="24"
+          [attr.aria-invalid]="message() ? 'true' : null"
+          [attr.aria-describedby]="message() ? 'code-error' : null"
+          [ngModel]="code()"
+          (ngModelChange)="code.set($event)"
+        />
+        @if (message()) {
+          <p
+            id="code-error"
+            role="alert"
+            class="mt-2 rounded-xl bg-error-bg px-3 py-2 text-sm font-medium text-error"
+          >
+            {{ message() }}
+          </p>
+        }
+        <button appButton type="submit" class="mt-4 w-full" [disabled]="!canRestore()">
+          Restore my habits
+        </button>
+      </form>
+      <p class="mt-4 text-center">
+        <button appButton variant="ghost" type="button" (click)="view.set('idle')">
+          Back to fingerprint
+        </button>
+      </p>
+    }
+    @case ('recovered') {
+      <div class="text-center">
+        <h1 class="text-[28px] leading-tight">You’re back in</h1>
+        <p class="mt-2 text-muted">
+          This is your new recovery code. The old one no longer works, so save this one somewhere
+          safe.
+        </p>
+      </div>
+      <div class="mt-6">
+        <app-recovery-code-box [code]="newCode()" />
+      </div>
+      @if (message()) {
+        <p
+          role="alert"
+          class="mt-3 rounded-xl bg-error-bg px-3 py-2 text-sm font-medium text-error"
+        >
+          {{ message() }}
+        </p>
+      }
+      <button
+        appButton
+        type="button"
+        class="mt-5 w-full"
+        [disabled]="busy()"
+        (click)="addFingerprint()"
+      >
+        Add fingerprint to this device
+      </button>
+      <p class="mt-3 text-center">
+        <button appButton variant="ghost" type="button" (click)="goHome()">Skip for now</button>
+      </p>
+    }
+    @default {
+      <app-fingerprint-circle [state]="circle()" />
+      <div class="mt-6 text-center" aria-live="polite">
+        @switch (view()) {
+          @case ('scanning') {
+            <h1 class="text-[28px] leading-tight">Waiting for your fingerprint</h1>
+            <p class="mt-2 text-muted">Touch the sensor or look at your device when asked.</p>
+          }
+          @case ('success') {
+            <h1 class="text-[28px] leading-tight">Unlocked</h1>
+            <p class="mt-2 text-muted">Opening your habits…</p>
+          }
+          @case ('error') {
+            <h1 class="text-[28px] leading-tight text-error">Fingerprint not recognised</h1>
+            <p class="mt-2 text-muted">
+              {{ message() || 'Try again, or use your recovery code.' }}
+            </p>
+          }
+          @default {
+            <h1 class="text-[28px] leading-tight">Welcome back</h1>
+            <p class="mt-2 text-muted">Use your fingerprint to open your habits.</p>
+          }
+        }
+      </div>
+      <div class="mt-6 flex flex-col items-stretch gap-3 text-center">
+        @switch (view()) {
+          @case ('scanning') {
+            <button appButton variant="secondary" type="button" (click)="cancel()">Cancel</button>
+          }
+          @case ('success') {}
+          @case ('error') {
+            <button appButton type="button" (click)="unlock()">Try again</button>
+            <button appButton variant="ghost" type="button" (click)="showRecovery()">
+              Use recovery code
+            </button>
+          }
+          @default {
+            <button appButton type="button" (click)="unlock()">Unlock with fingerprint</button>
+            <button appButton variant="ghost" type="button" (click)="showRecovery()">
+              Use recovery code
+            </button>
+          }
+        }
+      </div>
+    }
+  }
+
+  <div class="mt-8 border-t border-line pt-5 text-center text-sm text-muted">
+    <p>Your fingerprint never leaves this device. No password, no email.</p>
+    <p class="mt-2">
+      <a
+        routerLink="/setup"
+        class="inline-flex min-h-11 items-center font-semibold text-accent underline underline-offset-4"
+      >
+        First time here? Set up fingerprint
+      </a>
+    </p>
+  </div>
+</app-auth-shell>

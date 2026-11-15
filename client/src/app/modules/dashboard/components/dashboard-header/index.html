@@ -1,0 +1,19 @@
+<header class="flex items-center justify-between gap-3 py-5">
+  <h1 class="sr-only">Your habits</h1>
+  <app-logo />
+  <div
+    class="flex items-center gap-1 rounded-full border border-line bg-surface py-1 pl-3.5 pr-1 text-sm font-medium"
+  >
+    <app-icon name="lock" [size]="16" class="text-accent" />
+    <span class="hidden px-1 sm:inline">Locked with fingerprint</span>
+    <span class="px-1 sm:hidden">Locked</span>
+    <button
+      type="button"
+      class="flex h-11 w-11 items-center justify-center rounded-full hover:bg-page"
+      aria-label="Log out"
+      (click)="logOut()"
+    >
+      <app-icon name="log-out" [size]="20" />
+    </button>
+  </div>
+</header>
