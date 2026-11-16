@@ -12,7 +12,6 @@ export type IconName =
   | 'log-out'
   | 'copy';
 
-/** Small stroke icons (24px grid). Decorative: put an aria-label on the button that holds one. */
 @Component({
   selector: 'app-icon',
   template: `

@@ -5,9 +5,7 @@ import { PrismaClient } from '../src/generated/prisma/client.js';
 
 try {
   process.loadEnvFile();
-} catch {
-  // No .env file: rely on variables already present in the environment.
-}
+} catch {}
 
 if (process.env.NODE_ENV === 'production') {
   console.error('Refusing to seed: NODE_ENV is production.');
@@ -25,7 +23,6 @@ const HABITS = [
   { name: 'Journal', note: 'Three lines is enough', days: [2, 4, 6, 7], rate: 0.6 },
 ];
 
-/** Small deterministic random generator so the demo data looks the same on every run. */
 function mulberry32(seed: number): () => number {
   let a = seed;
   return () => {
@@ -74,7 +71,7 @@ async function main(): Promise<void> {
       const rows: { habitId: string; date: string }[] = [];
       for (let i = 0; i < DAYS_OF_HISTORY; i++) {
         const date = addDays(start, i);
-        if (date === today) continue; // leave today open so there is something to tick
+        if (date === today) continue;
         if (habit.days.includes(isoWeekday(date)) && random() < habit.rate) {
           rows.push({ habitId: created.id, date });
         }

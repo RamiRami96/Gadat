@@ -1,4 +1,3 @@
-/** How long the success check shows before going to the home screen. */
 export const SUCCESS_DELAY_MS = 600;
 
 export const TOO_MANY_TRIES = 'Too many tries. Wait a minute and try again.';

@@ -28,7 +28,6 @@ function atLeastOneDay(control: AbstractControl<number[]>): ValidationErrors | n
   return control.value.length === 0 ? { noDays: true } : null;
 }
 
-/** The Add habit form: a centered dialog on wide screens, a bottom sheet on phones. */
 @Component({
   selector: 'app-add-habit-dialog',
   imports: [ReactiveFormsModule, HabitRow, DaysPicker, Button, Chip, Icon],

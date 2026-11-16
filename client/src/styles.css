@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 
-/* Theme: design tokens (change --accent to re-colour the app), base styles, motion, dialog layout. */
 @import './app/infrastructure/theme/tokens.css';
 @import './app/infrastructure/theme/base.css';
 @import './app/infrastructure/theme/animations.css';

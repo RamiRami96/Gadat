@@ -5,7 +5,6 @@ import { AppStore } from '../stores/app-store';
 import { HOME_URL, UNLOCK_URL } from '../constants/app-constants';
 import { SessionService } from '../services/session-service';
 
-/** Home needs a session. The first navigation asks /api/auth/me; later ones reuse the answer. */
 export const authGuard: CanActivateFn = () => {
   const router = inject(Router);
   const state = inject(AppStore);
@@ -16,7 +15,6 @@ export const authGuard: CanActivateFn = () => {
     .pipe(map((signedIn) => signedIn || unlock));
 };
 
-/** Unlock and Set up are for signed-out visitors; signed-in ones go straight home. */
 export const guestGuard: CanActivateFn = () => {
   const router = inject(Router);
   const state = inject(AppStore);

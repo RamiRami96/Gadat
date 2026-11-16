@@ -1,7 +1,6 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
 import { isFutureDate, isValidDateString } from './dates.js';
 
-/** A real YYYY-MM-DD date. With `allowFuture: false` it also rejects dates later than UTC today + 1. */
 export function IsIsoDate(options: { allowFuture?: boolean } = {}, validation?: ValidationOptions) {
   const allowFuture = options.allowFuture ?? true;
   return (target: object, propertyName: string) => {

@@ -26,7 +26,6 @@ export class CheckInsService {
 
   async tick(userId: string, habitId: string, date: string): Promise<void> {
     await this.habits.findOwned(userId, habitId);
-    // INSERT ... ON CONFLICT DO NOTHING: ticking twice (even at the same instant) is safe.
     await this.prisma.checkIn.createMany({ data: [{ habitId, date }], skipDuplicates: true });
   }
 

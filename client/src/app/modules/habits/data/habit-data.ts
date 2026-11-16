@@ -1,6 +1,5 @@
 import type { WeekdayOption } from '../models/habit-models';
 
-/** One tap on these fills the name in the Add habit form. */
 export const QUICK_PICKS: readonly string[] = [
   'Read 20 pages',
   'Drink water',
@@ -9,7 +8,6 @@ export const QUICK_PICKS: readonly string[] = [
   'Journal',
 ];
 
-/** Monday to Sunday, in ISO weekday order. */
 export const WEEKDAY_OPTIONS: readonly WeekdayOption[] = [
   { value: 1, short: 'Mon', full: 'Monday' },
   { value: 2, short: 'Tue', full: 'Tuesday' },

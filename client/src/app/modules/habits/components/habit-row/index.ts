@@ -1,7 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { Icon } from '@shared/components/icon';
 
-/** One habit on the Today list. The whole row is a single toggle button. */
 @Component({
   selector: 'app-habit-row',
   imports: [Icon],
@@ -50,7 +49,6 @@ export class HabitRow {
   readonly note = input<string | null>(null);
   readonly checked = input(false);
   readonly streak = input(0);
-  /** A non-interactive sample, used by the Add habit preview. */
   readonly preview = input(false);
   readonly toggled = output<void>();
 

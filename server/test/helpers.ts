@@ -11,7 +11,6 @@ export interface TestContext {
   app: INestApplication;
   prisma: PrismaService;
   userIds: string[];
-  /** Creates a user straight in the database and returns a session cookie for them. */
   signIn(): Promise<{ id: string; cookie: string; recoveryCode: string }>;
   close(): Promise<void>;
 }
@@ -40,14 +39,12 @@ export async function createTestApp(): Promise<TestContext> {
       return { id: user.id, cookie: `session=${token}`, recoveryCode };
     },
     async close() {
-      // Only remove what this file created, so a developer's own data is never touched.
       await prisma.user.deleteMany({ where: { id: { in: userIds } } });
       await app.close();
     },
   };
 }
 
-/** Supertest helpers that always send JSON, as the API requires. */
 export function api(ctx: TestContext, cookie?: string) {
   const server = ctx.app.getHttpServer();
   const withAuth = (req: request.Test) => {

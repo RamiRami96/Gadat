@@ -2,7 +2,6 @@ import { Component, input, signal } from '@angular/core';
 import { Button } from '@shared/components/button';
 import { Icon } from '@shared/components/icon';
 
-/** Shows a recovery code in a dashed box with a Copy button. */
 @Component({
   selector: 'app-recovery-code-box',
   imports: [Button, Icon],
@@ -32,7 +31,7 @@ export class RecoveryCodeBox {
       this.copied.set(true);
       setTimeout(() => this.copied.set(false), 2000);
     } catch {
-      // The code is selectable on screen, so the user can still copy it by hand.
+      return;
     }
   }
 }

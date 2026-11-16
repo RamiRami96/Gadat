@@ -1,4 +1,3 @@
-/** The three ticked lines on the first Set up step. */
 export const SETUP_BENEFITS: readonly string[] = [
   'Unlock with a touch. There is no password to remember.',
   'Your fingerprint never leaves this device.',

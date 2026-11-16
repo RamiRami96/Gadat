@@ -5,7 +5,6 @@ import { AddHabitDialog, HabitStore, StatsTiles, TodayCard } from '@modules/habi
 import { ADD_HABIT_DIALOG } from '../../constants/dashboard-constants';
 import { useTodayClock } from '../../hooks/use-today-clock';
 
-/** The two columns: Today and stats on the left, the calendar on the right. */
 @Component({
   selector: 'app-dashboard-main',
   imports: [TodayCard, StatsTiles, CalendarCard],
@@ -29,7 +28,6 @@ export class DashboardMain implements OnInit {
   }
 
   protected openAdd(trigger: HTMLElement): void {
-    // Focus goes back to the button that opened the dialog when it closes.
     this.dialog.open(AddHabitDialog, { ...ADD_HABIT_DIALOG, restoreFocus: trigger });
   }
 }

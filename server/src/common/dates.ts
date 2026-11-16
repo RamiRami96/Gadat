@@ -1,7 +1,6 @@
 const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 const DAY_MS = 86_400_000;
 
-/** True for a real calendar date written as YYYY-MM-DD (so 2025-02-30 is rejected). */
 export function isValidDateString(value: unknown): value is string {
   if (typeof value !== 'string') return false;
   const match = DATE_RE.exec(value);
@@ -23,12 +22,10 @@ export function addDays(date: string, days: number): string {
   return formatDate(toMs(date) + days * DAY_MS);
 }
 
-/** Whole days from `from` to `to` (negative when `to` is earlier). */
 export function diffDays(from: string, to: string): number {
   return Math.round((toMs(to) - toMs(from)) / DAY_MS);
 }
 
-/** The latest date the server accepts: its own UTC date plus one day (covers UTC+14 clients). */
 export function latestAllowedDate(now: Date = new Date()): string {
   return addDays(formatDate(now.getTime()), 1);
 }

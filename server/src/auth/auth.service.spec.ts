@@ -4,7 +4,6 @@ import type { EnvService } from '../common/env.service.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
 import { hashRecoveryCode } from './recovery-code.js';
 
-// The WebAuthn library needs a real authenticator, so it is replaced before the service loads.
 const generateRegistrationOptions = jest.fn<(...args: unknown[]) => Promise<unknown>>();
 const verifyRegistrationResponse = jest.fn<(...args: unknown[]) => Promise<unknown>>();
 const generateAuthenticationOptions = jest.fn<(...args: unknown[]) => Promise<unknown>>();

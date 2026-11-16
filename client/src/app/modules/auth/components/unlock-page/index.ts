@@ -50,7 +50,6 @@ export class UnlockPage {
       this.view.set('success');
       setTimeout(() => void this.router.navigateByUrl(HOME_URL), SUCCESS_DELAY_MS);
     } catch (error) {
-      // Pressing Cancel aborts the prompt on purpose, which is not an error.
       this.message.set(
         error instanceof HttpErrorResponse && error.status === 429 ? TOO_MANY_TRIES : '',
       );

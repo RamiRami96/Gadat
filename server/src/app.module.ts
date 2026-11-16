@@ -12,7 +12,6 @@ import { HabitsModule } from './habits/habits.module.js';
 import { HealthController } from './health.controller.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
-/** Auth routes share one budget of 10/min per IP; everything else gets 120/min. */
 function scopedKey(context: ExecutionContext, tracker: string): string {
   const request = context.switchToHttp().getRequest<Request>();
   const scope = request.path.startsWith('/api/auth') ? 'auth' : 'api';

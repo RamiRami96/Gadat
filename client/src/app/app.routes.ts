@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 
-/** Each module is lazy-loaded. The dashboard matches only "/", so Auth loads only when needed. */
 export const routes: Routes = [
   {
     path: '',

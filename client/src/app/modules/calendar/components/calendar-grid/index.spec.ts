@@ -28,16 +28,12 @@ class Host {
   picked = '';
 }
 
-// November 2025: the 1st is a Saturday. Today is Wednesday the 12th.
 const habits = [habit('read'), habit('water'), habit('mwf', { days: [1, 3, 5] })];
 const checks = new Set([
-  // Mon 3: all three done -> full
   checkKey('read', '2025-11-03'),
   checkKey('water', '2025-11-03'),
   checkKey('mwf', '2025-11-03'),
-  // Tue 4: one of two done -> partial
   checkKey('read', '2025-11-04'),
-  // Wed 5: nothing done -> empty ring
 ]);
 
 function render(filter: string | null = null, selected = '2025-11-12') {
@@ -82,17 +78,17 @@ describe('CalendarGrid day classes', () => {
 
   it('shows a plain disabled number before the first habit, and in the future', () => {
     const { day } = render();
-    expect(day(1).classList).toContain('day--off'); // before the habits started
+    expect(day(1).classList).toContain('day--off');
     expect(day(1).disabled).toBe(true);
-    expect(day(20).classList).toContain('day--off'); // future
+    expect(day(20).classList).toContain('day--off');
     expect(day(20).disabled).toBe(true);
   });
 
   it('never shows an unscheduled habit: a single weekday habit leaves other days plain', () => {
     const { day } = render('mwf');
-    expect(day(4).classList).toContain('day--off'); // Tuesday: mwf is not scheduled
+    expect(day(4).classList).toContain('day--off');
     expect(day(4).disabled).toBe(true);
-    expect(day(5).classList).toContain('day--empty'); // Wednesday
+    expect(day(5).classList).toContain('day--empty');
   });
 
   it('with one habit selected, a day is either solid or an empty ring', () => {

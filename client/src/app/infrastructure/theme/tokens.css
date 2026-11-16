@@ -1,4 +1,3 @@
-/* Design tokens. Change --accent to re-colour rings, checked boxes and primary buttons. */
 :root {
   --accent: #137a50;
   --accent-tint: color-mix(in srgb, var(--accent) 7%, white);
@@ -16,7 +15,6 @@
   --radius-row: 16px;
   --radius-button: 16px;
 
-  /* Space Grotesk has no Cyrillic, so the ӓ in Gӓdӓt falls back to Inter (which has U+04D3) glyph by glyph. */
   --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }

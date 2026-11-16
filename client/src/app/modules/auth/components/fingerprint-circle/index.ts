@@ -3,7 +3,6 @@ import { Icon } from '@shared/components/icon';
 
 import type { FingerprintState } from '../../models/auth-models';
 
-/** The big 168px circle. Decorative: the page announces the state in text next to it. */
 @Component({
   selector: 'app-fingerprint-circle',
   imports: [Icon],

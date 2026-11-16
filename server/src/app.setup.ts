@@ -5,7 +5,6 @@ import helmet from 'helmet';
 import { AllExceptionsFilter } from './common/all-exceptions.filter.js';
 import { EnvService } from './common/env.service.js';
 
-/** Everything main.ts and the e2e tests share, so tests exercise the real configuration. */
 export function configureApp(app: INestApplication): void {
   const env = app.get(EnvService);
   const express = app as NestExpressApplication;

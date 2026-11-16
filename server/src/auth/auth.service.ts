@@ -26,13 +26,10 @@ export class AuthService {
     private readonly env: EnvService,
   ) {}
 
-  // ---------- Register (first visit) ----------
-
   async startRegistration(): Promise<{
     options: PublicKeyCredentialCreationOptionsJSON;
     state: ChallengeState;
   }> {
-    // Users that never finished setting up a passkey cannot have data; sweep old ones.
     await this.prisma.user.deleteMany({
       where: {
         createdAt: { lt: new Date(Date.now() - ABANDONED_SIGNUP_MS) },
@@ -64,8 +61,6 @@ export class AuthService {
     });
     return { userId, recoveryCode };
   }
-
-  // ---------- Login ----------
 
   async startLogin(): Promise<{
     options: PublicKeyCredentialRequestOptionsJSON;
@@ -114,9 +109,6 @@ export class AuthService {
     return { userId: stored.userId };
   }
 
-  // ---------- Recovery ----------
-
-  /** Single use: the code is replaced by a new one in the same step. */
   async useRecoveryCode(code: string): Promise<{ userId: string; recoveryCode: string }> {
     const hash = hashRecoveryCode(code);
     const row = await this.prisma.recoveryCode.findFirst({ where: { hash } });
@@ -124,7 +116,6 @@ export class AuthService {
       throw new UnauthorizedException('That recovery code is not valid');
     }
     const recoveryCode = generateRecoveryCode();
-    // Conditional update: if two requests race with the same code, only one wins.
     const swapped = await this.prisma.recoveryCode.updateMany({
       where: { userId: row.userId, hash },
       data: { hash: hashRecoveryCode(recoveryCode) },
@@ -132,8 +123,6 @@ export class AuthService {
     if (swapped.count !== 1) throw new UnauthorizedException('That recovery code is not valid');
     return { userId: row.userId, recoveryCode };
   }
-
-  // ---------- Add a passkey on another device ----------
 
   async startAddCredential(userId: string): Promise<{
     options: PublicKeyCredentialCreationOptionsJSON;
@@ -156,8 +145,6 @@ export class AuthService {
     const credential = await this.verifyRegistration(state.challenge, body);
     await this.prisma.credential.create({ data: { ...credential, userId } });
   }
-
-  // ---------- Helpers ----------
 
   private creationOptions(userId: string, exclude: { id: string; transports?: string[] }[]) {
     return generateRegistrationOptions({

@@ -1,4 +1,3 @@
-/** How often the dashboard checks whether the date changed (it follows midnight). */
 export const CLOCK_CHECK_MS = 60_000;
 
 export const ADD_HABIT_DIALOG = {

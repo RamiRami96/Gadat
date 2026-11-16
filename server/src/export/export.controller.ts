@@ -14,7 +14,6 @@ export class ExportController {
     private readonly prisma: PrismaService,
   ) {}
 
-  /** One JSON file with every habit and check-in: also works as a backup. */
   @Get()
   @Header('Cache-Control', 'no-store')
   async download(@CurrentUser() user: SessionUser, @Res({ passthrough: true }) res: Response) {

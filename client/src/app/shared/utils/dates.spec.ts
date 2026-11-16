@@ -11,7 +11,6 @@ import {
 
 describe('dates', () => {
   it('uses the local calendar day, not UTC', () => {
-    // 23:30 local time on 31 Dec must stay 31 Dec even though UTC may already be 1 Jan.
     expect(todayIso(new Date(2025, 11, 31, 23, 30))).toBe('2025-12-31');
     expect(todayIso(new Date(2026, 0, 1, 0, 5))).toBe('2026-01-01');
   });
@@ -40,7 +39,7 @@ describe('dates', () => {
   });
 
   it('builds a Monday-first grid padded to full weeks', () => {
-    const grid = monthGrid(2025, 11); // 1 Nov 2025 is a Saturday
+    const grid = monthGrid(2025, 11);
     expect(grid.length % 7).toBe(0);
     expect(grid.slice(0, 5)).toEqual([null, null, null, null, null]);
     expect(grid[5]).toBe('2025-11-01');

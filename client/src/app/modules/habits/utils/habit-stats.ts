@@ -1,9 +1,6 @@
 import type { Habit } from '@infrastructure/models/api-models';
 import { addDays, daysInMonth, isoWeekday, toIso } from '@shared/utils/dates';
 
-/** Everything here is pure: streaks, rates and rings are computed, never stored. */
-
-/** A set of "habitId|date" keys, one per tick. */
 export type CheckInSet = ReadonlySet<string>;
 
 export function checkKey(habitId: string, date: string): string {
@@ -17,7 +14,6 @@ export interface DayProgress {
 
 export type RingStatus = 'none' | 'empty' | 'partial' | 'full';
 
-/** A habit is scheduled when it has started, has not ended, and repeats on that weekday. */
 export function isScheduled(habit: Habit, date: string): boolean {
   return (
     habit.startDate <= date &&
@@ -26,7 +22,6 @@ export function isScheduled(habit: Habit, date: string): boolean {
   );
 }
 
-/** Habits scheduled on `date`, optionally narrowed to a single habit (the calendar chip filter). */
 export function scheduledOn(
   habits: readonly Habit[],
   date: string,
@@ -46,7 +41,6 @@ export function dayProgress(
   return { done, total: scheduled.length };
 }
 
-/** How much of the ring is filled, clockwise from the top: done / total. */
 export function ringFraction({ done, total }: DayProgress): number {
   return total === 0 ? 0 : Math.min(1, done / total);
 }
@@ -57,7 +51,6 @@ export function ringStatus(progress: DayProgress): RingStatus {
   return progress.done >= progress.total ? 'full' : 'partial';
 }
 
-/** The earliest start date among the habits, or null when there are none. */
 export function earliestStart(
   habits: readonly Habit[],
   habitId: string | null = null,
@@ -68,10 +61,6 @@ export function earliestStart(
 
 type Outcome = 'skip' | 'hit' | 'miss';
 
-/**
- * One day of history. With all habits it is a hit when at least one scheduled habit is ticked;
- * with one habit it is a hit when that habit is ticked. Nothing scheduled means the day is skipped.
- */
 function outcome(
   habits: readonly Habit[],
   checks: CheckInSet,
@@ -83,10 +72,6 @@ function outcome(
   return done > 0 ? 'hit' : 'miss';
 }
 
-/**
- * The streak that ends today, or yesterday while today is still open (scheduled but not ticked yet),
- * so it does not fall to zero before the day is over. Unscheduled days neither count nor break it.
- */
 export function currentStreak(
   habits: readonly Habit[],
   checks: CheckInSet,
@@ -104,7 +89,6 @@ export function currentStreak(
   return streak;
 }
 
-/** The longest run of hit days in the whole history. */
 export function bestStreak(
   habits: readonly Habit[],
   checks: CheckInSet,
@@ -127,10 +111,6 @@ export function bestStreak(
   return best;
 }
 
-/**
- * Whole percent of scheduled habit-days that were ticked, from the 1st up to and including today
- * (the whole month for past months). 0 when nothing was scheduled.
- */
 export function monthRate(
   habits: readonly Habit[],
   checks: CheckInSet,

@@ -8,7 +8,6 @@ function labelFor(date: string, done: number, total: number, disabled: boolean):
   return `${text}, ${done} of ${total} ${total === 1 ? 'habit' : 'habits'} done`;
 }
 
-/** The cells of one month, Monday first, with blanks (null) before the 1st and after the last day. */
 export function buildCalendar(input: CalendarInput): (DayCell | null)[] {
   const first = earliestStart(input.habits, input.filter);
   return monthGrid(input.year, input.month).map((date) => {

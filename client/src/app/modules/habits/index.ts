@@ -1,4 +1,3 @@
-/** Public API of the habits module. Other modules import from here, never from inner folders. */
 export { AddHabitDialog } from './components/add-habit-dialog';
 export { StatsTiles } from './components/stats-tiles';
 export { TodayCard } from './components/today-card';

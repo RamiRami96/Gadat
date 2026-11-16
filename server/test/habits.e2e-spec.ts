@@ -126,7 +126,6 @@ describe('Habits (e2e)', () => {
 
     await api(ctx, alice.cookie).delete(`/api/habits/${habit.body.id}`).expect(400);
     await api(ctx, alice.cookie).delete(`/api/habits/${habit.body.id}?date=${today()}`).expect(204);
-    // repeating is safe and does not move the end date
     await api(ctx, alice.cookie)
       .delete(`/api/habits/${habit.body.id}?date=${addDays(today(), 1)}`)
       .expect(204);

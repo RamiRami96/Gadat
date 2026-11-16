@@ -13,7 +13,6 @@ const VARIANTS: Record<ButtonVariant, string> = {
 };
 
 @Component({
-  // Attribute selector on purpose: it styles a native <button> instead of wrapping it.
   // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'button[appButton]',
   template: '<ng-content />',
