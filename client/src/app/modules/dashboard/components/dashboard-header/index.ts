@@ -14,7 +14,9 @@ import { SessionService } from '@shared/services/session-service';
 })
 export class DashboardHeader {
   private readonly session = inject(SessionService);
+
   private readonly store = inject(HabitStore);
+
   private readonly router = inject(Router);
 
   protected async logOut(): Promise<void> {

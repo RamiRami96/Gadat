@@ -14,7 +14,9 @@ import { TodayClockService } from '../../services/today-clock-service';
 })
 export class DashboardMain implements OnInit {
   private readonly store = inject(HabitStore);
+
   private readonly dialog = inject(Dialog);
+
   private readonly clock = inject(TodayClockService);
 
   ngOnInit(): void {

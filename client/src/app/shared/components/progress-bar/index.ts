@@ -22,9 +22,13 @@ import { Component, computed, input } from '@angular/core';
 })
 export class ProgressBar {
   readonly value = input.required<number>();
+
   readonly max = input.required<number>();
+
   readonly label = input.required<string>();
+
   readonly thin = input(false);
+
   protected readonly percent = computed(() =>
     this.max() <= 0 ? 0 : Math.min(100, (this.value() / this.max()) * 100),
   );

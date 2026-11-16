@@ -7,6 +7,7 @@ import { api } from './api-service';
 @Injectable({ providedIn: 'root' })
 export class SessionService {
   private readonly http = inject(HttpClient);
+
   private readonly store = inject(AppStore);
 
   check(): Observable<boolean> {

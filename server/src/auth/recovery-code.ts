@@ -6,8 +6,7 @@ export const RECOVERY_CODE_LENGTH = 16;
 
 export function generateRecoveryCode(): string {
   const bytes = randomBytes(RECOVERY_CODE_LENGTH);
-  let raw = '';
-  for (const byte of bytes) raw += ALPHABET[byte % 32];
+  const raw = Array.from(bytes, (byte) => ALPHABET[byte % 32]).join('');
   return raw.match(/.{4}/g)!.join('-');
 }
 

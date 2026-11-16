@@ -33,7 +33,9 @@ import { WEEKDAY_OPTIONS } from '../../constants/habit-constants';
 })
 export class DaysPicker {
   readonly selected = model.required<number[]>();
+
   readonly id = input('days');
+
   protected readonly days = WEEKDAY_OPTIONS;
 
   protected readonly summary = computed(() => {

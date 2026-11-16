@@ -22,15 +22,10 @@ import { Component } from '@angular/core';
           stroke-linejoin="round"
         />
       </svg>
-      <span class="logo-text text-[26px] leading-none text-ink">Gӓdӓt</span>
+      <span class="font-sans text-[26px] leading-none font-bold tracking-[-0.04em] text-ink"
+        >Gӓdӓt</span
+      >
     </span>
-  `,
-  styles: `
-    .logo-text {
-      font-family: 'Inter', system-ui, sans-serif;
-      font-weight: 700;
-      letter-spacing: -0.04em;
-    }
   `,
 })
 export class Logo {}

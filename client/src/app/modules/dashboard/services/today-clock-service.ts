@@ -5,6 +5,7 @@ import { CLOCK_CHECK_MS } from '../constants/dashboard-constants';
 @Injectable()
 export class TodayClockService {
   private readonly store = inject(HabitStore);
+
   private readonly destroyRef = inject(DestroyRef);
 
   start(): void {

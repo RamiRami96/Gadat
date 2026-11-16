@@ -24,7 +24,7 @@ The client is split into modules by feature. A module is a folder that owns ever
 client/src/app/
 ├── infrastructure/
 │   ├── models/              api-models.ts: Habit, CheckIn, NewHabit (the API contract)
-│   └── theme/               tokens.css (colours, radii, fonts), base.css, animations.css, overlay.css
+│   └── theme/               tokens.css (colours, radii, fonts), base.css, animations.css (Tailwind theme animations), overlay.css
 │
 ├── modules/
 │   ├── auth/                unlock, set up, recovery
@@ -98,13 +98,14 @@ It creates a demo user with five habits and about a year of check-ins, and print
 | --- | --- | --- |
 | server | `start:dev` | Nest in watch mode |
 | server | `build` | Compile to `dist/` (runs `prisma generate` first) |
-| server | `lint` | ESLint + Prettier rules |
+| server | `lint` | ESLint (Airbnb rules) + Prettier |
 | server | `test` | Jest unit tests (services, with `@simplewebauthn/server` mocked) |
 | server | `test:e2e` | Jest + Supertest against the real database |
 | server | `prisma:seed` | Demo user, 5 habits, ~1 year of check-ins |
 | client | `start` | `ng serve` with the `/api` proxy |
 | client | `build` | Production build |
-| client | `lint` | angular-eslint |
+| client | `lint` | angular-eslint + Airbnb rules + Prettier |
+| client | `format` | Prettier on `src` |
 | client | `test` | `ng test` (Vitest, the Angular CLI default) |
 
 `npm run test:e2e` writes to the database in `DATABASE_URL` but only creates its own users (random ids) and deletes exactly those afterwards, so it is safe to run next to your own data.

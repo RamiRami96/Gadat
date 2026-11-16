@@ -1,3 +1,5 @@
+import { HttpStatusCode } from '@angular/common/http';
+
 export const SETUP_BENEFITS: readonly string[] = [
   'Unlock with a touch. There is no password to remember.',
   'Your fingerprint never leaves this device.',
@@ -17,3 +19,9 @@ export const RECOVERY_INVALID = 'That recovery code is not valid. Each code work
 export const SERVER_UNREACHABLE = 'Could not reach the server. Try again.';
 
 export const RECOVERY_CODE_MIN_LENGTH = 8;
+
+export const RECOVERY_ERROR_MESSAGES: Readonly<Record<number, string>> = {
+  [HttpStatusCode.TooManyRequests]: TOO_MANY_TRIES,
+  [HttpStatusCode.Unauthorized]: RECOVERY_INVALID,
+  [HttpStatusCode.BadRequest]: RECOVERY_INVALID,
+};

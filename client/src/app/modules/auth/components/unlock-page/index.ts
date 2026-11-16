@@ -1,16 +1,16 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { Button } from '@shared/components/button';
+import { HOME_URL } from '@shared/constants/app-constants';
 import { PasskeyService } from '../../services/passkey-service';
 import { AuthShell } from '../auth-shell';
 import { FingerprintCircle } from '../fingerprint-circle';
 import { RecoveryCodeBox } from '../recovery-code-box';
-import { Button } from '@shared/components/button';
-import { HOME_URL } from '@shared/constants/app-constants';
 import {
   RECOVERY_CODE_MIN_LENGTH,
-  RECOVERY_INVALID,
+  RECOVERY_ERROR_MESSAGES,
   SERVER_UNREACHABLE,
   SUCCESS_DELAY_MS,
   ADD_FINGERPRINT_FAILED,
@@ -25,19 +25,26 @@ import type { FingerprintState, UnlockView } from '../../models/auth-models';
 })
 export class UnlockPage {
   private readonly auth = inject(PasskeyService);
+
   private readonly router = inject(Router);
 
   protected readonly view = signal<UnlockView>('idle');
+
   protected readonly code = signal('');
+
   protected readonly newCode = signal('');
+
   protected readonly message = signal('');
+
   protected readonly busy = signal(false);
+
   private cancelled = false;
 
   protected readonly circle = computed<FingerprintState>(() => {
     const v = this.view();
     return v === 'scanning' || v === 'success' || v === 'error' ? v : 'idle';
   });
+
   protected readonly canRestore = computed(
     () => this.code().trim().length >= RECOVERY_CODE_MIN_LENGTH && !this.busy(),
   );
@@ -48,10 +55,14 @@ export class UnlockPage {
     try {
       await this.auth.login();
       this.view.set('success');
-      setTimeout(() => void this.router.navigateByUrl(HOME_URL), SUCCESS_DELAY_MS);
+      setTimeout(() => {
+        void this.router.navigateByUrl(HOME_URL);
+      }, SUCCESS_DELAY_MS);
     } catch (error) {
       this.message.set(
-        error instanceof HttpErrorResponse && error.status === 429 ? TOO_MANY_TRIES : '',
+        error instanceof HttpErrorResponse && error.status === HttpStatusCode.TooManyRequests
+          ? TOO_MANY_TRIES
+          : '',
       );
       this.view.set(this.cancelled ? 'idle' : 'error');
     }
@@ -76,13 +87,7 @@ export class UnlockPage {
       this.view.set('recovered');
     } catch (error) {
       const status = error instanceof HttpErrorResponse ? error.status : 0;
-      this.message.set(
-        status === 429
-          ? TOO_MANY_TRIES
-          : status === 401 || status === 400
-            ? RECOVERY_INVALID
-            : SERVER_UNREACHABLE,
-      );
+      this.message.set(RECOVERY_ERROR_MESSAGES[status] ?? SERVER_UNREACHABLE);
     } finally {
       this.busy.set(false);
     }

@@ -82,5 +82,6 @@ export type IconName =
 })
 export class Icon {
   readonly name = input.required<IconName>();
+
   readonly size = input(24);
 }

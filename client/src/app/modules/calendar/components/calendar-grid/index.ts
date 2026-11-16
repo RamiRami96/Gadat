@@ -17,13 +17,8 @@ import type { DayCell } from '../../models/calendar-models';
         @if (cell) {
           <button
             type="button"
-            class="day"
-            [class.day--off]="cell.disabled"
-            [class.day--empty]="cell.status === 'empty'"
-            [class.day--partial]="cell.status === 'partial'"
-            [class.day--full]="cell.status === 'full'"
-            [class.day--today]="cell.isToday"
-            [class.day--selected]="cell.isSelected"
+            [class]="dayClass(cell)"
+            [attr.data-status]="cell.status"
             [disabled]="cell.disabled"
             [attr.aria-label]="cell.label"
             [attr.aria-current]="cell.isToday ? 'date' : null"
@@ -31,10 +26,10 @@ import type { DayCell } from '../../models/calendar-models';
             [style.--fill.deg]="cell.fraction * 360"
             (click)="pick.emit(cell.date)"
           >
-            <span class="day__ring">
-              <span class="day__num">{{ cell.day }}</span>
+            <span [class]="ringClass(cell)">
+              <span class="relative z-1">{{ cell.day }}</span>
               @if (cell.isToday) {
-                <span class="day__dot"></span>
+                <span data-dot [class]="dotClass(cell)"></span>
               }
             </span>
           </button>
@@ -45,94 +40,39 @@ import type { DayCell } from '../../models/calendar-models';
     </div>
   `,
   host: { class: 'block' },
-  styles: `
-    .day {
-      display: grid;
-      place-items: center;
-      width: 100%;
-      min-height: 48px;
-      padding: 1px 0;
-      background: none;
-      border: 0;
-      color: var(--text);
-    }
-    .day__ring {
-      position: relative;
-      display: grid;
-      place-items: center;
-      width: min(100%, 54px);
-      aspect-ratio: 1;
-      border-radius: 50%;
-      font-size: 15px;
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
-    }
-    .day__ring::before {
-      content: '';
-      position: absolute;
-      inset: 5px;
-      border-radius: 50%;
-      background: var(--surface);
-    }
-    .day__num {
-      position: relative;
-      z-index: 1;
-    }
-    .day__dot {
-      position: absolute;
-      z-index: 1;
-      bottom: 22%;
-      left: 50%;
-      width: 4px;
-      height: 4px;
-      margin-left: -2px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-    .day--off {
-      color: var(--muted);
-      cursor: default;
-    }
-    .day--off .day__ring::before {
-      display: none;
-    }
-    .day--off .day__ring {
-      font-weight: 500;
-    }
-    .day--empty .day__ring {
-      background: var(--track);
-    }
-    .day--partial .day__ring {
-      background: conic-gradient(from 0deg, var(--accent) var(--fill), var(--track) 0);
-    }
-    .day--full {
-      color: #fff;
-    }
-    .day--full .day__ring {
-      background: var(--accent);
-    }
-    .day--full .day__ring::before {
-      display: none;
-    }
-    .day--full .day__dot {
-      background: #fff;
-    }
-    .day--selected .day__ring {
-      box-shadow:
-        0 0 0 3px var(--surface),
-        0 0 0 5px var(--text);
-    }
-    .day:not(:disabled):hover .day__ring {
-      filter: brightness(0.96);
-    }
-    .day:focus-visible {
-      outline-offset: -2px;
-      border-radius: 14px;
-    }
-  `,
 })
 export class CalendarGrid {
   readonly days = input.required<readonly (DayCell | null)[]>();
+
   readonly pick = output<string>();
+
   protected readonly weekdays = WEEKDAY_LABELS;
+
+  protected dayClass(cell: DayCell): string {
+    const base =
+      'group grid min-h-12 w-full place-items-center bg-transparent px-0 py-px focus-visible:-outline-offset-2 focus-visible:rounded-[14px]';
+    if (cell.status === 'none') return `${base} cursor-default text-muted`;
+    return `${base} ${cell.status === 'full' ? 'text-white' : 'text-ink'}`;
+  }
+
+  protected ringClass(cell: DayCell): string {
+    const base =
+      "relative grid aspect-square w-[min(100%,54px)] place-items-center rounded-full text-[15px] tabular-nums before:absolute before:inset-[5px] before:rounded-full before:bg-surface before:content-['']";
+    const ring: Record<DayCell['status'], string> = {
+      none: 'font-medium before:hidden',
+      empty: 'bg-track font-semibold',
+      partial:
+        'bg-[conic-gradient(from_0deg,var(--accent)_var(--fill),var(--track)_0)] font-semibold',
+      full: 'bg-accent font-semibold before:hidden',
+    };
+    const selected = cell.isSelected
+      ? ' shadow-[0_0_0_3px_var(--surface),0_0_0_5px_var(--text)]'
+      : '';
+    return `${base} ${ring[cell.status]}${selected} group-enabled:group-hover:brightness-[0.96]`;
+  }
+
+  protected dotClass(cell: DayCell): string {
+    const color = cell.status === 'full' ? 'bg-white' : 'bg-accent';
+    return `absolute bottom-[22%] left-1/2 z-1 -ml-0.5 size-1 rounded-full ${color}`;
+  }
 }

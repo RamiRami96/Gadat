@@ -1,10 +1,10 @@
 import { Component, computed, inject, output } from '@angular/core';
 import { formatLongDate } from '@shared/utils/dates';
-import { HabitRow } from '../habit-row';
-import { HabitStore } from '../../stores/habit-store';
 import { Button } from '@shared/components/button';
 import { Icon } from '@shared/components/icon';
 import { ProgressBar } from '@shared/components/progress-bar';
+import { HabitStore } from '../../stores/habit-store';
+import { HabitRow } from '../habit-row';
 
 @Component({
   selector: 'app-today-card',
@@ -98,11 +98,15 @@ import { ProgressBar } from '@shared/components/progress-bar';
 })
 export class TodayCard {
   protected readonly store = inject(HabitStore);
+
   readonly add = output<HTMLElement>();
-  readonly retry = output<void>();
+
+  readonly retry = output();
 
   protected readonly skeletonRows = [1, 2, 3];
+
   protected readonly dateLabel = computed(() => formatLongDate(this.store.today()));
+
   protected readonly progress = this.store.todayProgress;
 
   protected onAdd(event: Event): void {

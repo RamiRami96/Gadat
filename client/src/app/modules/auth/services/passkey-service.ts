@@ -16,6 +16,7 @@ import { AppStore } from '@shared/stores/app-store';
 @Injectable({ providedIn: 'root' })
 export class PasskeyService {
   private readonly http = inject(HttpClient);
+
   private readonly store = inject(AppStore);
 
   async register(): Promise<string> {

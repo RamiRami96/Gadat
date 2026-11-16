@@ -25,6 +25,7 @@ function habit(id: string, over: Partial<Habit> = {}): Habit {
 })
 class Host {
   days: (DayCell | null)[] = [];
+
   picked = '';
 }
 
@@ -54,59 +55,62 @@ function render(filter: string | null = null, selected = '2025-11-12') {
   return { fixture, root, day };
 }
 
-describe('CalendarGrid day classes', () => {
+function hostOf(el: Element): Element {
+  return el.closest('app-calendar-grid')!;
+}
+
+describe('CalendarGrid days', () => {
   beforeEach(() => TestBed.configureTestingModule({ imports: [Host] }));
 
   it('draws a solid circle when every scheduled habit is done', () => {
     const { day } = render();
-    expect(day(3).classList).toContain('day--full');
+    expect(day(3).dataset['status']).toBe('full');
     expect(day(3).getAttribute('aria-label')).toBe('3 November, 3 of 3 habits done');
   });
 
   it('draws a partial arc when some habits are done', () => {
     const { day } = render();
-    expect(day(4).classList).toContain('day--partial');
+    expect(day(4).dataset['status']).toBe('partial');
     expect(day(4).getAttribute('aria-label')).toBe('4 November, 1 of 2 habits done');
     expect(day(4).style.getPropertyValue('--fill')).toBe('180deg');
   });
 
   it('draws an empty ring when nothing is done yet', () => {
     const { day } = render();
-    expect(day(5).classList).toContain('day--empty');
-    expect(day(5).classList).not.toContain('day--full');
+    expect(day(5).dataset['status']).toBe('empty');
+    expect(day(5).dataset['status']).not.toBe('full');
   });
 
   it('shows a plain disabled number before the first habit, and in the future', () => {
     const { day } = render();
-    expect(day(1).classList).toContain('day--off');
+    expect(day(1).dataset['status']).toBe('none');
     expect(day(1).disabled).toBe(true);
-    expect(day(20).classList).toContain('day--off');
+    expect(day(20).dataset['status']).toBe('none');
     expect(day(20).disabled).toBe(true);
   });
 
   it('never shows an unscheduled habit: a single weekday habit leaves other days plain', () => {
     const { day } = render('mwf');
-    expect(day(4).classList).toContain('day--off');
+    expect(day(4).dataset['status']).toBe('none');
     expect(day(4).disabled).toBe(true);
-    expect(day(5).classList).toContain('day--empty');
+    expect(day(5).dataset['status']).toBe('empty');
   });
 
   it('with one habit selected, a day is either solid or an empty ring', () => {
     const { day } = render('read');
-    expect(day(3).classList).toContain('day--full');
-    expect(day(4).classList).toContain('day--full');
-    expect(day(5).classList).toContain('day--empty');
-    expect(root(day(3)).querySelector('.day--partial')).toBeNull();
+    expect(day(3).dataset['status']).toBe('full');
+    expect(day(4).dataset['status']).toBe('full');
+    expect(day(5).dataset['status']).toBe('empty');
+    expect(hostOf(day(3)).querySelector('[data-status="partial"]')).toBeNull();
   });
 
-  it('marks today with a dot and the selected day with the selected class', () => {
+  it('marks today with a dot and the selected day as pressed', () => {
     const { day } = render(null, '2025-11-04');
-    expect(day(12).classList).toContain('day--today');
-    expect(day(12).querySelector('.day__dot')).not.toBeNull();
+    expect(day(12).querySelector('[data-dot]')).not.toBeNull();
     expect(day(12).getAttribute('aria-current')).toBe('date');
-    expect(day(4).classList).toContain('day--selected');
-    expect(day(5).classList).not.toContain('day--selected');
-    expect(day(5).querySelector('.day__dot')).toBeNull();
+    expect(day(4).getAttribute('aria-pressed')).toBe('true');
+    expect(day(5).getAttribute('aria-pressed')).toBe('false');
+    expect(day(5).querySelector('[data-dot]')).toBeNull();
   });
 
   it('reports the date of the tapped day', () => {
@@ -117,13 +121,9 @@ describe('CalendarGrid day classes', () => {
 
   it('pads the first week so the 1st lands on a Saturday', () => {
     const { root } = render();
-    const buttons = root.querySelectorAll('button.day');
+    const buttons = root.querySelectorAll('button[data-status]');
     expect(buttons).toHaveLength(30);
     const cells = root.querySelectorAll('[role="group"] > *');
     expect(cells[5]).toBe(buttons[0]);
   });
 });
-
-function root(el: Element): Element {
-  return el.closest('app-calendar-grid')!;
-}

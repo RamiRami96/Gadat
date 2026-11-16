@@ -13,13 +13,21 @@ function required(name: string, source: NodeJS.ProcessEnv): string {
 @Injectable()
 export class EnvService {
   readonly nodeEnv: string;
+
   readonly isProduction: boolean;
+
   readonly port: number;
+
   readonly jwtSecret: string;
+
   readonly cookieSecret: string;
+
   readonly rpId: string;
+
   readonly rpName: string;
+
   readonly origin: string;
+
   readonly trustProxy: number;
 
   constructor(source: NodeJS.ProcessEnv = process.env) {
@@ -35,16 +43,16 @@ export class EnvService {
     required('DATABASE_URL', source);
 
     if (this.isProduction) {
-      for (const [name, value] of [
+      [
         ['JWT_SECRET', this.jwtSecret],
         ['COOKIE_SECRET', this.cookieSecret],
-      ]) {
+      ].forEach(([name, value]) => {
         if (value.startsWith(PLACEHOLDER) || value.length < 32) {
           throw new Error(
             `${name} must be a random string of at least 32 characters in production.`,
           );
         }
-      }
+      });
     }
   }
 }

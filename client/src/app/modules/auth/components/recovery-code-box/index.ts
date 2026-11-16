@@ -23,6 +23,7 @@ import { Icon } from '@shared/components/icon';
 })
 export class RecoveryCodeBox {
   readonly code = input.required<string>();
+
   protected readonly copied = signal(false);
 
   protected async copy(): Promise<void> {
@@ -31,7 +32,7 @@ export class RecoveryCodeBox {
       this.copied.set(true);
       setTimeout(() => this.copied.set(false), 2000);
     } catch {
-      return;
+      this.copied.set(false);
     }
   }
 }

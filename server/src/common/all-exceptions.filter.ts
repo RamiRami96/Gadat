@@ -14,6 +14,18 @@ interface ErrorBody {
   errors?: string[];
 }
 
+function isBodyParserError(error: unknown): error is { status: number; type: string } {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'status' in error &&
+    'type' in error &&
+    typeof (error as { status: unknown }).status === 'number' &&
+    (error as { status: number }).status >= 400 &&
+    (error as { status: number }).status < 500
+  );
+}
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger('Exceptions');
@@ -48,16 +60,4 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
     return { statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Internal server error' };
   }
-}
-
-function isBodyParserError(error: unknown): error is { status: number; type: string } {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'status' in error &&
-    'type' in error &&
-    typeof (error as { status: unknown }).status === 'number' &&
-    (error as { status: number }).status >= 400 &&
-    (error as { status: number }).status < 500
-  );
 }
