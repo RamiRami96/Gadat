@@ -2,31 +2,17 @@ import { DialogRef } from '@angular/cdk/dialog';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  AbstractControl,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators,
-} from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ALL_WEEKDAYS } from '@shared/constants/app-constants';
 import { NAME_MAX, NOTE_MAX, SAVE_ERROR } from '../../constants/habit-constants';
-import { QUICK_PICKS } from '../../data/habit-data';
+import { QUICK_PICKS } from '../../constants/habit-constants';
 import { HabitRow } from '../habit-row';
+import { HabitValidators } from '../../services/habit-validators';
 import { HabitStore } from '../../stores/habit-store';
 import { DaysPicker } from '../days-picker';
 import { Button } from '@shared/components/button';
 import { Chip } from '@shared/components/chip';
 import { Icon } from '@shared/components/icon';
-
-function notBlank(control: AbstractControl<string>): ValidationErrors | null {
-  return control.value.trim().length === 0 ? { blank: true } : null;
-}
-
-function atLeastOneDay(control: AbstractControl<number[]>): ValidationErrors | null {
-  return control.value.length === 0 ? { noDays: true } : null;
-}
 
 @Component({
   selector: 'app-add-habit-dialog',
@@ -35,6 +21,7 @@ function atLeastOneDay(control: AbstractControl<number[]>): ValidationErrors | n
 })
 export class AddHabitDialog {
   private readonly store = inject(HabitStore);
+  private readonly validators = inject(HabitValidators);
   private readonly ref = inject<DialogRef<boolean>>(DialogRef);
 
   protected readonly nameMax = NAME_MAX;
@@ -46,12 +33,12 @@ export class AddHabitDialog {
   protected readonly form = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(NAME_MAX), notBlank],
+      validators: [Validators.required, Validators.maxLength(NAME_MAX), this.validators.notBlank],
     }),
     note: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(NOTE_MAX)] }),
     days: new FormControl([...ALL_WEEKDAYS], {
       nonNullable: true,
-      validators: [atLeastOneDay],
+      validators: [this.validators.atLeastOneDay],
     }),
   });
 

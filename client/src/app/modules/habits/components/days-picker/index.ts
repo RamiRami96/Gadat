@@ -1,5 +1,5 @@
 import { Component, computed, input, model } from '@angular/core';
-import { WEEKDAY_OPTIONS } from '../../data/habit-data';
+import { WEEKDAY_OPTIONS } from '../../constants/habit-constants';
 
 @Component({
   selector: 'app-days-picker',

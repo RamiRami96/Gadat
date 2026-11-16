@@ -9,7 +9,7 @@ import { Button } from '@shared/components/button';
 import { Icon } from '@shared/components/icon';
 import { HOME_URL } from '@shared/constants/app-constants';
 import { SETUP_FAILED, TOO_MANY_TRIES } from '../../constants/auth-constants';
-import { SETUP_BENEFITS, SETUP_STEPS } from '../../data/auth-data';
+import { SETUP_BENEFITS, SETUP_STEPS } from '../../constants/auth-constants';
 import type { SetupStep } from '../../models/auth-models';
 
 @Component({
