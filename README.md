@@ -135,8 +135,7 @@ The API address is `apiBase` in `client/src/environments/environment.extension.t
 | Variable | Example | Meaning |
 | --- | --- | --- |
 | `DATABASE_URL` | `postgresql://gadat:gadat@localhost:5432/gadat` | PostgreSQL connection string |
-| `JWT_SECRET` | long random string | Signs the session cookie. In production it must be 32+ characters and not start with `change-me` |
-| `COOKIE_SECRET` | another long random string | Signs the `chal` (challenge) cookie. Same production rule |
+| `COOKIE_SECRET` | long random string | Signs the `chal` (challenge) cookie. In production it must be 32+ characters and not start with `change-me` |
 | `RP_ID` | `localhost` | WebAuthn relying-party id: the bare domain, no scheme, port or path |
 | `RP_NAME` | `Gӓdӓt` | Name shown in the fingerprint prompt |
 | `ORIGIN` | `http://localhost:4200` | Full front-end URL. Used for CORS and for WebAuthn origin checks |
@@ -161,7 +160,7 @@ All routes are JSON, live under `/api`, and answer errors in one shape: `{ "stat
 | POST | `/api/auth/credentials/options` | session | Options to add a passkey on a new device |
 | POST | `/api/auth/credentials/verify` | session + challenge cookie | Body `{ response }`. Stores the extra passkey |
 | GET | `/api/auth/me` | session | `{ id }`; used by the client guard |
-| POST | `/api/auth/logout` | session | Clears the cookie, returns 204 |
+| POST | `/api/auth/logout` | session | Deletes the session and clears the cookie, returns 204 |
 | GET | `/api/habits` | session | Active and archived habits of this user |
 | POST | `/api/habits` | session | Body `{ name, note?, days?, startDate }`; `days` defaults to all seven. Returns 201 |
 | PATCH | `/api/habits/:id` | session | Body with any of `name`, `note` (`""` or `null` clears it), `days` |
@@ -190,7 +189,7 @@ Login uses WebAuthn passkeys. The device checks your fingerprint and signs a ser
 
 Cookies:
 
-- `session`: a signed JWT holding only the user id, 30 days, `HttpOnly`, `SameSite=Lax`, `Secure` whenever `NODE_ENV=production`. No tokens are kept in `localStorage`.
+- `session`: a random 256-bit token that points to a row in the `Session` table, 30 days, `HttpOnly`, `SameSite=Lax`, `Secure` whenever `NODE_ENV=production`. Only the SHA-256 hash of the token is stored, so a leaked database cannot be used to sign in. Logging out deletes the row, so the cookie stops working at once. Expired rows are removed whenever a new session starts. No tokens are kept in `localStorage`.
 - `chal`: the pending challenge, signed, `HttpOnly`, 5 minutes, deleted after one use.
 
 Recovery code: 16 characters from `crypto.randomBytes` (alphabet without 0, 1, I, O), shown as `XXXX-XXXX-XXXX-XXXX`. Only its SHA-256 hash is stored, and the hashes are compared in constant time. Swapping in the new code is one conditional update, so two simultaneous uses of the same code cannot both succeed.
@@ -201,7 +200,7 @@ Other protection: `helmet`, CORS limited to `ORIGIN` with credentials, `SameSite
 
 - **HTTPS is required for passkeys** everywhere except `localhost`.
 - Set `RP_ID` to the bare domain (for example `example.com`) and `ORIGIN` to the full front-end URL (`https://app.example.com`). They must match what the browser sees, or registration and login fail.
-- Set `NODE_ENV=production`. Cookies become `Secure`. Use real random values for `JWT_SECRET` and `COOKIE_SECRET` (`openssl rand -base64 48`); the server refuses to start with short or placeholder secrets.
+- Set `NODE_ENV=production`. Cookies become `Secure`. Use a real random value for `COOKIE_SECRET` (`openssl rand -base64 48`); the server refuses to start with a short or placeholder secret.
 - Cookies are `SameSite=Lax`, so the app and the API must be the **same site**: either one origin with a reverse proxy sending `/api` to the API (simplest; keep `apiBase: '/api'`), or sibling subdomains such as `app.example.com` and `api.example.com` (then set `apiBase` in `client/src/environments/environment.prod.ts` to the full API URL).
 - Behind a reverse proxy set `TRUST_PROXY=1` so rate limits count real client IPs.
 - Apply migrations with `npx prisma migrate deploy`, run the API with `npm run build && npm run start:prod`, and serve `client/dist/client/browser` as static files with a fallback to `index.html`.

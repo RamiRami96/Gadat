@@ -15,6 +15,7 @@ model User {
   credentials Credential[]
   recovery    RecoveryCode?
   habits      Habit[]
+  sessions    Session[]
 }
 
 model Credential {
@@ -27,6 +28,17 @@ model Credential {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model Session {
+  id        String   @id // SHA-256 of the random token in the cookie; the token itself is never stored
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model RecoveryCode {

@@ -1,10 +1,10 @@
 import { INestApplication } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module.js';
 import { configureApp } from '../src/app.setup.js';
 import { generateRecoveryCode, hashRecoveryCode } from '../src/auth/recovery-code.js';
+import { SessionService } from '../src/auth/session.service.js';
 import { PrismaService } from '../src/prisma/prisma.service.js';
 
 export interface TestContext {
@@ -22,7 +22,7 @@ export async function createTestApp(): Promise<TestContext> {
   await app.init();
 
   const prisma = app.get(PrismaService);
-  const jwt = app.get(JwtService);
+  const sessions = app.get(SessionService);
   const userIds: string[] = [];
 
   return {
@@ -35,7 +35,7 @@ export async function createTestApp(): Promise<TestContext> {
         data: { recovery: { create: { hash: hashRecoveryCode(recoveryCode) } } },
       });
       userIds.push(user.id);
-      const token = await jwt.signAsync({ sub: user.id }, { expiresIn: '1h' });
+      const token = await sessions.create(user.id);
       return { id: user.id, cookie: `session=${token}`, recoveryCode };
     },
     async close() {

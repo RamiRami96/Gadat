@@ -16,7 +16,7 @@ import { AuthService } from './auth.service.js';
 import { ChallengeCookie, ChallengeKind, ChallengeState } from './challenge.js';
 import { RecoveryDto, WebAuthnResponseDto } from './dto/auth.dto.js';
 import { SessionGuard } from './session.guard.js';
-import { SessionService } from './session.service.js';
+import { SESSION_COOKIE, SessionService } from './session.service.js';
 
 @Controller('auth')
 @Throttle({ default: { limit: 10, ttl: 60_000 } })
@@ -118,7 +118,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(204)
   @UseGuards(SessionGuard)
-  logout(@Res({ passthrough: true }) res: Response): void {
-    this.sessions.clear(res);
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<void> {
+    await this.sessions.end(res, req.cookies?.[SESSION_COOKIE]);
   }
 }
