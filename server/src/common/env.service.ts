@@ -10,7 +10,6 @@ function required(name: string, source: NodeJS.ProcessEnv): string {
   return value;
 }
 
-/** Typed, validated view of the environment. Secrets only ever come from here. */
 @Injectable()
 export class EnvService {
   readonly nodeEnv: string;

@@ -1,7 +1,6 @@
 import { Component, computed, input, model } from '@angular/core';
 import { WEEKDAY_OPTIONS } from '../../data/habit-data';
 
-/** Seven round weekday toggles, Monday to Sunday. */
 @Component({
   selector: 'app-days-picker',
   template: `

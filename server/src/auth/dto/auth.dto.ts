@@ -1,6 +1,5 @@
 import { IsObject, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
-/** Wraps the JSON returned by @simplewebauthn/browser, which the server library validates itself. */
 export class WebAuthnResponseDto {
   @IsObject()
   response!: Record<string, unknown>;

@@ -10,7 +10,6 @@ import {
   ringStatus,
 } from './habit-stats';
 
-// November 2025: the 1st is a Saturday, so Mon 3, Wed 5, Fri 7, Mon 10 ...
 const ALL = [1, 2, 3, 4, 5, 6, 7];
 
 function habit(id: string, over: Partial<Habit> = {}): Habit {
@@ -36,9 +35,9 @@ describe('isScheduled', () => {
   const mwf = habit('mwf', { days: [1, 3, 5], startDate: '2025-11-03', endDate: '2025-11-14' });
 
   it('is scheduled only on its weekdays', () => {
-    expect(isScheduled(mwf, '2025-11-03')).toBe(true); // Monday
-    expect(isScheduled(mwf, '2025-11-04')).toBe(false); // Tuesday
-    expect(isScheduled(mwf, '2025-11-05')).toBe(true); // Wednesday
+    expect(isScheduled(mwf, '2025-11-03')).toBe(true);
+    expect(isScheduled(mwf, '2025-11-04')).toBe(false);
+    expect(isScheduled(mwf, '2025-11-05')).toBe(true);
   });
 
   it('is not scheduled before it started', () => {
@@ -47,8 +46,8 @@ describe('isScheduled', () => {
   });
 
   it('counts its end date as the last scheduled day', () => {
-    expect(isScheduled(mwf, '2025-11-14')).toBe(true); // Friday, the end date
-    expect(isScheduled(mwf, '2025-11-17')).toBe(false); // Monday after
+    expect(isScheduled(mwf, '2025-11-14')).toBe(true);
+    expect(isScheduled(mwf, '2025-11-17')).toBe(false);
   });
 });
 
@@ -56,9 +55,7 @@ describe('day progress and ring', () => {
   const habits = [habit('a'), habit('b'), habit('mwf', { days: [1, 3, 5] })];
 
   it('counts only habits scheduled that weekday', () => {
-    // Tuesday: mwf is not scheduled
     expect(dayProgress(habits, new Set(), '2025-11-04')).toEqual({ done: 0, total: 2 });
-    // Monday: all three
     expect(dayProgress(habits, new Set(), '2025-11-03')).toEqual({ done: 0, total: 3 });
   });
 
@@ -123,11 +120,8 @@ describe('currentStreak', () => {
   it('skips days when nothing is scheduled instead of breaking', () => {
     const mwf = [habit('mwf', { days: [1, 3, 5] })];
     const checks = set(ticks('mwf', ['2025-11-03', '2025-11-05', '2025-11-07']));
-    // Sunday 9 Nov: Saturday and Sunday are unscheduled, so the streak is still 3
     expect(currentStreak(mwf, checks, '2025-11-09')).toBe(3);
-    // Monday 10 Nov, not ticked yet: still 3
     expect(currentStreak(mwf, checks, '2025-11-10')).toBe(3);
-    // Wednesday 12 Nov: Monday 10 was missed, so it ends there
     expect(currentStreak(mwf, checks, '2025-11-12')).toBe(0);
   });
 
@@ -163,11 +157,11 @@ describe('bestStreak', () => {
     const checks = set(
       ticks('a', [
         '2025-11-01',
-        '2025-11-02', // run of 2
+        '2025-11-02',
         '2025-11-04',
         '2025-11-05',
-        '2025-11-06', // run of 3
-        '2025-11-08', // run of 1
+        '2025-11-06',
+        '2025-11-08',
       ]),
     );
     expect(bestStreak([habit('a')], checks, '2025-11-08')).toBe(3);
@@ -194,7 +188,6 @@ describe('monthRate', () => {
   const habits = [habit('a'), habit('mwf', { days: [1, 3, 5] })];
 
   it('divides ticks by scheduled habit-days from the 1st through today', () => {
-    // 1-10 Nov. a: 10 scheduled. mwf: Mon 3, Wed 5, Fri 7, Mon 10 = 4 scheduled. Total 14.
     const checks = set(
       ticks('a', ['2025-11-01', '2025-11-02', '2025-11-03', '2025-11-04', '2025-11-05']),
       ticks('mwf', ['2025-11-03', '2025-11-05']),
@@ -203,7 +196,6 @@ describe('monthRate', () => {
   });
 
   it('uses the whole month for a past month', () => {
-    // October 2025 is before the habits started: nothing scheduled
     expect(monthRate(habits, new Set(), 2025, 10, '2025-11-10')).toBe(0);
     const old = [habit('a', { startDate: '2025-10-01' })];
     const checks = set(ticks('a', ['2025-10-01', '2025-10-02', '2025-10-03']));
@@ -212,7 +204,7 @@ describe('monthRate', () => {
 
   it('is 0, not NaN, when nothing was scheduled', () => {
     expect(monthRate([], new Set(), 2025, 11, '2025-11-10')).toBe(0);
-    expect(monthRate(habits, new Set(), 2025, 12, '2025-11-10')).toBe(0); // a future month
+    expect(monthRate(habits, new Set(), 2025, 12, '2025-11-10')).toBe(0);
   });
 
   it('ignores ticks on days a habit was not scheduled', () => {

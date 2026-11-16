@@ -1,5 +1,3 @@
-/** Calendar-date helpers. A date is always a plain "YYYY-MM-DD" string in the user's local calendar. */
-
 export const WEEKDAY_NAMES = [
   'Monday',
   'Tuesday',
@@ -45,7 +43,6 @@ function utcMs(date: string): number {
   return Date.UTC(year, month - 1, day);
 }
 
-/** The local calendar date of `now`. Never goes through UTC, so ticks land on the user's own day. */
 export function todayIso(now: Date = new Date()): string {
   return toIso(now.getFullYear(), now.getMonth() + 1, now.getDate());
 }
@@ -59,7 +56,6 @@ export function diffDays(from: string, to: string): number {
   return Math.round((utcMs(to) - utcMs(from)) / DAY_MS);
 }
 
-/** ISO weekday of a date: 1 = Monday ... 7 = Sunday. */
 export function isoWeekday(date: string): number {
   const day = new Date(utcMs(date)).getUTCDay();
   return day === 0 ? 7 : day;
@@ -74,7 +70,6 @@ export function monthOf(date: string): { year: number; month: number } {
   return { year, month };
 }
 
-/** Months since year 0, so months can be compared and stepped as plain numbers. */
 export function monthIndex(year: number, month: number): number {
   return year * 12 + (month - 1);
 }
@@ -88,10 +83,6 @@ export function shiftMonth(
   return { year: Math.floor(index / 12), month: (index % 12) + 1 };
 }
 
-/**
- * The cells of a month, Monday first. Leading and trailing nulls pad whole weeks so the grid
- * always has complete rows of seven.
- */
 export function monthGrid(year: number, month: number): (string | null)[] {
   const lead = isoWeekday(toIso(year, month, 1)) - 1;
   const cells: (string | null)[] = Array.from({ length: lead }, () => null);
@@ -100,13 +91,11 @@ export function monthGrid(year: number, month: number): (string | null)[] {
   return cells;
 }
 
-/** "Monday, 3 November" */
 export function formatLongDate(date: string): string {
   const { month, day } = parseIso(date);
   return `${WEEKDAY_NAMES[isoWeekday(date) - 1]}, ${day} ${MONTH_NAMES[month - 1]}`;
 }
 
-/** "3 November" */
 export function formatDayMonth(date: string): string {
   const { month, day } = parseIso(date);
   return `${day} ${MONTH_NAMES[month - 1]}`;

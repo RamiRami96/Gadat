@@ -5,7 +5,7 @@ import { HabitRepository } from '../services/habit-repository';
 import type { CheckIn, Habit } from '@infrastructure/models/api-models';
 import { HabitStore } from './habit-store';
 
-const TODAY = '2025-11-12'; // a Wednesday
+const TODAY = '2025-11-12';
 
 const READ: Habit = {
   id: 'read',
@@ -68,7 +68,7 @@ describe('HabitStore', () => {
     const { store, repo } = setup();
     await store.load();
     const done = store.toggleToday('read');
-    expect(store.isChecked('read', TODAY)).toBe(true); // before the API answers
+    expect(store.isChecked('read', TODAY)).toBe(true);
     expect(store.todayProgress()).toEqual({ done: 1, total: 1 });
     await done;
     expect(repo.ticks).toEqual([`PUT read ${TODAY}`]);
@@ -90,13 +90,13 @@ describe('HabitStore', () => {
     await store.load();
     const gate = new Subject<void>();
     let calls = 0;
-    repo.next = () => (calls++ === 0 ? gate : of(undefined)); // only the first call waits
+    repo.next = () => (calls++ === 0 ? gate : of(undefined));
 
-    const first = store.toggleToday('read'); // tick
-    const second = store.toggleToday('read'); // untick, before the first call finished
+    const first = store.toggleToday('read');
+    const second = store.toggleToday('read');
     expect(store.isChecked('read', TODAY)).toBe(false);
     await new Promise((resolve) => setTimeout(resolve));
-    expect(repo.ticks).toEqual([`PUT read ${TODAY}`]); // second waits for the first
+    expect(repo.ticks).toEqual([`PUT read ${TODAY}`]);
 
     gate.next();
     gate.complete();
@@ -112,7 +112,7 @@ describe('HabitStore', () => {
     store.viewMonth.set({ year: 2025, month: 11 });
     await store.load();
     expect(store.canGoNext()).toBe(false);
-    expect(store.canGoPrev()).toBe(false); // the habit started in November
+    expect(store.canGoPrev()).toBe(false);
     store.habits.update((list) => [{ ...list[0]!, startDate: '2025-09-01' }]);
     expect(store.canGoPrev()).toBe(true);
     store.shiftMonth(-1);
@@ -123,7 +123,7 @@ describe('HabitStore', () => {
     const { store } = setup();
     store.selectedDate.set(TODAY);
     store.viewMonth.set({ year: 2025, month: 11 });
-    store.refreshToday(new Date(2025, 11, 1, 0, 1)); // 1 December, local
+    store.refreshToday(new Date(2025, 11, 1, 0, 1));
     expect(store.today()).toBe('2025-12-01');
     expect(store.selectedDate()).toBe('2025-12-01');
     expect(store.viewMonth()).toEqual({ year: 2025, month: 12 });

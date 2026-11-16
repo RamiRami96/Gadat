@@ -6,7 +6,6 @@ import { Logo } from '@shared/components/logo';
 import { UNLOCK_URL } from '@shared/constants/app-constants';
 import { SessionService } from '@shared/services/session-service';
 
-/** Logo on the left; a "Locked with fingerprint" pill with the log-out action on the right. */
 @Component({
   selector: 'app-dashboard-header',
   imports: [Icon, Logo],

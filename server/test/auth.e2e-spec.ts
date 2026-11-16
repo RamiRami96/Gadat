@@ -9,7 +9,6 @@ function cookiesOf(res: request.Response): string[] {
 describe('Auth (e2e)', () => {
   let ctx: TestContext;
 
-  // A fresh app per test gives every test its own 10-requests-a-minute auth budget.
   beforeEach(async () => {
     ctx = await createTestApp();
   });
@@ -87,9 +86,7 @@ describe('Auth (e2e)', () => {
     expect(session).toMatch(/HttpOnly/);
     expect(session).toMatch(/SameSite=Lax/);
 
-    // the old code is dead
     await api(ctx).post('/api/auth/recovery').send({ code: user.recoveryCode }).expect(401);
-    // typing it loosely (lower case, spaces) still works for the new one
     const loose = first.body.recoveryCode.toLowerCase().replaceAll('-', ' ');
     const second = await api(ctx).post('/api/auth/recovery').send({ code: loose }).expect(200);
     expect(second.body.recoveryCode).not.toBe(first.body.recoveryCode);
@@ -113,7 +110,6 @@ describe('Auth (e2e)', () => {
         statusCode: 429,
         message: 'Too many requests. Please wait a minute and try again.',
       });
-      // other routes have their own, larger budget
       await api(limited).get('/api/health').expect(200);
     } finally {
       await limited.close();

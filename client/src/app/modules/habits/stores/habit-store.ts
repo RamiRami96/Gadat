@@ -24,7 +24,6 @@ import {
   scheduledOn,
 } from '../utils/habit-stats';
 
-/** All screen state lives here as signals. Streaks, rings and rates are computed from them. */
 @Injectable({ providedIn: 'root' })
 export class HabitStore {
   private readonly repo = inject(HabitRepository);
@@ -34,16 +33,13 @@ export class HabitStore {
   readonly habits = signal<Habit[]>([]);
   readonly checks = signal<CheckInSet>(new Set());
   readonly today = signal(todayIso());
-  /** The habit chosen in the calendar chips, or null for "All habits". */
   readonly filter = signal<string | null>(null);
   readonly viewMonth = signal(monthOf(todayIso()));
   readonly selectedDate = signal(todayIso());
 
-  // ---- Today ----
   readonly todayHabits = computed(() => scheduledOn(this.habits(), this.today()));
   readonly todayProgress = computed(() => dayProgress(this.habits(), this.checks(), this.today()));
 
-  // ---- Calendar bounds ----
   readonly firstDate = computed(() => earliestStart(this.habits()));
   readonly canGoPrev = computed(() => {
     const first = this.firstDate();
@@ -58,7 +54,6 @@ export class HabitStore {
     return monthIndex(view.year, view.month) < monthIndex(now.year, now.month);
   });
 
-  // ---- Stats tiles (follow the chip filter) ----
   readonly currentStreak = computed(() =>
     currentStreak(this.habits(), this.checks(), this.today(), this.filter()),
   );
@@ -71,7 +66,6 @@ export class HabitStore {
   });
   readonly monthRateLabel = computed(() => `${monthShortName(this.viewMonth().month)} rate`);
 
-  /** Streak shown on one Today row: that habit alone. */
   streakFor(habitId: string): number {
     return currentStreak(this.habits(), this.checks(), this.today(), habitId);
   }
@@ -80,7 +74,6 @@ export class HabitStore {
     return this.checks().has(checkKey(habitId, date));
   }
 
-  // ---- Loading ----
   async load(): Promise<void> {
     this.status.set('loading');
     try {
@@ -113,7 +106,6 @@ export class HabitStore {
     this.filter.set(null);
   }
 
-  // ---- Habits ----
   async addHabit(input: Omit<NewHabit, 'startDate'>): Promise<Habit> {
     const habit = await firstValueFrom(
       this.repo.createHabit({ ...input, startDate: this.today() }),
@@ -122,18 +114,10 @@ export class HabitStore {
     return habit;
   }
 
-  // ---- Ticking ----
-  /** Last state the server confirmed, per habit|date. */
   private readonly confirmed = new Map<string, boolean>();
-  /** Requests in flight or queued, per habit|date. */
   private readonly pending = new Map<string, number>();
   private readonly queue = new Map<string, Promise<void>>();
 
-  /**
-   * Ticks or unticks a habit today. The screen changes at once; the API call follows. Calls for one
-   * habit and day run one after another, so rapid double taps cannot reach the server out of order.
-   * If a call fails, the box returns to the last state the server confirmed.
-   */
   toggleToday(habitId: string): Promise<void> {
     const date = this.today();
     const key = checkKey(habitId, date);
@@ -151,7 +135,6 @@ export class HabitStore {
         this.confirmed.set(key, next);
       } catch {
         this.toast.show(SAVE_ERROR);
-        // Only undo when no later tap is still waiting; that tap will settle the final state.
         if ((this.pending.get(key) ?? 1) <= 1)
           this.setChecked(key, this.confirmed.get(key) ?? !next);
       } finally {
@@ -177,7 +160,6 @@ export class HabitStore {
     });
   }
 
-  // ---- Calendar navigation ----
   selectFilter(habitId: string | null): void {
     this.filter.set(habitId);
   }
@@ -192,7 +174,6 @@ export class HabitStore {
     this.viewMonth.set({ year: Math.floor(index / 12), month: (index % 12) + 1 });
   }
 
-  /** Called on a timer and when the tab becomes visible, so the app follows midnight. */
   refreshToday(now: Date = new Date()): void {
     const fresh = todayIso(now);
     const old = this.today();

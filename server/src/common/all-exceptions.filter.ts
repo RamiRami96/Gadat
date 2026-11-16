@@ -14,7 +14,6 @@ interface ErrorBody {
   errors?: string[];
 }
 
-/** One error shape for the whole API: { statusCode, message, errors? }. Never leaks stack traces. */
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger('Exceptions');

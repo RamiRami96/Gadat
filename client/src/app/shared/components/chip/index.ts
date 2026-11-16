@@ -1,8 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 
-/** A fully round filter chip. The selected one is dark with white text. */
 @Component({
-  // Attribute selector on purpose: it styles a native <button> instead of wrapping it.
   // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'button[appChip]',
   template: '<ng-content />',

@@ -9,7 +9,6 @@ export class RangeQuery {
   to!: string;
 }
 
-/** Path params of PUT/DELETE /habits/:id/check-ins/:date. */
 export class CheckInParams {
   @IsString()
   @MaxLength(64)

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Logo } from '@shared/components/logo';
 
-/** Centered card with the logo above it, shared by Unlock and Set up. */
 @Component({
   selector: 'app-auth-shell',
   imports: [Logo],

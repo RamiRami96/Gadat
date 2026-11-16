@@ -30,7 +30,6 @@ export class HabitsService {
 
   create(userId: string, dto: CreateHabitDto) {
     return this.prisma.$transaction(async (tx) => {
-      // Serialise concurrent creates for one user so the limit cannot be bypassed.
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${userId}))`;
       const active = await tx.habit.count({ where: { userId, endDate: null } });
       if (active >= MAX_ACTIVE_HABITS) {
@@ -62,10 +61,9 @@ export class HabitsService {
     });
   }
 
-  /** Archives instead of deleting: the habit stops counting the day before `date`. */
   async archive(userId: string, id: string, date: string): Promise<void> {
     const habit = await this.findOwned(userId, id);
-    if (habit.endDate !== null) return; // already archived: repeating is safe
+    if (habit.endDate !== null) return;
     await this.prisma.habit.update({ where: { id, userId }, data: { endDate: addDays(date, -1) } });
   }
 

@@ -3,7 +3,6 @@ import { dayProgress, HabitStore } from '@modules/habits';
 import { formatLongDate, MONTH_NAMES } from '@shared/utils/dates';
 import { buildCalendar } from '../utils/calendar-days';
 
-/** The month on screen as signals: its title, its day cells and the selected-day summary. */
 export function useCalendar() {
   const store = inject(HabitStore);
 

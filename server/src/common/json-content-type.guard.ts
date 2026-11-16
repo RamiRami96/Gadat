@@ -8,7 +8,6 @@ import type { Request } from 'express';
 
 const MUTATING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
-/** CSRF defence in depth: mutating requests must declare application/json. */
 @Injectable()
 export class JsonContentTypeGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {

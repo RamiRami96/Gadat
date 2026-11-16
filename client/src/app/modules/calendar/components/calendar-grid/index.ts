@@ -2,10 +2,6 @@ import { Component, input, output } from '@angular/core';
 import { WEEKDAY_LABELS } from '../../constants/calendar-constants';
 import type { DayCell } from '../../models/calendar-models';
 
-/**
- * The month grid. Each day is a circle drawn with a conic-gradient ring that starts at the top and
- * runs clockwise. It only displays; tapping a day just reports which one.
- */
 @Component({
   selector: 'app-calendar-grid',
   template: `
@@ -93,7 +89,6 @@ import type { DayCell } from '../../models/calendar-models';
       border-radius: 50%;
       background: var(--accent);
     }
-    /* Not scheduled, in the future, or before the first habit: just a muted number. */
     .day--off {
       color: var(--muted);
       cursor: default;
@@ -104,15 +99,12 @@ import type { DayCell } from '../../models/calendar-models';
     .day--off .day__ring {
       font-weight: 500;
     }
-    /* Scheduled, nothing done: light grey ring, white centre. */
     .day--empty .day__ring {
       background: var(--track);
     }
-    /* Partly done: an accent arc for done / total, from the top, clockwise. */
     .day--partial .day__ring {
       background: conic-gradient(from 0deg, var(--accent) var(--fill), var(--track) 0);
     }
-    /* All done: a solid accent circle with a white number. */
     .day--full {
       color: #fff;
     }
@@ -125,7 +117,6 @@ import type { DayCell } from '../../models/calendar-models';
     .day--full .day__dot {
       background: #fff;
     }
-    /* Selected: 2px dark ring with a 3px white gap. */
     .day--selected .day__ring {
       box-shadow:
         0 0 0 3px var(--surface),

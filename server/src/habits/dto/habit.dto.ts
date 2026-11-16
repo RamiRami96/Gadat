@@ -15,7 +15,6 @@ import {
 import { IsIsoDate } from '../../common/is-iso-date.decorator.js';
 
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
-/** Trimmed; an empty note becomes null so it clears the note. */
 const trimOrNull = ({ value }: { value: unknown }) => {
   if (typeof value !== 'string') return value;
   const trimmed = value.trim();

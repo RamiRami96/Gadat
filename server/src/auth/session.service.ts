@@ -6,7 +6,6 @@ import { EnvService } from '../common/env.service.js';
 export const SESSION_COOKIE = 'session';
 export const SESSION_DAYS = 30;
 
-/** Issues and verifies the session: a signed JWT holding only the user id, in an HttpOnly cookie. */
 @Injectable()
 export class SessionService {
   constructor(
@@ -35,7 +34,6 @@ export class SessionService {
     res.clearCookie(SESSION_COOKIE, this.cookieOptions());
   }
 
-  /** Returns the user id inside a valid token, or null. */
   async verify(token: unknown): Promise<string | null> {
     if (typeof token !== 'string' || token.length === 0) return null;
     try {

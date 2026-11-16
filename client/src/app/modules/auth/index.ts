@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { guestGuard } from '@shared/utils/route-guards';
 
-/** Unlock, Set up and recovery. Lazy-loaded from app.routes.ts. */
 export const AUTH_ROUTES: Routes = [
   {
     path: 'unlock',

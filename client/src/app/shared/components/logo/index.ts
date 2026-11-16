@@ -1,9 +1,5 @@
 import { Component } from '@angular/core';
 
-/**
- * The wordmark. Gӓdӓt contains U+04D3 (Cyrillic ӓ), which Space Grotesk does not draw, so the logo
- * is set in Inter, a font that does, instead of letting the browser substitute a random one.
- */
 @Component({
   selector: 'app-logo',
   template: `

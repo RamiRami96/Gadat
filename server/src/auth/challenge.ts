@@ -13,7 +13,6 @@ export interface ChallengeState {
 const COOKIE = 'chal';
 const FIVE_MINUTES = 5 * 60 * 1000;
 
-/** The pending WebAuthn challenge lives in a short-lived, signed, HttpOnly cookie. */
 @Injectable()
 export class ChallengeCookie {
   constructor(private readonly env: EnvService) {}
@@ -35,7 +34,6 @@ export class ChallengeCookie {
     });
   }
 
-  /** Reads the pending challenge and always deletes it: a challenge is single use. */
   take(req: Request, res: Response, kind: ChallengeKind): ChallengeState | null {
     const raw: unknown = req.signedCookies?.[COOKIE];
     res.clearCookie(COOKIE, this.options());
