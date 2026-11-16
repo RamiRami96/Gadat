@@ -18,8 +18,6 @@ export class EnvService {
 
   readonly port: number;
 
-  readonly jwtSecret: string;
-
   readonly cookieSecret: string;
 
   readonly rpId: string;
@@ -34,7 +32,6 @@ export class EnvService {
     this.nodeEnv = source.NODE_ENV ?? 'development';
     this.isProduction = this.nodeEnv === 'production';
     this.port = Number(source.PORT ?? 3000);
-    this.jwtSecret = required('JWT_SECRET', source);
     this.cookieSecret = required('COOKIE_SECRET', source);
     this.rpId = required('RP_ID', source);
     this.rpName = source.RP_NAME ?? 'Gӓdӓt';
@@ -43,16 +40,11 @@ export class EnvService {
     required('DATABASE_URL', source);
 
     if (this.isProduction) {
-      [
-        ['JWT_SECRET', this.jwtSecret],
-        ['COOKIE_SECRET', this.cookieSecret],
-      ].forEach(([name, value]) => {
-        if (value.startsWith(PLACEHOLDER) || value.length < 32) {
-          throw new Error(
-            `${name} must be a random string of at least 32 characters in production.`,
-          );
-        }
-      });
+      if (this.cookieSecret.startsWith(PLACEHOLDER) || this.cookieSecret.length < 32) {
+        throw new Error(
+          'COOKIE_SECRET must be a random string of at least 32 characters in production.',
+        );
+      }
     }
   }
 }

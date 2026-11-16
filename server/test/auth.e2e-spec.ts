@@ -67,11 +67,12 @@ describe('Auth (e2e)', () => {
       .expect(400);
   });
 
-  it('logout clears the session cookie', async () => {
+  it('logout clears the session cookie and ends the session on the server', async () => {
     const user = await ctx.signIn();
     const res = await api(ctx, user.cookie).post('/api/auth/logout').send({}).expect(204);
     expect(cookiesOf(res).find((c) => c.startsWith('session='))).toMatch(/session=;/);
     await api(ctx).post('/api/auth/logout').send({}).expect(401);
+    await api(ctx, user.cookie).get('/api/auth/me').expect(401);
   });
 
   it('the recovery code works once, and the reply carries a new one', async () => {
