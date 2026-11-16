@@ -110,6 +110,26 @@ It creates a demo user with five habits and about a year of check-ins, and print
 
 `npm run test:e2e` writes to the database in `DATABASE_URL` but only creates its own users (random ids) and deletes exactly those afterwards, so it is safe to run next to your own data.
 
+## Chrome extension
+
+The client builds as a Manifest V3 Chrome extension. The toolbar button opens Gӓdӓt in its own tab.
+
+```bash
+cd client
+npm run build:extension      # writes client/dist/extension
+```
+
+Open `chrome://extensions`, turn on Developer mode, choose "Load unpacked" and pick `client/dist/extension`. The `key` in `client/public/manifest.json` pins the extension id to `dddeldmgddfmcoobmdgaboaeobapcebo`, so the server settings below stay valid.
+
+Set these in `server/.env` so passkeys and CORS accept the extension:
+
+```
+RP_ID=dddeldmgddfmcoobmdgaboaeobapcebo
+ORIGIN=chrome-extension://dddeldmgddfmcoobmdgaboaeobapcebo
+```
+
+The API address is `apiBase` in `client/src/environments/environment.extension.ts`, and the same host must be listed under `host_permissions` in the manifest.
+
 ## Environment variables (`server/.env`)
 
 | Variable | Example | Meaning |

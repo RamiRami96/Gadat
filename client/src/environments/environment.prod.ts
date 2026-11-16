@@ -6,4 +6,5 @@ export const environment = {
    * sites that share a registrable domain.
    */
   apiBase: '/api',
+  useHash: false,
 };
