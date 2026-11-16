@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Gӓdӓt",
+  "version": "0.0.1",
+  "description": "Gӓdӓt: a calm habit tracker unlocked with your fingerprint.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArm7LOC4S6pzBMvRg6qBiEVxM7Y5Xq5+Ftb6S92bjD3mdzB14ecuUjFYyVW2l/T7vM/A3gsIcy4vUPAuLkVKquKOL3OXLLkjlHZvqFC9NzjvdI+sUwTbiXefOh1Mf57WJbbFwLB+Iyz3IiUU3i0ps9jr1Eout3ZmrVHmpxPMTWA9OPZKFClHKGeKZFjk3vWW3+/83PnCfYkJW9GToERe9VLbHFpugo8kHf+iBBWFpF45lDqpopbgIZ5XIlgfMxJlg6vvV+NGqb9ldmUQfFz31c7IiuHPZYVP62ruH499xxSdF8MFc/Q4Bu1Czit/ed52LfkXfvL1hATaN+FvBxEIT+QIDAQAB",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Gӓdӓt",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": ["http://localhost:3000/*"]
+}
