@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { HabitStore } from '../../stores/habit-store';
 import { Icon } from '@shared/components/icon';
+import { HabitStore } from '../../stores/habit-store';
 
 @Component({
   selector: 'app-stats-tiles',
@@ -35,5 +35,6 @@ import { Icon } from '@shared/components/icon';
 })
 export class StatsTiles {
   protected readonly store = inject(HabitStore);
+
   protected readonly ready = () => this.store.status() === 'ready';
 }

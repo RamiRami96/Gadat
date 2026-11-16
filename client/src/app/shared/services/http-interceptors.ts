@@ -1,4 +1,4 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn, HttpStatusCode } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
@@ -20,7 +20,11 @@ export const unauthorizedInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: unknown) => {
       const isAuthCall = req.url.includes('/auth/');
-      if (error instanceof HttpErrorResponse && error.status === 401 && !isAuthCall) {
+      if (
+        error instanceof HttpErrorResponse &&
+        error.status === HttpStatusCode.Unauthorized &&
+        !isAuthCall
+      ) {
         state.signedIn.set(false);
         void router.navigateByUrl(UNLOCK_URL);
       }

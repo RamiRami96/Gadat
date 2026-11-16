@@ -46,11 +46,16 @@ import { Icon } from '@shared/components/icon';
 })
 export class HabitRow {
   readonly name = input.required<string>();
+
   readonly note = input<string | null>(null);
+
   readonly checked = input(false);
+
   readonly streak = input(0);
+
   readonly preview = input(false);
-  readonly toggled = output<void>();
+
+  readonly toggled = output();
 
   protected readonly flameClass = computed(() =>
     this.streak() > 0 ? 'text-accent' : 'text-muted',

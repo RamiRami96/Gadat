@@ -9,9 +9,11 @@ import type { FingerprintState } from '../../models/auth-models';
   template: `
     <div class="relative mx-auto h-[168px] w-[168px]" aria-hidden="true">
       @if (state() === 'scanning') {
-        <span class="pulse-ring absolute inset-0 rounded-full border-2 border-accent"></span>
         <span
-          class="pulse-ring absolute inset-0 rounded-full border-2 border-accent"
+          class="animate-pulse-ring motion-reduce:animate-none motion-reduce:scale-[1.15] motion-reduce:opacity-35 absolute inset-0 rounded-full border-2 border-accent"
+        ></span>
+        <span
+          class="animate-pulse-ring motion-reduce:animate-none motion-reduce:scale-[1.15] motion-reduce:opacity-35 absolute inset-0 rounded-full border-2 border-accent"
           style="animation-delay: 0.9s"
         ></span>
       }

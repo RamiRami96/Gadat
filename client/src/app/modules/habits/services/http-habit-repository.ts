@@ -2,8 +2,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { api } from '@shared/services/api-service';
-import { HabitRepository } from './habit-repository';
 import type { CheckIn, Habit, NewHabit } from '@infrastructure/models/api-models';
+import { HabitRepository } from './habit-repository';
 
 @Injectable()
 export class HttpHabitRepository extends HabitRepository {

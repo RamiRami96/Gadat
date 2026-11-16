@@ -1,6 +1,6 @@
-import type { CalendarInput, DayCell } from '../models/calendar-models';
 import { formatDayMonth, monthGrid, parseIso } from '@shared/utils/dates';
 import { dayProgress, earliestStart, ringFraction, ringStatus } from '@modules/habits';
+import type { CalendarInput, DayCell } from '../models/calendar-models';
 
 function labelFor(date: string, done: number, total: number, disabled: boolean): string {
   const text = formatDayMonth(date);

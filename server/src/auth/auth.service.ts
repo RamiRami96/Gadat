@@ -7,7 +7,6 @@ import {
 } from '@simplewebauthn/server';
 import type {
   AuthenticationResponseJSON,
-  AuthenticatorTransport,
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialRequestOptionsJSON,
   RegistrationResponseJSON,
@@ -45,7 +44,7 @@ export class AuthService {
     state: ChallengeState,
     body: Record<string, unknown>,
   ): Promise<{ userId: string; recoveryCode: string }> {
-    const userId = state.userId;
+    const { userId } = state;
     if (!userId) throw new BadRequestException('Registration was not started');
     const existing = await this.prisma.credential.count({ where: { userId } });
     if (existing > 0) throw new BadRequestException('Registration was already completed');
@@ -94,7 +93,7 @@ export class AuthService {
           id: stored.id,
           publicKey: new Uint8Array(stored.publicKey),
           counter: stored.counter,
-          transports: stored.transports as AuthenticatorTransport[],
+          transports: stored.transports,
         },
       });
     } catch {

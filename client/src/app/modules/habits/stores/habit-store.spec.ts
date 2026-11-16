@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { ToastService } from '@shared/services/toast-service';
-import { HabitRepository } from '../services/habit-repository';
 import type { CheckIn, Habit } from '@infrastructure/models/api-models';
+import { HabitRepository } from '../services/habit-repository';
 import { HabitStore } from './habit-store';
 
 const TODAY = '2025-11-12';
@@ -19,26 +19,34 @@ const READ: Habit = {
 
 class FakeRepository extends HabitRepository {
   habits: Habit[] = [READ];
+
   checkIns: CheckIn[] = [{ habitId: 'read', date: '2025-11-11' }];
+
   ticks: string[] = [];
+
   next: () => Observable<void> = () => of(undefined);
 
   listHabits() {
     return of(this.habits);
   }
+
   createHabit(): never {
     throw new Error('not used');
   }
+
   archiveHabit(): never {
     throw new Error('not used');
   }
+
   listCheckIns() {
     return of(this.checkIns);
   }
+
   tick(habitId: string, date: string) {
     this.ticks.push(`PUT ${habitId} ${date}`);
     return this.next();
   }
+
   untick(habitId: string, date: string) {
     this.ticks.push(`DELETE ${habitId} ${date}`);
     return this.next();
@@ -90,12 +98,17 @@ describe('HabitStore', () => {
     await store.load();
     const gate = new Subject<void>();
     let calls = 0;
-    repo.next = () => (calls++ === 0 ? gate : of(undefined));
+    repo.next = () => {
+      calls += 1;
+      return calls === 1 ? gate : of(undefined);
+    };
 
     const first = store.toggleToday('read');
     const second = store.toggleToday('read');
     expect(store.isChecked('read', TODAY)).toBe(false);
-    await new Promise((resolve) => setTimeout(resolve));
+    await new Promise((resolve) => {
+      setTimeout(resolve);
+    });
     expect(repo.ticks).toEqual([`PUT read ${TODAY}`]);
 
     gate.next();
@@ -113,7 +126,7 @@ describe('HabitStore', () => {
     await store.load();
     expect(store.canGoNext()).toBe(false);
     expect(store.canGoPrev()).toBe(false);
-    store.habits.update((list) => [{ ...list[0]!, startDate: '2025-09-01' }]);
+    store.habits.update((list) => [{ ...list[0], startDate: '2025-09-01' }]);
     expect(store.canGoPrev()).toBe(true);
     store.shiftMonth(-1);
     expect(store.canGoNext()).toBe(true);

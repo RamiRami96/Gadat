@@ -4,15 +4,14 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ALL_WEEKDAYS } from '@shared/constants/app-constants';
-import { NAME_MAX, NOTE_MAX, SAVE_ERROR } from '../../constants/habit-constants';
-import { QUICK_PICKS } from '../../constants/habit-constants';
+import { Button } from '@shared/components/button';
+import { Chip } from '@shared/components/chip';
+import { Icon } from '@shared/components/icon';
+import { NAME_MAX, NOTE_MAX, SAVE_ERROR, QUICK_PICKS } from '../../constants/habit-constants';
 import { HabitRow } from '../habit-row';
 import { HabitValidators } from '../../services/habit-validators';
 import { HabitStore } from '../../stores/habit-store';
 import { DaysPicker } from '../days-picker';
-import { Button } from '@shared/components/button';
-import { Chip } from '@shared/components/chip';
-import { Icon } from '@shared/components/icon';
 
 @Component({
   selector: 'app-add-habit-dialog',
@@ -21,13 +20,19 @@ import { Icon } from '@shared/components/icon';
 })
 export class AddHabitDialog {
   private readonly store = inject(HabitStore);
+
   private readonly validators = inject(HabitValidators);
+
   private readonly ref = inject<DialogRef<boolean>>(DialogRef);
 
   protected readonly nameMax = NAME_MAX;
+
   protected readonly noteMax = NOTE_MAX;
+
   protected readonly quickPicks = QUICK_PICKS;
+
   protected readonly saving = signal(false);
+
   protected readonly serverError = signal('');
 
   protected readonly form = new FormGroup({
@@ -45,9 +50,13 @@ export class AddHabitDialog {
   private readonly value = toSignal(this.form.valueChanges, {
     initialValue: this.form.getRawValue(),
   });
+
   protected readonly nameLength = computed(() => (this.value().name ?? '').length);
+
   protected readonly noteLength = computed(() => (this.value().note ?? '').length);
+
   protected readonly previewName = computed(() => (this.value().name ?? '').trim() || 'Your habit');
+
   protected readonly previewNote = computed(() => (this.value().note ?? '').trim() || null);
 
   protected pick(name: string): void {

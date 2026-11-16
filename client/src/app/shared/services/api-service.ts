@@ -5,5 +5,5 @@ export function api(path: string): string {
 }
 
 export function isApiUrl(url: string): boolean {
-  return url.startsWith(environment.apiBase + '/');
+  return url.startsWith(`${environment.apiBase}/`);
 }

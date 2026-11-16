@@ -1,11 +1,10 @@
+import { existsSync } from 'node:fs';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { generateRecoveryCode, hashRecoveryCode } from '../src/auth/recovery-code.js';
 import { addDays, formatDate } from '../src/common/dates.js';
 import { PrismaClient } from '../src/generated/prisma/client.js';
 
-try {
-  process.loadEnvFile();
-} catch {}
+if (existsSync('.env')) process.loadEnvFile();
 
 if (process.env.NODE_ENV === 'production') {
   console.error('Refusing to seed: NODE_ENV is production.');
@@ -29,7 +28,7 @@ function mulberry32(seed: number): () => number {
     a |= 0;
     a = (a + 0x6d2b79f5) | 0;
     let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
@@ -69,7 +68,7 @@ async function main(): Promise<void> {
         },
       });
       const rows: { habitId: string; date: string }[] = [];
-      for (let i = 0; i < DAYS_OF_HISTORY; i++) {
+      for (let i = 0; i < DAYS_OF_HISTORY; i += 1) {
         const date = addDays(start, i);
         if (date === today) continue;
         if (habit.days.includes(isoWeekday(date)) && random() < habit.rate) {

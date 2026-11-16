@@ -86,7 +86,7 @@ export function shiftMonth(
 export function monthGrid(year: number, month: number): (string | null)[] {
   const lead = isoWeekday(toIso(year, month, 1)) - 1;
   const cells: (string | null)[] = Array.from({ length: lead }, () => null);
-  for (let day = 1; day <= daysInMonth(year, month); day++) cells.push(toIso(year, month, day));
+  for (let day = 1; day <= daysInMonth(year, month); day += 1) cells.push(toIso(year, month, day));
   while (cells.length % 7 !== 0) cells.push(null);
   return cells;
 }
@@ -102,5 +102,5 @@ export function formatDayMonth(date: string): string {
 }
 
 export function monthShortName(month: number): string {
-  return MONTH_NAMES[month - 1]!.slice(0, 3);
+  return MONTH_NAMES[month - 1].slice(0, 3);
 }

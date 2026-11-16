@@ -83,7 +83,7 @@ export function currentStreak(
   let streak = 0;
   for (let date = today; date >= first; date = addDays(date, -1)) {
     const result = outcome(habits, checks, date, habitId);
-    if (result === 'hit') streak++;
+    if (result === 'hit') streak += 1;
     else if (result === 'miss' && date !== today) break;
   }
   return streak;
@@ -102,7 +102,7 @@ export function bestStreak(
   for (let date = first; date <= today; date = addDays(date, 1)) {
     const result = outcome(habits, checks, date, habitId);
     if (result === 'hit') {
-      run++;
+      run += 1;
       best = Math.max(best, run);
     } else if (result === 'miss') {
       run = 0;

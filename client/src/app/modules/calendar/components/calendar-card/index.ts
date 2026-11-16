@@ -15,5 +15,6 @@ import { CalendarGrid } from '../calendar-grid';
 })
 export class CalendarCard {
   protected readonly store = inject(HabitStore);
+
   protected readonly calendar = inject(CalendarViewService);
 }

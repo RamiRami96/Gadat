@@ -113,14 +113,12 @@ describe('AuthService', () => {
       expect(result.userId).toBe('user-1');
       expect(result.recoveryCode).toMatch(/^[2-9A-Z]{4}(-[2-9A-Z]{4}){3}$/);
 
-      const data = (
-        prisma.user.update.mock.calls[0]![0] as {
-          data: {
-            credentials: { create: Record<string, unknown> };
-            recovery: { create: { hash: string } };
-          };
-        }
-      ).data;
+      const { data } = prisma.user.update.mock.calls[0][0] as {
+        data: {
+          credentials: { create: Record<string, unknown> };
+          recovery: { create: { hash: string } };
+        };
+      };
       expect(data.credentials.create).toMatchObject({
         id: 'cred-1',
         counter: 0,

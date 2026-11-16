@@ -1,9 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ToastService } from '@shared/services/toast-service';
-import { CHECK_IN_WINDOW_DAYS, SAVE_ERROR } from '../constants/habit-constants';
-import type { LoadStatus } from '../models/habit-models';
-import { HabitRepository } from '../services/habit-repository';
 import type { Habit, NewHabit } from '@infrastructure/models/api-models';
 import {
   addDays,
@@ -13,6 +10,9 @@ import {
   monthShortName,
   todayIso,
 } from '@shared/utils/dates';
+import { CHECK_IN_WINDOW_DAYS, SAVE_ERROR } from '../constants/habit-constants';
+import type { LoadStatus } from '../models/habit-models';
+import { HabitRepository } from '../services/habit-repository';
 import {
   bestStreak,
   checkKey,
@@ -27,20 +27,29 @@ import {
 @Injectable({ providedIn: 'root' })
 export class HabitStore {
   private readonly repo = inject(HabitRepository);
+
   private readonly toast = inject(ToastService);
 
   readonly status = signal<LoadStatus>('idle');
+
   readonly habits = signal<Habit[]>([]);
+
   readonly checks = signal<CheckInSet>(new Set());
+
   readonly today = signal(todayIso());
+
   readonly filter = signal<string | null>(null);
+
   readonly viewMonth = signal(monthOf(todayIso()));
+
   readonly selectedDate = signal(todayIso());
 
   readonly todayHabits = computed(() => scheduledOn(this.habits(), this.today()));
+
   readonly todayProgress = computed(() => dayProgress(this.habits(), this.checks(), this.today()));
 
   readonly firstDate = computed(() => earliestStart(this.habits()));
+
   readonly canGoPrev = computed(() => {
     const first = this.firstDate();
     const view = this.viewMonth();
@@ -48,6 +57,7 @@ export class HabitStore {
     const start = monthOf(first);
     return monthIndex(view.year, view.month) > monthIndex(start.year, start.month);
   });
+
   readonly canGoNext = computed(() => {
     const view = this.viewMonth();
     const now = monthOf(this.today());
@@ -57,13 +67,16 @@ export class HabitStore {
   readonly currentStreak = computed(() =>
     currentStreak(this.habits(), this.checks(), this.today(), this.filter()),
   );
+
   readonly bestStreak = computed(() =>
     bestStreak(this.habits(), this.checks(), this.today(), this.filter()),
   );
+
   readonly monthRate = computed(() => {
     const { year, month } = this.viewMonth();
     return monthRate(this.habits(), this.checks(), year, month, this.today(), this.filter());
   });
+
   readonly monthRateLabel = computed(() => `${monthShortName(this.viewMonth().month)} rate`);
 
   streakFor(habitId: string): number {
@@ -87,9 +100,7 @@ export class HabitStore {
           const to = addDays(from, CHECK_IN_WINDOW_DAYS - 1);
           requests.push(firstValueFrom(this.repo.listCheckIns(from, to < today ? to : today)));
         }
-        for (const list of await Promise.all(requests)) {
-          for (const c of list) keys.add(checkKey(c.habitId, c.date));
-        }
+        (await Promise.all(requests)).flat().forEach((c) => keys.add(checkKey(c.habitId, c.date)));
       }
       this.habits.set(habits);
       this.checks.set(keys);
@@ -115,7 +126,9 @@ export class HabitStore {
   }
 
   private readonly confirmed = new Map<string, boolean>();
+
   private readonly pending = new Map<string, number>();
+
   private readonly queue = new Map<string, Promise<void>>();
 
   toggleToday(habitId: string): Promise<void> {

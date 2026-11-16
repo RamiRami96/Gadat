@@ -20,5 +20,6 @@ const VARIANTS: Record<ButtonVariant, string> = {
 })
 export class Button {
   readonly variant = input<ButtonVariant>('primary');
+
   protected readonly classes = computed(() => `${BASE} ${VARIANTS[this.variant()]}`);
 }
