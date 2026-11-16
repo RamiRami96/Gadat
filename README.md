@@ -31,12 +31,11 @@ client/src/app/
 │   │   ├── components/      auth-shell, fingerprint-circle, recovery-code-box, unlock-page, setup-page
 │   │   ├── services/        passkey-service.ts
 │   │   ├── constants/       auth-constants.ts
-│   │   ├── data/            auth-data.ts
 │   │   ├── models/          auth-models.ts
 │   │   └── index.ts         AUTH_ROUTES
 │   ├── dashboard/           the signed-in home screen
 │   │   ├── components/      dashboard-header, dashboard-main, dashboard-page
-│   │   ├── hooks/           use-today-clock.ts
+│   │   ├── services/        today-clock-service.ts
 │   │   ├── constants/       dashboard-constants.ts
 │   │   └── index.ts         DASHBOARD_ROUTES
 │   ├── habits/              Today list, stats, Add habit dialog, habit state
@@ -44,11 +43,11 @@ client/src/app/
 │   │   ├── stores/          habit-store.ts (signals)
 │   │   ├── services/        habit-repository.ts (abstract), http-habit-repository.ts
 │   │   ├── utils/           habit-stats.ts (streaks, rings, rates: pure functions)
-│   │   ├── constants/  data/  models/
+│   │   ├── constants/  models/
 │   │   └── index.ts
 │   └── calendar/            month grid, chips, selected-day summary
 │       ├── components/      calendar-card, calendar-grid
-│       ├── hooks/           use-calendar.ts
+│       ├── services/        calendar-view-service.ts
 │       ├── utils/           calendar-days.ts
 │       ├── constants/  models/
 │       └── index.ts
@@ -61,7 +60,7 @@ client/src/app/
     ├── constants/  models/
 ```
 
-Rules: each component lives in its own folder as `index.ts` (plus `index.html` when it has a template); modules import each other only through the other module's `index.ts` (`@modules/habits`); `shared/` and `infrastructure/` never import from `modules/`. Path aliases `@infrastructure/*`, `@modules/*` and `@shared/*` are set in `client/tsconfig.json`. "Hooks" are functions that use `inject()` and return signals, such as `useCalendar()`.
+Rules: each component lives in its own folder as `index.ts` (plus `index.html` when it has a template); modules import each other only through the other module's `index.ts` (`@modules/habits`); `shared/` and `infrastructure/` never import from `modules/`. Path aliases `@infrastructure/*`, `@modules/*` and `@shared/*` are set in `client/tsconfig.json`.
 
 There is no root `package.json`. `client/` and `server/` are installed and run on their own, and share no code. The API contract below is mirrored by hand in `client/src/app/infrastructure/models/api-models.ts`.
 
@@ -264,7 +263,7 @@ Content-Security-Policy:
 16. **Today** follows the device's local clock, checked every minute and when the tab becomes visible again, so the app moves to the next day at midnight without a reload.
 17. **Backup link.** The home footer has a "Download a backup of your habits" link to `GET /api/export` (a small addition; the spec only lists the endpoint).
 18. **Fonts.** Space Grotesk has no Cyrillic glyphs, so it cannot draw the ӓ. The logo is set in Inter, which has U+04D3, and the heading font stack falls back to Inter per glyph. Fonts load from Google Fonts as specified; self-hosting them would let `style-src` and `font-src` drop the Google hosts.
-19. **Module layout.** The client follows a folder-per-module layout (infrastructure, modules, shared) rather than Angular NgModules. Auth sits in its own module; the home screen is the `dashboard` module, which composes `habits` and `calendar`. Hooks are `inject()`-based functions returning signals.
+19. **Module layout.** The client follows a folder-per-module layout (infrastructure, modules, shared) rather than Angular NgModules. Auth sits in its own module; the home screen is the `dashboard` module, which composes `habits` and `calendar`.
 20. **Dev proxy and cookies.** Cookies are scoped to `Path=/api`, which is where all API calls go, including through the dev proxy.
 
 ## What was and was not verified
