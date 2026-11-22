@@ -1,9 +1,7 @@
-import { Component, computed, input } from '@angular/core';
+import { computed, Directive, input } from '@angular/core';
 
-@Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
+@Directive({
   selector: 'button[appChip]',
-  template: '<ng-content />',
   host: {
     type: 'button',
     '[attr.aria-pressed]': 'selected()',

@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { computed, Directive, input } from '@angular/core';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
@@ -12,10 +12,8 @@ const VARIANTS: Record<ButtonVariant, string> = {
   ghost: 'text-ink underline-offset-4 hover:underline',
 };
 
-@Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
+@Directive({
   selector: 'button[appButton]',
-  template: '<ng-content />',
   host: { '[class]': 'classes()' },
 })
 export class Button {
