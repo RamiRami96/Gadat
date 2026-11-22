@@ -14,7 +14,9 @@ import {
   SERVER_UNREACHABLE,
   SUCCESS_DELAY_MS,
   ADD_FINGERPRINT_FAILED,
+  FINGERPRINT_STATE,
   TOO_MANY_TRIES,
+  UNLOCK_VIEW_FINGERPRINT_STATE,
 } from '../../constants/auth-constants';
 import type { FingerprintState, UnlockView } from '../../models/auth-models';
 
@@ -40,10 +42,9 @@ export class UnlockPage {
 
   private cancelled = false;
 
-  protected readonly circle = computed<FingerprintState>(() => {
-    const v = this.view();
-    return v === 'scanning' || v === 'success' || v === 'error' ? v : 'idle';
-  });
+  protected readonly circle = computed<FingerprintState>(
+    () => UNLOCK_VIEW_FINGERPRINT_STATE[this.view()] ?? FINGERPRINT_STATE.Idle,
+  );
 
   protected readonly canRestore = computed(
     () => this.code().trim().length >= RECOVERY_CODE_MIN_LENGTH && !this.busy(),

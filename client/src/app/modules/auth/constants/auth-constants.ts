@@ -1,5 +1,7 @@
 import { HttpStatusCode } from '@angular/common/http';
 
+import type { FingerprintState, UnlockView } from '../models/auth-models';
+
 export const SETUP_BENEFITS: readonly string[] = [
   'Unlock with a touch. There is no password to remember.',
   'Your fingerprint never leaves this device.',
@@ -9,6 +11,21 @@ export const SETUP_BENEFITS: readonly string[] = [
 export const SETUP_STEPS = [1, 2, 3] as const;
 
 export const SUCCESS_DELAY_MS = 600;
+
+export const FINGERPRINT_STATE = {
+  Idle: 'idle',
+  Scanning: 'scanning',
+  Success: 'success',
+  Error: 'error',
+} as const;
+
+export const UNLOCK_VIEW_FINGERPRINT_STATE: Readonly<
+  Partial<Record<UnlockView, FingerprintState>>
+> = {
+  scanning: FINGERPRINT_STATE.Scanning,
+  success: FINGERPRINT_STATE.Success,
+  error: FINGERPRINT_STATE.Error,
+};
 
 export const TOO_MANY_TRIES = 'Too many tries. Wait a minute and try again.';
 export const SETUP_FAILED =

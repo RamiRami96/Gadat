@@ -1,6 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 import { Icon } from '@shared/components/icon';
-
+import { FINGERPRINT_STATE } from '../../constants/auth-constants';
 import type { FingerprintState } from '../../models/auth-models';
 
 @Component({
@@ -8,7 +8,7 @@ import type { FingerprintState } from '../../models/auth-models';
   imports: [Icon],
   template: `
     <div class="relative mx-auto h-[168px] w-[168px]" aria-hidden="true">
-      @if (state() === 'scanning') {
+      @if (state() === State.Scanning) {
         <span
           class="animate-pulse-ring motion-reduce:animate-none motion-reduce:scale-[1.15] motion-reduce:opacity-35 absolute inset-0 rounded-full border-2 border-accent"
         ></span>
@@ -22,10 +22,10 @@ import type { FingerprintState } from '../../models/auth-models';
         [class]="circleClasses()"
       >
         @switch (state()) {
-          @case ('success') {
+          @case (State.Success) {
             <app-icon name="check" [size]="72" />
           }
-          @case ('error') {
+          @case (State.Error) {
             <app-icon name="x" [size]="72" />
           }
           @default {
@@ -38,13 +38,15 @@ import type { FingerprintState } from '../../models/auth-models';
   host: { class: 'block' },
 })
 export class FingerprintCircle {
-  readonly state = input<FingerprintState>('idle');
+  readonly state = input<FingerprintState>(FINGERPRINT_STATE.Idle);
+
+  protected readonly State = FINGERPRINT_STATE;
 
   protected readonly circleClasses = computed(() => {
     switch (this.state()) {
-      case 'success':
+      case FINGERPRINT_STATE.Success:
         return 'bg-accent text-white';
-      case 'error':
+      case FINGERPRINT_STATE.Error:
         return 'bg-error-bg text-error';
       default:
         return 'bg-accent-tint text-accent border-2 border-accent/30';

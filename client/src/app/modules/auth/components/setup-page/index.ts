@@ -9,12 +9,13 @@ import { AuthShell } from '../auth-shell';
 import { FingerprintCircle } from '../fingerprint-circle';
 import { RecoveryCodeBox } from '../recovery-code-box';
 import {
+  FINGERPRINT_STATE,
   SETUP_FAILED,
   TOO_MANY_TRIES,
   SETUP_BENEFITS,
   SETUP_STEPS,
 } from '../../constants/auth-constants';
-import type { SetupStep } from '../../models/auth-models';
+import type { FingerprintState, SetupStep } from '../../models/auth-models';
 
 @Component({
   selector: 'app-setup-page',
@@ -38,7 +39,9 @@ export class SetupPage {
 
   protected readonly benefits = SETUP_BENEFITS;
 
-  protected readonly circle = computed(() => (this.step() === 2 ? 'scanning' : 'idle'));
+  protected readonly circle = computed<FingerprintState>(() =>
+    this.step() === 2 ? FINGERPRINT_STATE.Scanning : FINGERPRINT_STATE.Idle,
+  );
 
   private cancelled = false;
 
