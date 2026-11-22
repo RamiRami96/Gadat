@@ -1,8 +1,8 @@
 export { AddHabitDialog } from './components/add-habit-dialog';
 export { StatsTiles } from './components/stats-tiles';
 export { TodayCard } from './components/today-card';
-export { HabitRepository } from './services/habit-repository';
-export { HttpHabitRepository } from './services/http-habit-repository';
+export { HabitService } from './services/habit-service';
+export { HabitApiService } from './services/habit-api-service';
 export { HabitStore } from './stores/habit-store';
 export { LOAD_STATUS } from './constants/habit-constants';
 export type { LoadStatus } from './models/habit-models';

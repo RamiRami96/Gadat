@@ -1,7 +1,7 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
-import { HabitRepository, HttpHabitRepository } from '@modules/habits';
+import { HabitService, HabitApiService } from '@modules/habits';
 import {
   credentialsInterceptor,
   unauthorizedInterceptor,
@@ -14,6 +14,6 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, ...(environment.useHash ? [withHashLocation()] : [])),
     provideHttpClient(withInterceptors([credentialsInterceptor, unauthorizedInterceptor])),
-    { provide: HabitRepository, useClass: HttpHabitRepository },
+    { provide: HabitService, useClass: HabitApiService },
   ],
 };

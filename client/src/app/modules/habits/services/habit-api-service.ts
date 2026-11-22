@@ -3,37 +3,37 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { api } from '@shared/services/api-service';
 import type { CheckIn, Habit, NewHabit } from '@shared/models/api-models';
-import { HabitRepository } from './habit-repository';
+import { HabitService } from './habit-service';
 
 @Injectable()
-export class HttpHabitRepository extends HabitRepository {
+export class HabitApiService extends HabitService {
   private readonly http = inject(HttpClient);
 
-  listHabits(): Observable<Habit[]> {
+  public listHabits(): Observable<Habit[]> {
     return this.http.get<Habit[]>(api('/habits'));
   }
 
-  createHabit(habit: NewHabit): Observable<Habit> {
+  public createHabit(habit: NewHabit): Observable<Habit> {
     return this.http.post<Habit>(api('/habits'), habit);
   }
 
-  archiveHabit(id: string, date: string): Observable<void> {
+  public archiveHabit(id: string, date: string): Observable<void> {
     const params = new HttpParams().set('date', date);
     return this.http.delete(api(`/habits/${id}`), { params }).pipe(map(() => undefined));
   }
 
-  listCheckIns(from: string, to: string): Observable<CheckIn[]> {
+  public listCheckIns(from: string, to: string): Observable<CheckIn[]> {
     const params = new HttpParams().set('from', from).set('to', to);
     return this.http.get<CheckIn[]>(api('/check-ins'), { params });
   }
 
-  tick(habitId: string, date: string): Observable<void> {
+  public tick(habitId: string, date: string): Observable<void> {
     return this.http
       .put(api(`/habits/${habitId}/check-ins/${date}`), null)
       .pipe(map(() => undefined));
   }
 
-  untick(habitId: string, date: string): Observable<void> {
+  public untick(habitId: string, date: string): Observable<void> {
     return this.http.delete(api(`/habits/${habitId}/check-ins/${date}`)).pipe(map(() => undefined));
   }
 }

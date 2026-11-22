@@ -12,7 +12,7 @@ import {
 } from '@shared/utils/dates';
 import { CHECK_IN_WINDOW_DAYS, LOAD_STATUS, SAVE_ERROR } from '../constants/habit-constants';
 import type { LoadStatus } from '../models/habit-models';
-import { HabitRepository } from '../services/habit-repository';
+import { HabitService } from '../services/habit-service';
 import {
   bestStreak,
   checkKey,
@@ -26,31 +26,33 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class HabitStore {
-  private readonly repo = inject(HabitRepository);
+  private readonly habitService = inject(HabitService);
 
   private readonly toast = inject(ToastService);
 
-  readonly status = signal<LoadStatus>(LOAD_STATUS.Idle);
+  public readonly status = signal<LoadStatus>(LOAD_STATUS.Idle);
 
-  readonly habits = signal<Habit[]>([]);
+  public readonly habits = signal<Habit[]>([]);
 
-  readonly checks = signal<CheckInSet>(new Set());
+  public readonly checks = signal<CheckInSet>(new Set());
 
-  readonly today = signal(todayIso());
+  public readonly today = signal(todayIso());
 
-  readonly filter = signal<string | null>(null);
+  public readonly filter = signal<string | null>(null);
 
-  readonly viewMonth = signal(monthOf(todayIso()));
+  public readonly viewMonth = signal(monthOf(todayIso()));
 
-  readonly selectedDate = signal(todayIso());
+  public readonly selectedDate = signal(todayIso());
 
-  readonly todayHabits = computed(() => scheduledOn(this.habits(), this.today()));
+  public readonly todayHabits = computed(() => scheduledOn(this.habits(), this.today()));
 
-  readonly todayProgress = computed(() => dayProgress(this.habits(), this.checks(), this.today()));
+  public readonly todayProgress = computed(() =>
+    dayProgress(this.habits(), this.checks(), this.today()),
+  );
 
-  readonly firstDate = computed(() => earliestStart(this.habits()));
+  public readonly firstDate = computed(() => earliestStart(this.habits()));
 
-  readonly canGoPrev = computed(() => {
+  public readonly canGoPrev = computed(() => {
     const first = this.firstDate();
     const view = this.viewMonth();
     if (first === null) return false;
@@ -58,39 +60,39 @@ export class HabitStore {
     return monthIndex(view.year, view.month) > monthIndex(start.year, start.month);
   });
 
-  readonly canGoNext = computed(() => {
+  public readonly canGoNext = computed(() => {
     const view = this.viewMonth();
     const now = monthOf(this.today());
     return monthIndex(view.year, view.month) < monthIndex(now.year, now.month);
   });
 
-  readonly currentStreak = computed(() =>
+  public readonly currentStreak = computed(() =>
     currentStreak(this.habits(), this.checks(), this.today(), this.filter()),
   );
 
-  readonly bestStreak = computed(() =>
+  public readonly bestStreak = computed(() =>
     bestStreak(this.habits(), this.checks(), this.today(), this.filter()),
   );
 
-  readonly monthRate = computed(() => {
+  public readonly monthRate = computed(() => {
     const { year, month } = this.viewMonth();
     return monthRate(this.habits(), this.checks(), year, month, this.today(), this.filter());
   });
 
-  readonly monthRateLabel = computed(() => `${monthShortName(this.viewMonth().month)} rate`);
+  public readonly monthRateLabel = computed(() => `${monthShortName(this.viewMonth().month)} rate`);
 
-  streakFor(habitId: string): number {
+  public streakFor(habitId: string): number {
     return currentStreak(this.habits(), this.checks(), this.today(), habitId);
   }
 
-  isChecked(habitId: string, date: string): boolean {
+  public isChecked(habitId: string, date: string): boolean {
     return this.checks().has(checkKey(habitId, date));
   }
 
-  async load(): Promise<void> {
+  public async load(): Promise<void> {
     this.status.set(LOAD_STATUS.Loading);
     try {
-      const habits = await firstValueFrom(this.repo.listHabits());
+      const habits = await firstValueFrom(this.habitService.listHabits());
       const today = this.today();
       const first = earliestStart(habits);
       const keys = new Set<string>();
@@ -98,7 +100,9 @@ export class HabitStore {
         const requests = [];
         for (let from = first; from <= today; from = addDays(from, CHECK_IN_WINDOW_DAYS)) {
           const to = addDays(from, CHECK_IN_WINDOW_DAYS - 1);
-          requests.push(firstValueFrom(this.repo.listCheckIns(from, to < today ? to : today)));
+          requests.push(
+            firstValueFrom(this.habitService.listCheckIns(from, to < today ? to : today)),
+          );
         }
         (await Promise.all(requests)).flat().forEach((c) => keys.add(checkKey(c.habitId, c.date)));
       }
@@ -110,16 +114,16 @@ export class HabitStore {
     }
   }
 
-  reset(): void {
+  public reset(): void {
     this.status.set(LOAD_STATUS.Idle);
     this.habits.set([]);
     this.checks.set(new Set());
     this.filter.set(null);
   }
 
-  async addHabit(input: Omit<NewHabit, 'startDate'>): Promise<Habit> {
+  public async addHabit(input: Omit<NewHabit, 'startDate'>): Promise<Habit> {
     const habit = await firstValueFrom(
-      this.repo.createHabit({ ...input, startDate: this.today() }),
+      this.habitService.createHabit({ ...input, startDate: this.today() }),
     );
     this.habits.update((list) => [...list, habit]);
     return habit;
@@ -131,7 +135,7 @@ export class HabitStore {
 
   private readonly queue = new Map<string, Promise<void>>();
 
-  toggleToday(habitId: string): Promise<void> {
+  public toggleToday(habitId: string): Promise<void> {
     const date = this.today();
     const key = checkKey(habitId, date);
     const next = !this.checks().has(key);
@@ -143,7 +147,7 @@ export class HabitStore {
     const run = (this.queue.get(key) ?? Promise.resolve()).then(async () => {
       try {
         await firstValueFrom(
-          next ? this.repo.tick(habitId, date) : this.repo.untick(habitId, date),
+          next ? this.habitService.tick(habitId, date) : this.habitService.untick(habitId, date),
         );
         this.confirmed.set(key, next);
       } catch {
@@ -173,21 +177,21 @@ export class HabitStore {
     });
   }
 
-  selectFilter(habitId: string | null): void {
+  public selectFilter(habitId: string | null): void {
     this.filter.set(habitId);
   }
 
-  selectDate(date: string): void {
+  public selectDate(date: string): void {
     this.selectedDate.set(date);
   }
 
-  shiftMonth(delta: -1 | 1): void {
+  public shiftMonth(delta: -1 | 1): void {
     const { year, month } = this.viewMonth();
     const index = monthIndex(year, month) + delta;
     this.viewMonth.set({ year: Math.floor(index / 12), month: (index % 12) + 1 });
   }
 
-  refreshToday(now: Date = new Date()): void {
+  public refreshToday(now: Date = new Date()): void {
     const fresh = todayIso(now);
     const old = this.today();
     if (fresh === old || diffDays(old, fresh) < 0) return;

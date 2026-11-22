@@ -37,7 +37,7 @@ client/src/app/
 │   ├── habits/              Today list, stats, Add habit dialog, habit state
 │   │   ├── components/      habit-row, today-card, stats-tiles, add-habit-dialog, days-picker
 │   │   ├── stores/          habit-store.ts (signals)
-│   │   ├── services/        habit-repository.ts (abstract), http-habit-repository.ts
+│   │   ├── services/        habit-service.ts (abstract), habit-api-service.ts
 │   │   ├── utils/           habit-stats.ts (streaks, rings, rates: pure functions)
 │   │   ├── constants/  models/
 │   │   └── index.ts

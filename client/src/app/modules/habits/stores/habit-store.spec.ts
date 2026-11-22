@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { ToastService } from '@shared/services/toast-service';
 import type { CheckIn, Habit } from '@shared/models/api-models';
-import { HabitRepository } from '../services/habit-repository';
+import { HabitService } from '../services/habit-service';
 import { LOAD_STATUS } from '../constants/habit-constants';
 import { HabitStore } from './habit-store';
 
@@ -18,50 +18,50 @@ const READ: Habit = {
   createdAt: '2025-11-10T00:00:00Z',
 };
 
-class FakeRepository extends HabitRepository {
-  habits: Habit[] = [READ];
+class FakeHabitService extends HabitService {
+  public habits: Habit[] = [READ];
 
-  checkIns: CheckIn[] = [{ habitId: 'read', date: '2025-11-11' }];
+  public checkIns: CheckIn[] = [{ habitId: 'read', date: '2025-11-11' }];
 
-  ticks: string[] = [];
+  public ticks: string[] = [];
 
-  next: () => Observable<void> = () => of(undefined);
+  public next: () => Observable<void> = () => of(undefined);
 
-  listHabits() {
+  public listHabits() {
     return of(this.habits);
   }
 
-  createHabit(): never {
+  public createHabit(): never {
     throw new Error('not used');
   }
 
-  archiveHabit(): never {
+  public archiveHabit(): never {
     throw new Error('not used');
   }
 
-  listCheckIns() {
+  public listCheckIns() {
     return of(this.checkIns);
   }
 
-  tick(habitId: string, date: string) {
+  public tick(habitId: string, date: string) {
     this.ticks.push(`PUT ${habitId} ${date}`);
     return this.next();
   }
 
-  untick(habitId: string, date: string) {
+  public untick(habitId: string, date: string) {
     this.ticks.push(`DELETE ${habitId} ${date}`);
     return this.next();
   }
 }
 
 function setup() {
-  const repo = new FakeRepository();
+  const habitService = new FakeHabitService();
   TestBed.configureTestingModule({
-    providers: [HabitStore, { provide: HabitRepository, useValue: repo }],
+    providers: [HabitStore, { provide: HabitService, useValue: habitService }],
   });
   const store = TestBed.inject(HabitStore);
   store.today.set(TODAY);
-  return { repo, store, toast: TestBed.inject(ToastService) };
+  return { habitService, store, toast: TestBed.inject(ToastService) };
 }
 
 describe('HabitStore', () => {
@@ -74,32 +74,32 @@ describe('HabitStore', () => {
   });
 
   it('ticking updates the screen at once and the streak follows', async () => {
-    const { store, repo } = setup();
+    const { store, habitService } = setup();
     await store.load();
     const done = store.toggleToday('read');
     expect(store.isChecked('read', TODAY)).toBe(true);
     expect(store.todayProgress()).toEqual({ done: 1, total: 1 });
     await done;
-    expect(repo.ticks).toEqual([`PUT read ${TODAY}`]);
+    expect(habitService.ticks).toEqual([`PUT read ${TODAY}`]);
     expect(store.streakFor('read')).toBe(2);
     expect(store.currentStreak()).toBe(2);
   });
 
   it('undoes the change and shows a toast when the call fails', async () => {
-    const { store, repo, toast } = setup();
+    const { store, habitService, toast } = setup();
     await store.load();
-    repo.next = () => throwError(() => new Error('offline'));
+    habitService.next = () => throwError(() => new Error('offline'));
     await store.toggleToday('read');
     expect(store.isChecked('read', TODAY)).toBe(false);
     expect(toast.toasts().map((t) => t.message)).toEqual(['Couldn’t save. Try again.']);
   });
 
   it('survives rapid double taps: calls go out in order and the end state is right', async () => {
-    const { store, repo } = setup();
+    const { store, habitService } = setup();
     await store.load();
     const gate = new Subject<void>();
     let calls = 0;
-    repo.next = () => {
+    habitService.next = () => {
       calls += 1;
       return calls === 1 ? gate : of(undefined);
     };
@@ -110,14 +110,14 @@ describe('HabitStore', () => {
     await new Promise((resolve) => {
       setTimeout(resolve);
     });
-    expect(repo.ticks).toEqual([`PUT read ${TODAY}`]);
+    expect(habitService.ticks).toEqual([`PUT read ${TODAY}`]);
 
     gate.next();
     gate.complete();
     await first;
     await second;
 
-    expect(repo.ticks).toEqual([`PUT read ${TODAY}`, `DELETE read ${TODAY}`]);
+    expect(habitService.ticks).toEqual([`PUT read ${TODAY}`, `DELETE read ${TODAY}`]);
     expect(store.isChecked('read', TODAY)).toBe(false);
   });
 
