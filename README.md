@@ -1,347 +1,207 @@
-# Gӓdӓt
+<div align="center">
 
-Gӓdӓt is a calm habit tracker. You unlock it with your fingerprint (a passkey, no password and no email), tick today's habits, and watch a monthly calendar where every day is a ring that fills as habits get done.
+# 🌿 Gӓdӓt
 
-- A habit has a name, an optional note and the weekdays it repeats on.
-- Streaks, month rates and calendar rings are **computed on the client** from habits and check-ins. They are never stored.
-- No social features, no push notifications, no translations (English only).
+**A calm habit tracker, unlocked with your fingerprint.**
 
-> The name is written with U+04D3 (Cyrillic small a with diaeresis), not the Latin ä (U+00E4). It is used only in visible text (logo, page title, passkey prompt). Folders, packages, the database, Docker and URLs use the ASCII slug `gadat`.
+No password. No email. Tick today's habits and watch every day on the calendar fill like a ring.
+
+![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS-12-E0234E?logo=nestjs&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma&logoColor=white)
+![WebAuthn](https://img.shields.io/badge/Passkeys-WebAuthn-5C6BC0)
+![Node](https://img.shields.io/badge/Node-24-339933?logo=nodedotjs&logoColor=white)
+
+</div>
+
+---
+
+## ✨ Features
+
+- 🔐 **Fingerprint login.** Passkeys (WebAuthn), with a single-use recovery code as backup.
+- ✅ **Simple habits.** A name, an optional note, and the weekdays it repeats on.
+- 📅 **Monthly calendar.** Each day is a ring that fills as habits get done.
+- 🔥 **Streaks and rates.** Worked out in the browser from your check-ins, never stored.
+- 🧩 **Chrome extension.** The same app from your toolbar.
+
+## 🧰 Technologies
+
+| Layer | Stack |
+| --- | --- |
+| 🖥️ **Client** | Angular 22 (standalone components, signals), Tailwind CSS 4, Vitest |
+| ⚙️ **Server** | Nest.js 12, TypeScript, class-validator, Jest and Supertest |
+| 🗄️ **Database** | PostgreSQL 16 with Prisma 7 |
+| 🔐 **Auth** | WebAuthn passkeys (`@simplewebauthn`), cookie sessions |
+| 🛡️ **Hardening** | helmet, CORS, `@nestjs/throttler` rate limits |
+| 📈 **Observability** | pino logs, Prometheus-format metrics (`prom-client`), health checks |
+| 🧹 **Tooling** | ESLint (Airbnb rules), Prettier, Docker Compose |
+
+## 🏗️ Architecture
+
+Two independent apps that talk over a JSON API. They share no code, and the API contract is mirrored by hand in `client/src/app/shared/models/api-models.ts`.
+
+```
+ Browser or Chrome extension          Nest.js API                      PostgreSQL
+┌───────────────────────────┐  /api  ┌───────────────────────────┐    ┌──────────────┐
+│ Angular app               │ ─────▶ │ auth, habits, check-ins   │ ─▶ │ User         │
+│ signal stores             │ ◀───── │ validation, rate limits   │    │ Credential   │
+│ streaks and rings are     │ cookie │ logging, metrics          │    │ Session      │
+│ computed here, not stored │        └───────────────────────────┘    │ RecoveryCode │
+└───────────────────────────┘                                         │ Habit        │
+                                                                      │ CheckIn      │
+                                                                      └──────────────┘
+```
 
 ```
 gadat/
-├── client/            Angular 22 app, port 4200
-├── server/            Nest.js 12 API (Prisma, PostgreSQL), port 3000
-├── docker-compose.yml PostgreSQL 16 only
-└── README.md
+├── client/             Angular app          http://localhost:4200
+├── server/             Nest.js API + Prisma http://localhost:3000/api
+└── docker-compose.yml  PostgreSQL 16
 ```
 
-### Client architecture
+### Client
 
-The client is split into modules by feature. A module is a folder that owns everything for one feature and exposes a small public API through its `index.ts`. Components are standalone Angular components; there are no NgModules.
+Feature modules, each a folder that owns one feature and exposes a small public API through its `index.ts`.
 
 ```
 client/src/app/
 ├── modules/
-│   ├── auth/                unlock, set up, recovery
-│   │   ├── components/      auth-shell, fingerprint-circle, recovery-code-box, unlock-page, setup-page
-│   │   ├── services/        passkey-service.ts
-│   │   ├── constants/       auth-constants.ts
-│   │   ├── models/          auth-models.ts
-│   │   └── index.ts         AUTH_ROUTES
-│   ├── dashboard/           the signed-in home screen
-│   │   ├── components/      dashboard-header, dashboard-main, dashboard-page
-│   │   ├── services/        today-clock-service.ts
-│   │   ├── constants/       dashboard-constants.ts
-│   │   └── index.ts         DASHBOARD_ROUTES
-│   ├── habits/              Today list, stats, Add habit dialog, habit state
-│   │   ├── components/      habit-row, today-card, stats-tiles, add-habit-dialog, days-picker
-│   │   ├── stores/          habit-store.ts (signals)
-│   │   ├── services/        habit-service.ts (abstract), habit-api-service.ts
-│   │   ├── utils/           habit-stats.ts (streaks, rings, rates: pure functions)
-│   │   ├── constants/  models/
-│   │   └── index.ts
-│   └── calendar/            month grid, chips, selected-day summary
-│       ├── components/      calendar-card, calendar-grid
-│       ├── services/        calendar-view-service.ts
-│       ├── utils/           calendar-days.ts
-│       ├── constants/  models/
-│       └── index.ts
-│
-└── shared/
-    ├── components/          button, chip, icon, logo, progress-bar, toast-host
-    ├── stores/              app-store.ts (is the user signed in)
-    ├── services/            api-service.ts, http-interceptors.ts, session-service.ts, toast-service.ts
-    ├── utils/               dates.ts, route-guards.ts
-    ├── models/              api-models.ts (Habit, CheckIn, NewHabit: the API contract), shared-models.ts
-    ├── theme/               tokens.css (colours, radii, fonts), base.css, animations.css (Tailwind theme animations), overlay.css
-    ├── constants/
+│   ├── auth/        unlock, set up, recovery, passkey service
+│   ├── dashboard/   the signed-in home screen (composes habits and calendar)
+│   ├── habits/      today list, stats, add-habit dialog, habit store, stats maths
+│   └── calendar/    month grid, day chips, selected-day summary
+└── shared/          buttons, icons, toasts, API service, HTTP interceptors, theme
 ```
 
-Rules: each component lives in its own folder as `index.ts` (plus `index.html` when it has a template); modules import each other only through the other module's `index.ts` (`@modules/habits`); `shared/` never imports from `modules/`. Path aliases `@modules/*` and `@shared/*` are set in `client/tsconfig.json`.
+Rules: modules import each other only through `index.ts` (`@modules/habits`), and `shared/` never imports from `modules/`. State lives in signal stores, and streak and ring maths are pure functions in `habits/utils/habit-stats.ts`.
 
-There is no root `package.json`. `client/` and `server/` are installed and run on their own, and share no code. The API contract below is mirrored by hand in `client/src/app/shared/models/api-models.ts`.
+### Server
 
-## Run it locally
+```
+server/src/
+├── auth/        passkey register and login, sessions, recovery code
+├── habits/      create, list, update, archive
+├── check-ins/   tick and untick a habit for a day, list a date range
+├── common/      env config, validation helpers, exception filter
+├── logging/     pino request logs
+├── metrics/     Prometheus metrics
+└── prisma/      database access
+```
 
-Needs Node 24 (see `.nvmrc`), npm and Docker.
+### Data model
+
+`User` has many `Credential`s (passkeys), `Session`s and `Habit`s, and one `RecoveryCode`. A `Habit` has many `CheckIn`s, with one row per habit per day enforced by the primary key. Deleting a user cascades to everything it owns.
+
+## 🧠 How it works
+
+**Fingerprint login.** The device checks your fingerprint and signs a server challenge with a private key that never leaves it. The server verifies the signature with the stored public key.
+
+1. **First visit.** The server creates a user and sends passkey options. The browser asks for your fingerprint, and the server saves the public key, starts a session and shows a recovery code once.
+2. **Next visits.** The browser offers the saved passkey, the server verifies the signature, and a session starts.
+3. **Lost device.** Enter the recovery code. It works once, then the server replaces it with a new one.
+
+**Sessions.** A random 256-bit token in an `HttpOnly`, `SameSite=Lax` cookie for 30 days. Only its SHA-256 hash is stored, so a leaked database cannot be used to sign in. Logging out deletes the row.
+
+**Habits and check-ins.**
+- Name 1 to 40 characters, note up to 60, weekdays 1 to 7 (Monday is 1), at most 20 active habits per user.
+- Dates are plain `YYYY-MM-DD` strings in your local calendar. Dates too far in the future are rejected.
+- Ticking is safe to repeat (it is idempotent), and archiving a habit keeps its history.
+- Every query filters by the signed-in user, so someone else's habit id returns 404.
+
+**Streaks, rings and rates** are computed in the browser from habits and check-ins. Only the facts are stored.
+
+**Protection.** helmet, strict CORS, JSON-only writes, whitelist validation, and rate limits of 10 requests a minute on `/auth/*` and 120 elsewhere. API responses are `no-store`, and logs never contain cookies, bodies or query strings.
+
+## 🔌 API
+
+Everything is JSON under `/api`. "Session" means a valid `session` cookie.
+
+| | Route | Needs |
+| --- | --- | --- |
+| 🔐 | `POST /auth/register/options` and `/verify` | none |
+| 🔐 | `POST /auth/login/options` and `/verify` | none |
+| 🔐 | `POST /auth/recovery` | none |
+| 🔐 | `POST /auth/credentials/options` and `/verify`, `GET /auth/me`, `POST /auth/logout` | session |
+| ✅ | `GET`, `POST /habits` and `PATCH`, `DELETE /habits/:id` | session |
+| 📅 | `GET /check-ins?from=&to=` | session |
+| 📅 | `PUT`, `DELETE /habits/:id/check-ins/:date` | session |
+| 🩺 | `GET /health`, `GET /health/ready`, `GET /metrics` | none, none, token |
+
+## 🚀 Run it
+
+You need Node 24 (see `.nvmrc`), npm and Docker.
 
 ```bash
-docker compose up -d
+docker compose up -d            # PostgreSQL
 
 cd server
 npm install
 cp .env.example .env
 npx prisma migrate dev
-npm run start:dev            # http://localhost:3000/api
+npm run start:dev               # API on :3000
 
 cd ../client
 npm install
-npm start                    # http://localhost:4200, proxies /api to port 3000
+npm start                       # app on :4200, proxies /api to :3000
 ```
 
-Open <http://localhost:4200>. Passkeys work on `localhost` over plain HTTP; everywhere else they need HTTPS.
+Open <http://localhost:4200>. Passkeys work on `localhost` over plain HTTP, and everywhere else they need HTTPS.
 
-Optional demo data (refuses to run when `NODE_ENV=production`):
+Want demo data? Run `npm run prisma:seed` in `server/`. It prints a recovery code you can use to sign in.
 
-```bash
-cd server && npm run prisma:seed
-```
+### ⚙️ Configuration
 
-It creates a demo user with five habits and about a year of check-ins, and prints a recovery code. Use "Use recovery code" on the unlock screen to sign in as that user.
+Set these in `server/.env` (`.env.example` has working defaults).
 
-### Scripts
-
-| Where | Script | What it does |
+| Variable | Example | What it is |
 | --- | --- | --- |
-| server | `start:dev` | Nest in watch mode |
-| server | `build` | Compile to `dist/` (runs `prisma generate` first) |
-| server | `lint` | ESLint (Airbnb rules) + Prettier |
-| server | `test` | Jest unit tests (services, with `@simplewebauthn/server` mocked) |
-| server | `test:e2e` | Jest + Supertest against the real database |
-| server | `prisma:seed` | Demo user, 5 habits, ~1 year of check-ins |
-| client | `start` | `ng serve` with the `/api` proxy |
-| client | `build` | Production build |
-| client | `lint` | angular-eslint + Airbnb rules + Prettier |
-| client | `format` | Prettier on `src` |
-| client | `test` | `ng test` (Vitest, the Angular CLI default) |
+| `DATABASE_URL` | `postgresql://gadat:gadat@localhost:5432/gadat` | PostgreSQL connection |
+| `COOKIE_SECRET` | long random string | Signs the challenge cookie |
+| `RP_ID` | `localhost` | Bare domain for passkeys |
+| `ORIGIN` | `http://localhost:4200` | Front-end URL (CORS and passkey check) |
+| `NODE_ENV` | `development` | Anything else counts as production |
 
-`npm run test:e2e` writes to the database in `DATABASE_URL` but only creates its own users (random ids) and deletes exactly those afterwards, so it is safe to run next to your own data.
+Optional: `PORT`, `RP_NAME`, `TRUST_PROXY`, `DB_POOL_MAX`, `LOG_LEVEL`, `METRICS_TOKEN`.
 
-## Chrome extension
+### 🧪 Scripts
 
-The client builds as a Manifest V3 Chrome extension. The toolbar button opens Gӓdӓt in its own tab.
+| Where | Command | Does |
+| --- | --- | --- |
+| server | `npm run start:dev` | API in watch mode |
+| server | `npm test` | Unit tests |
+| server | `npm run test:e2e` | End-to-end tests against the database |
+| server | `npm run lint` | ESLint and Prettier |
+| client | `npm start` | Dev server with the `/api` proxy |
+| client | `npm test` | Unit tests |
+| client | `npm run build` | Production build |
+
+### 🧩 Chrome extension
 
 ```bash
-cd client
-npm run build:extension      # writes client/dist/extension
+cd client && npm run build:extension
 ```
 
-Open `chrome://extensions`, turn on Developer mode, choose "Load unpacked" and pick `client/dist/extension`. The `key` in `client/public/manifest.json` pins the extension id to `dddeldmgddfmcoobmdgaboaeobapcebo`, so the server settings below stay valid.
-
-Set these in `server/.env` so passkeys and CORS accept the extension:
+Open `chrome://extensions`, turn on **Developer mode**, choose **Load unpacked** and pick `client/dist/extension`. Then set this in `server/.env`:
 
 ```
 RP_ID=dddeldmgddfmcoobmdgaboaeobapcebo
 ORIGIN=chrome-extension://dddeldmgddfmcoobmdgaboaeobapcebo
 ```
 
-The API address is `apiBase` in `client/src/environments/environment.extension.ts`, and the same host must be listed under `host_permissions` in the manifest.
+## 📦 Deploying
 
-## Environment variables (`server/.env`)
+1. Use **HTTPS**. Set `RP_ID` to your domain and `ORIGIN` to the full front-end URL.
+2. Set `NODE_ENV=production` and a real `COOKIE_SECRET` (`openssl rand -base64 48`).
+3. Serve the app and the API from the **same site**, for example one domain with `/api` proxied to the API.
+4. Behind a proxy, set `TRUST_PROXY=1` and point health checks at `/api/health/ready`.
+5. Run `npx prisma migrate deploy`, then `npm run build && npm run start:prod`.
+6. Serve `client/dist/client/browser` as static files, falling back to `index.html`. Cache hashed files for a year and send `no-cache` for `index.html`.
 
-| Variable | Example | Meaning |
-| --- | --- | --- |
-| `DATABASE_URL` | `postgresql://gadat:gadat@localhost:5432/gadat` | PostgreSQL connection string |
-| `COOKIE_SECRET` | long random string | Signs the `chal` (challenge) cookie. In production it must be 32+ characters and not start with `change-me` |
-| `RP_ID` | `localhost` | WebAuthn relying-party id: the bare domain, no scheme, port or path |
-| `RP_NAME` | `Gӓdӓt` | Name shown in the fingerprint prompt |
-| `ORIGIN` | `http://localhost:4200` | Full front-end URL. Used for CORS and for WebAuthn origin checks |
-| `PORT` | `3000` | API port |
-| `NODE_ENV` | `development` | Anything other than `development` or `test` (including unset) is treated as production: `Secure` cookies and the strong-`COOKIE_SECRET` check. `production` also makes the seed refuse to run |
-| `DB_POOL_MAX` | `10` (optional) | Max database connections per API instance. With N instances Postgres sees N times this, so keep it under its `max_connections` |
-| `LOG_LEVEL` | `info` (optional) | `fatal`, `error`, `warn`, `info`, `debug`, `trace` or `silent` |
-| `METRICS_TOKEN` | long random string (optional) | Bearer token for `GET /api/metrics`. Unset disables the endpoint |
-| `TRUST_PROXY` | `1` (optional) | Number of reverse-proxy hops to trust, so rate limits see the real client IP. Default 0 |
+The rate limiter counts in memory, so with more than one API instance the limits multiply. Move it to a shared store such as Redis before scaling out.
 
-Secrets only ever come from the environment. `.env` is git-ignored; `.env.example` is committed.
+## 📈 Operations
 
-## API
-
-All routes are JSON, live under `/api`, and answer errors in one shape: `{ "statusCode": 400, "message": "...", "errors": ["..."] }` (`errors` only for validation). Stack traces are never returned. "Session" means a valid `session` cookie.
-
-| Method | Path | Needs | What it does |
-| --- | --- | --- | --- |
-| GET | `/api/health` | none | `{ "ok": true }` (liveness) |
-| GET | `/api/health/ready` | none | `{ "ok": true }`, or 503 when the database does not answer (readiness) |
-| GET | `/api/metrics` | bearer `METRICS_TOKEN` | Prometheus metrics (404 when no token is configured) |
-| POST | `/api/auth/register/options` | none | Creates a user and returns passkey creation options |
-| POST | `/api/auth/register/verify` | challenge cookie | Body `{ response }` (the `startRegistration` result). Stores the passkey, starts a session, returns `{ recoveryCode }` once |
-| POST | `/api/auth/login/options` | none | Passkey login options (discoverable credential, no username) |
-| POST | `/api/auth/login/verify` | challenge cookie | Body `{ response }` (the `startAuthentication` result). Verifies the signature, updates the counter, starts a session, returns `{ id }` |
-| POST | `/api/auth/recovery` | none | Body `{ code }`. Starts a session, invalidates that code, returns `{ recoveryCode }` (the new one) |
-| POST | `/api/auth/credentials/options` | session | Options to add a passkey on a new device |
-| POST | `/api/auth/credentials/verify` | session + challenge cookie | Body `{ response }`. Stores the extra passkey |
-| GET | `/api/auth/me` | session | `{ id }`; used by the client guard |
-| POST | `/api/auth/logout` | session | Deletes the session and clears the cookie, returns 204 |
-| GET | `/api/habits` | session | Active and archived habits of this user |
-| POST | `/api/habits` | session | Body `{ name, note?, days?, startDate }`; `days` defaults to all seven. Returns 201 |
-| PATCH | `/api/habits/:id` | session | Body with any of `name`, `note` (`""` or `null` clears it), `days` |
-| DELETE | `/api/habits/:id?date=YYYY-MM-DD` | session | Archives the habit: `endDate` becomes the day before `date`. 204, repeating is safe |
-| GET | `/api/check-ins?from=&to=` | session | `[{ habitId, date }]`; at most 400 days (inclusive) |
-| PUT | `/api/habits/:id/check-ins/:date` | session | Ticks that day. Repeating is safe. 204 |
-| DELETE | `/api/habits/:id/check-ins/:date` | session | Unticks it. Repeating is safe. 204 |
-
-A habit is `{ id, name, note, days, startDate, endDate, createdAt }`. Rules enforced by the server:
-
-- Name is trimmed, 1 to 40 characters. Note is at most 60. `days` are ISO weekdays 1 to 7 (Monday = 1), unique, at least one. At most 20 **active** habits per user (400).
-- Dates are plain `YYYY-MM-DD` strings in the user's local calendar, checked as real calendar dates. A check-in or habit start date later than the server's UTC date plus one day is rejected with 400.
-- Every query filters by the signed-in user. Someone else's habit id returns **404**, not 403, so ids cannot be probed.
-- Whitelist validation is on: unknown fields are rejected with 400.
-- Rate limits: **10 requests per minute per IP across `/api/auth/*`** (one shared budget), 120 per minute elsewhere. Over the limit returns 429.
-- Mutating requests (POST, PUT, PATCH, DELETE) must send `Content-Type: application/json`, otherwise 415. The client interceptor adds it, even for requests without a body.
-
-## How fingerprint login works
-
-Login uses WebAuthn passkeys. The device checks your fingerprint and signs a server challenge with a private key that never leaves it. The server verifies the signature with the stored public key. No password and no email exist anywhere.
-
-1. **First visit.** The client calls `register/options`. The server creates a user and returns options with `authenticatorAttachment: 'platform'`, `residentKey: 'required'`, `userVerification: 'required'`, `attestation: 'none'` and the app name. The browser shows the fingerprint prompt (`startRegistration`) and the result is posted to `register/verify`. The server checks it against the stored challenge, `ORIGIN` and `RP_ID`, saves the public key, generates a recovery code, starts a session and shows the code once.
-2. **Next visits.** `login/options` has no allow-list, so the browser offers the saved passkey. After `startAuthentication`, `login/verify` finds the credential by id, verifies the signature and stores the new counter.
-3. **Lost device.** Enter the recovery code on the unlock screen. It is **single use**: the server replaces it and returns a new one, and the client then offers to add a fingerprint on this device.
-
-Cookies:
-
-- `session`: a random 256-bit token that points to a row in the `Session` table, 30 days, `HttpOnly`, `SameSite=Lax`, `Secure` whenever `NODE_ENV=production`. Only the SHA-256 hash of the token is stored, so a leaked database cannot be used to sign in. Logging out deletes the row, so the cookie stops working at once. Expired rows are removed whenever a new session starts. No tokens are kept in `localStorage`.
-- `chal`: the pending challenge, signed, `HttpOnly`, 5 minutes, deleted after one use.
-
-Recovery code: 16 characters from `crypto.randomBytes` (alphabet without 0, 1, I, O), shown as `XXXX-XXXX-XXXX-XXXX`. Only its SHA-256 hash is stored, and the hashes are compared in constant time. Swapping in the new code is one conditional update, so two simultaneous uses of the same code cannot both succeed.
-
-Other protection: `helmet`, CORS limited to `ORIGIN` with credentials, `SameSite=Lax` cookies, no state change on GET, JSON-only mutations, rate limits, a validation pipe with whitelisting, and every query scoped to the user.
-
-## Deployment notes
-
-- **HTTPS is required for passkeys** everywhere except `localhost`.
-- Set `RP_ID` to the bare domain (for example `example.com`) and `ORIGIN` to the full front-end URL (`https://app.example.com`). They must match what the browser sees, or registration and login fail.
-- Set `NODE_ENV=production`. Cookies become `Secure`. Use a real random value for `COOKIE_SECRET` (`openssl rand -base64 48`); the server refuses to start with a short or placeholder secret.
-- Cookies are `SameSite=Lax`, so the app and the API must be the **same site**: either one origin with a reverse proxy sending `/api` to the API (simplest; keep `apiBase: '/api'`), or sibling subdomains such as `app.example.com` and `api.example.com` (then set `apiBase` in `client/src/environments/environment.prod.ts` to the full API URL).
-- Behind a reverse proxy set `TRUST_PROXY=1` so rate limits count real client IPs.
-- Apply migrations with `npx prisma migrate deploy`, run the API with `npm run build && npm run start:prod`, and serve `client/dist/client/browser` as static files with a fallback to `index.html`.
-
-### Scaling
-
-The API keeps no state in memory that matters: sessions are rows in Postgres and the sign-in challenge is a signed cookie, so any instance can serve any request. To run more than one instance, put a reverse proxy in front:
-
-```nginx
-upstream gadat_api {
-    server 127.0.0.1:3000;
-    server 127.0.0.1:3001;   # a second instance, if you run one
-}
-
-server {
-    listen 443 ssl;
-    server_name app.example.com;
-
-    location /api/ {
-        proxy_pass http://gadat_api;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # Metrics are for your Prometheus server only, never the public internet.
-    location = /api/metrics { allow 10.0.0.0/8; deny all; proxy_pass http://gadat_api; }
-
-    location / {
-        root /var/www/gadat;              # client/dist/client/browser
-        try_files $uri /index.html;
-    }
-}
-```
-
-- Set `TRUST_PROXY=1` so rate limits and logs see the real client IP.
-- Point the load balancer's health check at `/api/health/ready`. It returns 503 when the database is down, so the instance is taken out of rotation.
-- On `SIGTERM` the API stops accepting connections, finishes in-flight requests and closes the database pool, so rolling restarts do not drop requests.
-- **Rate limits are per instance.** The limiter counts in memory, so with N instances the real limit is N times higher (the 10 per minute sign-in limit becomes up to 10N). That is fine for one instance. Before running several, move the limiter to a shared store such as Redis.
-- Set `DB_POOL_MAX` so that instances times pool size stays under Postgres `max_connections`.
-- Look at the p95 latency and Postgres CPU (see Metrics above) before adding instances. Indexes and query tuning come first.
-
-### Logging and monitoring
-
-**Logs (pino).** The API writes one structured JSON line per request to stdout, for example:
-
-```json
-{"level":40,"req":{"id":"2489f8b1-...","method":"GET","url":"/api/habits"},"ip":"::1","res":{"statusCode":401},"responseTime":39,"msg":"GET /api/habits 401"}
-```
-
-- `info` for 2xx/3xx, `warn` for 4xx, `error` for 5xx. `LOG_LEVEL` sets the threshold; with `NODE_ENV=development` the output is human-readable.
-- Cookies, headers, query strings and bodies are never logged, so session tokens and recovery codes cannot end up in logs. Health and metrics requests are left out.
-- Every response has an `X-Request-Id` header. The same id is in the request line and in the stack trace of any 5xx.
-- Using a recovery code logs a warning (`Auth` logger), because it is the only way in without a fingerprint.
-- Ship stdout to your log collector. With `TRUST_PROXY` set correctly, `ip` is the real client address.
-
-**Metrics (Prometheus format).** `GET /api/metrics` is meant for a Prometheus server you run yourself. It needs `Authorization: Bearer <METRICS_TOKEN>` and answers 404 when `METRICS_TOKEN` is unset. Use a long random token and keep the endpoint off the public internet (block it at the reverse proxy).
-
-- `gadat_http_request_duration_seconds` (histogram, labels `method`, `route`, `status`): request rate, errors and latency. `route` is the matched pattern (`/api/habits/:id`), never the raw URL.
-- `gadat_recovery_code_uses_total`: sign-ins with a recovery code.
-- Default `process_*` and `nodejs_*` metrics (CPU, memory, event loop lag).
-
-**Health checks.** `/api/health` is liveness; `/api/health/ready` also checks the database and returns 503 if it does not answer.
-
-### Caching
-
-- **API:** every `/api` response, including errors, carries `Cache-Control: no-store`. The data is per-user and the responses set cookies, so browsers and shared proxies must never keep a copy. A reverse proxy in front of the API must not override this or add its own caching.
-- **Static host:** the Angular production build writes hashed file names (`main-ABC123.js`, `styles-XYZ789.css`). Serve those with a long, immutable lifetime and make sure `index.html` is revalidated, so a new deploy is picked up straight away:
-
-```
-# files with a hash in the name (*.js, *.css, fonts)
-Cache-Control: public, max-age=31536000, immutable
-
-# index.html and the SPA fallback
-Cache-Control: no-cache
-```
-
-### Content Security Policy for the static host
-
-The production build has no inline scripts (critical-CSS inlining is turned off for this reason), so `script-src 'self'` works. Verified by loading the production build under this exact policy with no violations:
-
-```
-Content-Security-Policy:
-  default-src 'self';
-  script-src 'self';
-  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  font-src https://fonts.gstatic.com;
-  img-src 'self' data:;
-  connect-src 'self';
-  base-uri 'self';
-  form-action 'self';
-  frame-ancestors 'none';
-  object-src 'none'
-```
-
-`style-src` needs `'unsafe-inline'` because Angular injects component styles at run time and the Google Fonts stylesheet is inlined at build time. Scripts stay strict. If the API is on another origin, add it to `connect-src`.
-
-## Testing
-
-- **Client** (`npm test`): unit tests for `modules/habits/utils/habit-stats.ts` (scheduling by weekday, ring fraction, current streak when today is not ticked yet, streaks that skip unscheduled days, best streak, month rate for the current and a past month), `shared/utils/dates.ts`, the `HabitStore` (optimistic tick, rollback with toast, rapid double taps, month bounds, midnight rollover), and one component test that checks the calendar's day classes.
-- **Server** (`npm test`): unit tests for `AuthService` with the `@simplewebauthn/server` functions mocked, the recovery code and the date helpers. (`npm run test:e2e`): Supertest tests for habits, check-ins and auth covering ownership, validation, idempotency, date limits, the 20-habit limit, error shape, the recovery code being single use and the rate limit.
-
-## Libraries added beyond the required stack, and why
-
-| Package | Where | Why |
-| --- | --- | --- |
-| `@prisma/adapter-pg` | server | Prisma 7 (latest stable) has no built-in database engine and needs a driver adapter for PostgreSQL |
-| `tsx` | server (dev) | Runs `prisma/seed.ts`. The generated Prisma client uses TypeScript namespaces, which Node's built-in type stripping cannot run |
-| `ts-jest`, `@types/jest`, `@types/cookie-parser`, `@types/pg`, `@types/supertest` | server (dev) | Jest in TypeScript, and type definitions |
-| `eslint`, `@eslint/js`, `typescript-eslint`, `eslint-config-prettier`, `globals` | server (dev) | ESLint is required; the Nest 12 scaffold ships oxlint and Vitest, which were replaced by ESLint and Jest as specified |
-| `angular-eslint` | client (dev) | ESLint for Angular (added with `ng add`) |
-| `postcss`, `@tailwindcss/postcss` | client (dev) | Angular's build loads Tailwind CSS v4 through PostCSS |
-
-`pg` comes in through the adapter. Nothing else is outside the stack in the spec.
-
-## Assumptions
-
-1. **Folder name.** The repository root is this folder (`Gadat`); in the layout it is called `gadat/`.
-2. **Node.** `.nvmrc` pins Node 24, the current LTS line at the time of writing (also copied into `client/` and `server/`).
-3. **Versions.** Everything is the latest stable release: Angular 22, Nest 12, Prisma 7.10, `@simplewebauthn` 14, Tailwind 4. Prisma's npm `latest` tag points at a release candidate (8.0.0-rc), so `prisma` and `@prisma/client` are pinned to 7.10.1, the latest stable.
-4. **ESM.** Nest 12 is ESM-only, so the server is ESM (relative imports end in `.js`) and Jest runs in native ESM mode (`NODE_OPTIONS=--experimental-vm-modules`, set in the npm scripts). `@nestjs/throttler` is CommonJS, so the e2e setup loads `@nestjs/common` first to let Jest load it.
-5. **Prisma client** is generated into `server/src/generated/prisma` (git-ignored). `npm install` and the `build` / `start:dev` scripts run `prisma generate`; `prisma migrate dev` in Prisma 7 does not generate it by itself.
-6. **Passkey registration payload.** `register/verify`, `login/verify` and `credentials/verify` take `{ "response": <browser result> }`, a thin wrapper so the validation pipe's whitelist can stay on. The server library validates the inner object.
-7. **Abandoned sign-ups.** `register/options` creates the user straight away, as specified. A user that never finishes (no passkey saved) is deleted by the next `register/options` call once it is over an hour old.
-8. **Status codes.** The 20-active-habit limit returns 400. A non-JSON mutation returns 415. Logout returns 204. `credentials/verify` returns `{ ok: true }`.
-9. **Content-Type rule.** Applied to every POST, PUT, PATCH and DELETE, including ones with no body, as the checklist says. The client interceptor sets it, so a plain `curl -X PUT` needs `-H 'Content-Type: application/json'`.
-10. **Rate limit scope.** "10 per minute per IP on `/api/auth/*`" is one shared budget for all auth routes, including `/auth/me`, which the client guard calls once per page load. Repeated reloads count toward it.
-11. **Check-in range.** "At most 400 days" is counted inclusively (`to - from + 1 <= 400`). The client asks for the whole history in several 400-day windows, from the earliest habit start to today, so "best streak" covers all history.
-12. **Date limit.** Applies to check-in dates, to the `date` of an archive request and to a habit's `startDate`. Past dates are accepted (so a missed day can be backfilled through the API); the UI only ticks today.
-13. **Recovery lookup.** The hash is found with a query and then re-compared in constant time. The table is tiny and the code has 80 bits of entropy, so the lookup timing reveals nothing useful.
-14. **No UI for editing or archiving.** The screens in the spec only create and tick habits. `PATCH` and `DELETE` exist on the API, but there is no button for them, so the 20-habit limit can only be freed through the API.
-15. **Calendar details.** A day is disabled when it is not scheduled, in the future, or before the first habit (so today is disabled too if nothing is scheduled today). The chip list includes archived habits so history can still be filtered. Changing the days of a habit changes how its past rings look, because schedules are derived, not stored.
-16. **Today** follows the device's local clock, checked every minute and when the tab becomes visible again, so the app moves to the next day at midnight without a reload.
-17. **Fonts.** Space Grotesk has no Cyrillic glyphs, so it cannot draw the ӓ. The logo is set in Inter, which has U+04D3, and the heading font stack falls back to Inter per glyph. Fonts load from Google Fonts as specified; self-hosting them would let `style-src` and `font-src` drop the Google hosts.
-18. **Module layout.** The client follows a folder-per-module layout (modules, shared) rather than Angular NgModules. Auth sits in its own module; the home screen is the `dashboard` module, which composes `habits` and `calendar`.
-19. **Dev proxy and cookies.** Cookies are scoped to `Path=/api`, which is where all API calls go, including through the dev proxy.
-
-## What was and was not verified
-
-Checked by running them: client and server build, lint, unit tests and e2e tests; the full acceptance checklist in a real Chrome against a fresh database with a **virtual** WebAuthn authenticator (registration, login, add-passkey after recovery, all the checks from the brief); an axe-core accessibility scan of the unlock, recovery, home and dialog screens; and the production build under the CSP above.
-
-Not verified: a **physical** fingerprint sensor or phone (only Chrome's virtual authenticator was used), `docker compose up -d` itself (Docker was not installed on the build machine, so a local PostgreSQL 18 instance stood in for PostgreSQL 16, and the compose file was written but not started), and other browsers (Safari, Firefox).
+- 🩺 `/api/health` is liveness. `/api/health/ready` also checks the database and returns 503 if it is down.
+- 📝 Logs are JSON on stdout (pino), one line per request, each with an `X-Request-Id`.
+- 📊 `/api/metrics` serves Prometheus metrics and needs `Authorization: Bearer <METRICS_TOKEN>`. It is off when the token is unset, so keep it off the public internet.
