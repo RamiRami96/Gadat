@@ -163,23 +163,4 @@ describe('Habits (e2e)', () => {
       .send({ name: 'Fits now', startDate: today() })
       .expect(201);
   });
-
-  it('exports every habit and check-in as a downloadable JSON file', async () => {
-    const dave = await ctx.signIn();
-    const habit = await api(ctx, dave.cookie)
-      .post('/api/habits')
-      .send({ name: 'Export me', startDate: today() })
-      .expect(201);
-    await api(ctx, dave.cookie)
-      .put(`/api/habits/${habit.body.id}/check-ins/${today()}`)
-      .expect(204);
-
-    const res = await api(ctx, dave.cookie).get('/api/export').expect(200);
-    expect(res.headers['content-disposition']).toMatch(
-      /^attachment; filename="gadat-export-\d{4}-\d{2}-\d{2}\.json"$/,
-    );
-    expect(res.body.habits).toHaveLength(1);
-    expect(res.body.checkIns).toEqual([{ habitId: habit.body.id, date: today() }]);
-    await api(ctx).get('/api/export').expect(401);
-  });
 });

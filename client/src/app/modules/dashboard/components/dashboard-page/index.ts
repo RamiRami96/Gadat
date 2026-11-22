@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { environment } from '../../../../../environments/environment';
 import { DashboardHeader } from '../dashboard-header';
 import { DashboardMain } from '../dashboard-main';
 
@@ -8,6 +7,4 @@ import { DashboardMain } from '../dashboard-main';
   imports: [DashboardHeader, DashboardMain],
   templateUrl: './index.html',
 })
-export class DashboardPage {
-  protected readonly exportUrl = `${environment.apiBase}/export`;
-}
+export class DashboardPage {}

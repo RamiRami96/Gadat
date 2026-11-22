@@ -7,7 +7,6 @@ import { AuthModule } from './auth/auth.module.js';
 import { CheckInsModule } from './check-ins/check-ins.module.js';
 import { CommonModule } from './common/common.module.js';
 import { JsonContentTypeGuard } from './common/json-content-type.guard.js';
-import { ExportModule } from './export/export.module.js';
 import { HabitsModule } from './habits/habits.module.js';
 import { HealthController } from './health.controller.js';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -29,7 +28,6 @@ function scopedKey(context: ExecutionContext, tracker: string): string {
     AuthModule,
     HabitsModule,
     CheckInsModule,
-    ExportModule,
   ],
   controllers: [HealthController],
   providers: [

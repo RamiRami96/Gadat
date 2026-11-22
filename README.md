@@ -166,7 +166,6 @@ All routes are JSON, live under `/api`, and answer errors in one shape: `{ "stat
 | GET | `/api/check-ins?from=&to=` | session | `[{ habitId, date }]`; at most 400 days (inclusive) |
 | PUT | `/api/habits/:id/check-ins/:date` | session | Ticks that day. Repeating is safe. 204 |
 | DELETE | `/api/habits/:id/check-ins/:date` | session | Unticks it. Repeating is safe. 204 |
-| GET | `/api/export` | session | Downloads all habits and check-ins as one JSON file (also a backup, since browsers can lose cookies) |
 
 A habit is `{ id, name, note, days, startDate, endDate, createdAt }`. Rules enforced by the server:
 
@@ -226,7 +225,7 @@ Content-Security-Policy:
 ## Testing
 
 - **Client** (`npm test`): unit tests for `modules/habits/utils/habit-stats.ts` (scheduling by weekday, ring fraction, current streak when today is not ticked yet, streaks that skip unscheduled days, best streak, month rate for the current and a past month), `shared/utils/dates.ts`, the `HabitStore` (optimistic tick, rollback with toast, rapid double taps, month bounds, midnight rollover), and one component test that checks the calendar's day classes.
-- **Server** (`npm test`): unit tests for `AuthService` with the `@simplewebauthn/server` functions mocked, the recovery code and the date helpers. (`npm run test:e2e`): Supertest tests for habits, check-ins and auth covering ownership, validation, idempotency, date limits, the 20-habit limit, export, error shape, the recovery code being single use and the rate limit.
+- **Server** (`npm test`): unit tests for `AuthService` with the `@simplewebauthn/server` functions mocked, the recovery code and the date helpers. (`npm run test:e2e`): Supertest tests for habits, check-ins and auth covering ownership, validation, idempotency, date limits, the 20-habit limit, error shape, the recovery code being single use and the rate limit.
 
 ## Libraries added beyond the required stack, and why
 
@@ -259,10 +258,9 @@ Content-Security-Policy:
 14. **No UI for editing or archiving.** The screens in the spec only create and tick habits. `PATCH` and `DELETE` exist on the API, but there is no button for them, so the 20-habit limit can only be freed through the API.
 15. **Calendar details.** A day is disabled when it is not scheduled, in the future, or before the first habit (so today is disabled too if nothing is scheduled today). The chip list includes archived habits so history can still be filtered. Changing the days of a habit changes how its past rings look, because schedules are derived, not stored.
 16. **Today** follows the device's local clock, checked every minute and when the tab becomes visible again, so the app moves to the next day at midnight without a reload.
-17. **Backup link.** The home footer has a "Download a backup of your habits" link to `GET /api/export` (a small addition; the spec only lists the endpoint).
-18. **Fonts.** Space Grotesk has no Cyrillic glyphs, so it cannot draw the ӓ. The logo is set in Inter, which has U+04D3, and the heading font stack falls back to Inter per glyph. Fonts load from Google Fonts as specified; self-hosting them would let `style-src` and `font-src` drop the Google hosts.
-19. **Module layout.** The client follows a folder-per-module layout (modules, shared) rather than Angular NgModules. Auth sits in its own module; the home screen is the `dashboard` module, which composes `habits` and `calendar`.
-20. **Dev proxy and cookies.** Cookies are scoped to `Path=/api`, which is where all API calls go, including through the dev proxy.
+17. **Fonts.** Space Grotesk has no Cyrillic glyphs, so it cannot draw the ӓ. The logo is set in Inter, which has U+04D3, and the heading font stack falls back to Inter per glyph. Fonts load from Google Fonts as specified; self-hosting them would let `style-src` and `font-src` drop the Google hosts.
+18. **Module layout.** The client follows a folder-per-module layout (modules, shared) rather than Angular NgModules. Auth sits in its own module; the home screen is the `dashboard` module, which composes `habits` and `calendar`.
+19. **Dev proxy and cookies.** Cookies are scoped to `Path=/api`, which is where all API calls go, including through the dev proxy.
 
 ## What was and was not verified
 
