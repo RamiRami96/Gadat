@@ -1,5 +1,12 @@
 import type { WeekdayOption } from '../models/habit-models';
 
+export const LOAD_STATUS = {
+  Idle: 'idle',
+  Loading: 'loading',
+  Ready: 'ready',
+  Error: 'error',
+} as const;
+
 export const NAME_MAX = 40;
 export const NOTE_MAX = 60;
 

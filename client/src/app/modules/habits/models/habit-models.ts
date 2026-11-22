@@ -1,4 +1,6 @@
-export type LoadStatus = 'idle' | 'loading' | 'ready' | 'error';
+import type { LOAD_STATUS } from '../constants/habit-constants';
+
+export type LoadStatus = (typeof LOAD_STATUS)[keyof typeof LOAD_STATUS];
 
 export interface WeekdayOption {
   value: number;

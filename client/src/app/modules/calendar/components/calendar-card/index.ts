@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { HabitStore } from '@modules/habits';
+import { HabitStore, LOAD_STATUS } from '@modules/habits';
 import { Chip } from '@shared/components/chip';
 import { Icon } from '@shared/components/icon';
 import { ProgressBar } from '@shared/components/progress-bar';
@@ -15,6 +15,8 @@ import { CalendarGrid } from '../calendar-grid';
 })
 export class CalendarCard {
   protected readonly store = inject(HabitStore);
+
+  protected readonly Status = LOAD_STATUS;
 
   protected readonly calendar = inject(CalendarViewService);
 }

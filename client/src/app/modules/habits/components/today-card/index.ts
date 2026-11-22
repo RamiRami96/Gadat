@@ -3,6 +3,7 @@ import { formatLongDate } from '@shared/utils/dates';
 import { Button } from '@shared/components/button';
 import { Icon } from '@shared/components/icon';
 import { ProgressBar } from '@shared/components/progress-bar';
+import { LOAD_STATUS } from '../../constants/habit-constants';
 import { HabitStore } from '../../stores/habit-store';
 import { HabitRow } from '../habit-row';
 
@@ -19,14 +20,14 @@ import { HabitRow } from '../habit-row';
           <p class="text-sm text-muted">{{ dateLabel() }}</p>
           <h2 id="today-title" class="text-4xl leading-none">Today</h2>
         </div>
-        @if (store.status() === 'ready' && progress().total > 0) {
+        @if (store.status() === Status.Ready && progress().total > 0) {
           <p class="pb-1 text-[15px] font-semibold text-muted">
             {{ progress().done }} of {{ progress().total }} done
           </p>
         }
       </div>
 
-      @if (store.status() === 'ready' && progress().total > 0) {
+      @if (store.status() === Status.Ready && progress().total > 0) {
         <app-progress-bar
           class="mt-4"
           [value]="progress().done"
@@ -37,7 +38,7 @@ import { HabitRow } from '../habit-row';
 
       <div class="mt-5 space-y-3">
         @switch (store.status()) {
-          @case ('ready') {
+          @case (Status.Ready) {
             @if (store.habits().length === 0) {
               <div class="rounded-[16px] border border-dashed border-control px-4 py-8 text-center">
                 <h3 class="text-xl">No habits yet</h3>
@@ -70,7 +71,7 @@ import { HabitRow } from '../habit-row';
               Add habit
             </button>
           }
-          @case ('error') {
+          @case (Status.Error) {
             <div role="alert" class="rounded-[16px] bg-error-bg px-4 py-5 text-center text-error">
               <p class="font-semibold">Couldn’t load your habits.</p>
               <button
@@ -102,6 +103,8 @@ export class TodayCard {
   readonly add = output<HTMLElement>();
 
   readonly retry = output();
+
+  protected readonly Status = LOAD_STATUS;
 
   protected readonly skeletonRows = [1, 2, 3];
 

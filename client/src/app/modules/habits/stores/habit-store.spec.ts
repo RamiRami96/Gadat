@@ -3,6 +3,7 @@ import { Observable, of, Subject, throwError } from 'rxjs';
 import { ToastService } from '@shared/services/toast-service';
 import type { CheckIn, Habit } from '@shared/models/api-models';
 import { HabitRepository } from '../services/habit-repository';
+import { LOAD_STATUS } from '../constants/habit-constants';
 import { HabitStore } from './habit-store';
 
 const TODAY = '2025-11-12';
@@ -67,7 +68,7 @@ describe('HabitStore', () => {
   it('loads habits and check-ins', async () => {
     const { store } = setup();
     await store.load();
-    expect(store.status()).toBe('ready');
+    expect(store.status()).toBe(LOAD_STATUS.Ready);
     expect(store.todayHabits().map((h) => h.id)).toEqual(['read']);
     expect(store.streakFor('read')).toBe(1);
   });

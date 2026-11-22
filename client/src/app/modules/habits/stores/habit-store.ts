@@ -10,7 +10,7 @@ import {
   monthShortName,
   todayIso,
 } from '@shared/utils/dates';
-import { CHECK_IN_WINDOW_DAYS, SAVE_ERROR } from '../constants/habit-constants';
+import { CHECK_IN_WINDOW_DAYS, LOAD_STATUS, SAVE_ERROR } from '../constants/habit-constants';
 import type { LoadStatus } from '../models/habit-models';
 import { HabitRepository } from '../services/habit-repository';
 import {
@@ -30,7 +30,7 @@ export class HabitStore {
 
   private readonly toast = inject(ToastService);
 
-  readonly status = signal<LoadStatus>('idle');
+  readonly status = signal<LoadStatus>(LOAD_STATUS.Idle);
 
   readonly habits = signal<Habit[]>([]);
 
@@ -88,7 +88,7 @@ export class HabitStore {
   }
 
   async load(): Promise<void> {
-    this.status.set('loading');
+    this.status.set(LOAD_STATUS.Loading);
     try {
       const habits = await firstValueFrom(this.repo.listHabits());
       const today = this.today();
@@ -104,14 +104,14 @@ export class HabitStore {
       }
       this.habits.set(habits);
       this.checks.set(keys);
-      this.status.set('ready');
+      this.status.set(LOAD_STATUS.Ready);
     } catch {
-      this.status.set('error');
+      this.status.set(LOAD_STATUS.Error);
     }
   }
 
   reset(): void {
-    this.status.set('idle');
+    this.status.set(LOAD_STATUS.Idle);
     this.habits.set([]);
     this.checks.set(new Set());
     this.filter.set(null);
