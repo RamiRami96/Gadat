@@ -17,11 +17,11 @@ export class CheckInsService {
     if (diffDays(from, to) + 1 > MAX_RANGE_DAYS) {
       throw new BadRequestException(`The range can cover at most ${MAX_RANGE_DAYS} days`);
     }
-    return this.prisma.checkIn.findMany({
-      where: { habit: { userId }, date: { gte: from, lte: to } },
-      select: { habitId: true, date: true },
-      orderBy: [{ date: 'asc' }, { habitId: 'asc' }],
-    });
+    return this.find(userId, { gte: from, lte: to });
+  }
+
+  listAll(userId: string) {
+    return this.find(userId);
   }
 
   async tick(userId: string, habitId: string, date: string): Promise<void> {
@@ -32,5 +32,13 @@ export class CheckInsService {
   async untick(userId: string, habitId: string, date: string): Promise<void> {
     await this.habits.findOwned(userId, habitId);
     await this.prisma.checkIn.deleteMany({ where: { habitId, date, habit: { userId } } });
+  }
+
+  private find(userId: string, date?: { gte: string; lte: string }) {
+    return this.prisma.checkIn.findMany({
+      where: { habit: { userId }, ...(date && { date }) },
+      select: { habitId: true, date: true },
+      orderBy: [{ date: 'asc' }, { habitId: 'asc' }],
+    });
   }
 }
