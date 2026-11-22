@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  Logger,
   Post,
   Req,
   Res,
@@ -12,6 +13,7 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { CurrentUser, SessionUser } from '../common/current-user.decorator.js';
+import { MetricsService } from '../metrics/metrics.service.js';
 import { AuthService } from './auth.service.js';
 import { ChallengeCookie, ChallengeKind, ChallengeState } from './challenge.js';
 import { RecoveryDto, WebAuthnResponseDto } from './dto/auth.dto.js';
@@ -21,10 +23,13 @@ import { SESSION_COOKIE, SessionService } from './session.service.js';
 @Controller('auth')
 @Throttle({ default: { limit: 10, ttl: 60_000 } })
 export class AuthController {
+  private readonly logger = new Logger('Auth');
+
   constructor(
     private readonly auth: AuthService,
     private readonly sessions: SessionService,
     private readonly challenges: ChallengeCookie,
+    private readonly metrics: MetricsService,
   ) {}
 
   private takeChallenge(req: Request, res: Response, kind: ChallengeKind): ChallengeState {
@@ -80,6 +85,8 @@ export class AuthController {
   public async recovery(@Body() body: RecoveryDto, @Res({ passthrough: true }) res: Response) {
     const { userId, recoveryCode } = await this.auth.useRecoveryCode(body.code);
     await this.sessions.start(res, userId);
+    this.logger.warn(`Recovery code used user=${userId}`);
+    this.metrics.countRecoveryUse();
     return { recoveryCode };
   }
 

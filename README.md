@@ -139,6 +139,8 @@ The API address is `apiBase` in `client/src/environments/environment.extension.t
 | `ORIGIN` | `http://localhost:4200` | Full front-end URL. Used for CORS and for WebAuthn origin checks |
 | `PORT` | `3000` | API port |
 | `NODE_ENV` | `development` | Anything other than `development` or `test` (including unset) is treated as production: `Secure` cookies and the strong-`COOKIE_SECRET` check. `production` also makes the seed refuse to run |
+| `LOG_LEVEL` | `info` (optional) | `fatal`, `error`, `warn`, `info`, `debug`, `trace` or `silent` |
+| `METRICS_TOKEN` | long random string (optional) | Bearer token for `GET /api/metrics`. Unset disables the endpoint |
 | `TRUST_PROXY` | `1` (optional) | Number of reverse-proxy hops to trust, so rate limits see the real client IP. Default 0 |
 
 Secrets only ever come from the environment. `.env` is git-ignored; `.env.example` is committed.
@@ -149,7 +151,9 @@ All routes are JSON, live under `/api`, and answer errors in one shape: `{ "stat
 
 | Method | Path | Needs | What it does |
 | --- | --- | --- | --- |
-| GET | `/api/health` | none | `{ "ok": true }` |
+| GET | `/api/health` | none | `{ "ok": true }` (liveness) |
+| GET | `/api/health/ready` | none | `{ "ok": true }`, or 503 when the database does not answer (readiness) |
+| GET | `/api/metrics` | bearer `METRICS_TOKEN` | Prometheus metrics (404 when no token is configured) |
 | POST | `/api/auth/register/options` | none | Creates a user and returns passkey creation options |
 | POST | `/api/auth/register/verify` | challenge cookie | Body `{ response }` (the `startRegistration` result). Stores the passkey, starts a session, returns `{ recoveryCode }` once |
 | POST | `/api/auth/login/options` | none | Passkey login options (discoverable credential, no username) |
@@ -201,6 +205,41 @@ Other protection: `helmet`, CORS limited to `ORIGIN` with credentials, `SameSite
 - Cookies are `SameSite=Lax`, so the app and the API must be the **same site**: either one origin with a reverse proxy sending `/api` to the API (simplest; keep `apiBase: '/api'`), or sibling subdomains such as `app.example.com` and `api.example.com` (then set `apiBase` in `client/src/environments/environment.prod.ts` to the full API URL).
 - Behind a reverse proxy set `TRUST_PROXY=1` so rate limits count real client IPs.
 - Apply migrations with `npx prisma migrate deploy`, run the API with `npm run build && npm run start:prod`, and serve `client/dist/client/browser` as static files with a fallback to `index.html`.
+
+### Logging and monitoring
+
+**Logs (pino).** The API writes one structured JSON line per request to stdout, for example:
+
+```json
+{"level":40,"req":{"id":"2489f8b1-...","method":"GET","url":"/api/habits"},"ip":"::1","res":{"statusCode":401},"responseTime":39,"msg":"GET /api/habits 401"}
+```
+
+- `info` for 2xx/3xx, `warn` for 4xx, `error` for 5xx. `LOG_LEVEL` sets the threshold; with `NODE_ENV=development` the output is human-readable.
+- Cookies, headers, query strings and bodies are never logged, so session tokens and recovery codes cannot end up in logs. Health and metrics requests are left out.
+- Every response has an `X-Request-Id` header. The same id is in the request line and in the stack trace of any 5xx.
+- Using a recovery code logs a warning (`Auth` logger), because it is the only way in without a fingerprint.
+- Ship stdout to your log collector. With `TRUST_PROXY` set correctly, `ip` is the real client address.
+
+**Metrics (Prometheus format).** `GET /api/metrics` is meant for a Prometheus server you run yourself. It needs `Authorization: Bearer <METRICS_TOKEN>` and answers 404 when `METRICS_TOKEN` is unset. Use a long random token and keep the endpoint off the public internet (block it at the reverse proxy).
+
+- `gadat_http_request_duration_seconds` (histogram, labels `method`, `route`, `status`): request rate, errors and latency. `route` is the matched pattern (`/api/habits/:id`), never the raw URL.
+- `gadat_recovery_code_uses_total`: sign-ins with a recovery code.
+- Default `process_*` and `nodejs_*` metrics (CPU, memory, event loop lag).
+
+**Health checks.** `/api/health` is liveness; `/api/health/ready` also checks the database and returns 503 if it does not answer.
+
+### Caching
+
+- **API:** every `/api` response, including errors, carries `Cache-Control: no-store`. The data is per-user and the responses set cookies, so browsers and shared proxies must never keep a copy. A reverse proxy in front of the API must not override this or add its own caching.
+- **Static host:** the Angular production build writes hashed file names (`main-ABC123.js`, `styles-XYZ789.css`). Serve those with a long, immutable lifetime and make sure `index.html` is revalidated, so a new deploy is picked up straight away:
+
+```
+# files with a hash in the name (*.js, *.css, fonts)
+Cache-Control: public, max-age=31536000, immutable
+
+# index.html and the SPA fallback
+Cache-Control: no-cache
+```
 
 ### Content Security Policy for the static host
 

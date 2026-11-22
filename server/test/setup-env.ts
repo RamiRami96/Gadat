@@ -7,6 +7,7 @@ if (existsSync('.env')) {
   });
 }
 process.env.NODE_ENV = 'test';
+process.env.METRICS_TOKEN = 'e2e-metrics-token';
 process.env.COOKIE_SECRET ??= 'e2e-cookie-secret-e2e-cookie-secret';
 process.env.RP_ID ??= 'localhost';
 process.env.ORIGIN ??= 'http://localhost:4200';

@@ -19,6 +19,18 @@ describe('Habits (e2e)', () => {
     expect(res.body).toEqual({ ok: true });
   });
 
+  it('GET /api/health/ready checks the database', async () => {
+    const res = await api(ctx).get('/api/health/ready').expect(200);
+    expect(res.body).toEqual({ ok: true });
+  });
+
+  it('marks API responses as not cacheable', async () => {
+    const ok = await api(ctx, alice.cookie).get('/api/habits').expect(200);
+    expect(ok.headers['cache-control']).toBe('no-store');
+    const denied = await api(ctx).get('/api/habits').expect(401);
+    expect(denied.headers['cache-control']).toBe('no-store');
+  });
+
   it('requires a session', async () => {
     await api(ctx).get('/api/habits').expect(401);
     await api(ctx, 'session=not-a-token').get('/api/habits').expect(401);

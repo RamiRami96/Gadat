@@ -29,6 +29,10 @@ export class EnvService {
 
   public readonly trustProxy: number;
 
+  public readonly logLevel: string;
+
+  public readonly metricsToken: string | undefined;
+
   constructor(source: NodeJS.ProcessEnv = process.env) {
     // Fail closed: only an explicit development/test value relaxes the production safeguards.
     this.nodeEnv = source.NODE_ENV ?? 'production';
@@ -39,6 +43,8 @@ export class EnvService {
     this.rpName = source.RP_NAME ?? 'Gӓdӓt';
     this.origin = required('ORIGIN', source);
     this.trustProxy = Number(source.TRUST_PROXY ?? 0);
+    this.logLevel = source.LOG_LEVEL ?? (this.nodeEnv === 'test' ? 'silent' : 'info');
+    this.metricsToken = source.METRICS_TOKEN || undefined;
     required('DATABASE_URL', source);
 
     if (this.isProduction) {

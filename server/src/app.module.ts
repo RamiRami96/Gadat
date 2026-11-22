@@ -8,6 +8,8 @@ import { CheckInsModule } from './check-ins/check-ins.module.js';
 import { CommonModule } from './common/common.module.js';
 import { JsonContentTypeGuard } from './common/json-content-type.guard.js';
 import { HabitsModule } from './habits/habits.module.js';
+import { LoggingModule } from './logging/logging.module.js';
+import { MetricsModule } from './metrics/metrics.module.js';
 import { HealthController } from './health.controller.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
@@ -20,6 +22,8 @@ function scopedKey(context: ExecutionContext, tracker: string): string {
 @Module({
   imports: [
     CommonModule,
+    LoggingModule,
+    MetricsModule,
     PrismaModule,
     ThrottlerModule.forRoot({
       throttlers: [{ ttl: 60_000, limit: 120 }],

@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Response } from 'express';
+import { REQUEST_ID_HEADER } from '../logging/logging.module.js';
 
 interface ErrorBody {
   statusCode: number;
@@ -32,9 +33,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = host.switchToHttp().getResponse<Response>();
     const body = this.toBody(exception);
     if (body.statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
-      this.logger.error(
-        exception instanceof Error ? (exception.stack ?? exception.message) : String(exception),
-      );
+      const id = response.getHeader(REQUEST_ID_HEADER);
+      const detail =
+        exception instanceof Error ? (exception.stack ?? exception.message) : String(exception);
+      this.logger.error(`id=${String(id)} ${detail}`);
     }
     response.status(body.statusCode).json(body);
   }
