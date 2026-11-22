@@ -5,7 +5,12 @@ import { PrismaClient } from '../generated/prisma/client.js';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor() {
-    super({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
+    super({
+      adapter: new PrismaPg({
+        connectionString: process.env.DATABASE_URL,
+        max: Number(process.env.DB_POOL_MAX) || undefined,
+      }),
+    });
   }
 
   public async onModuleInit(): Promise<void> {

@@ -139,6 +139,7 @@ The API address is `apiBase` in `client/src/environments/environment.extension.t
 | `ORIGIN` | `http://localhost:4200` | Full front-end URL. Used for CORS and for WebAuthn origin checks |
 | `PORT` | `3000` | API port |
 | `NODE_ENV` | `development` | Anything other than `development` or `test` (including unset) is treated as production: `Secure` cookies and the strong-`COOKIE_SECRET` check. `production` also makes the seed refuse to run |
+| `DB_POOL_MAX` | `10` (optional) | Max database connections per API instance. With N instances Postgres sees N times this, so keep it under its `max_connections` |
 | `LOG_LEVEL` | `info` (optional) | `fatal`, `error`, `warn`, `info`, `debug`, `trace` or `silent` |
 | `METRICS_TOKEN` | long random string (optional) | Bearer token for `GET /api/metrics`. Unset disables the endpoint |
 | `TRUST_PROXY` | `1` (optional) | Number of reverse-proxy hops to trust, so rate limits see the real client IP. Default 0 |
@@ -205,6 +206,44 @@ Other protection: `helmet`, CORS limited to `ORIGIN` with credentials, `SameSite
 - Cookies are `SameSite=Lax`, so the app and the API must be the **same site**: either one origin with a reverse proxy sending `/api` to the API (simplest; keep `apiBase: '/api'`), or sibling subdomains such as `app.example.com` and `api.example.com` (then set `apiBase` in `client/src/environments/environment.prod.ts` to the full API URL).
 - Behind a reverse proxy set `TRUST_PROXY=1` so rate limits count real client IPs.
 - Apply migrations with `npx prisma migrate deploy`, run the API with `npm run build && npm run start:prod`, and serve `client/dist/client/browser` as static files with a fallback to `index.html`.
+
+### Scaling
+
+The API keeps no state in memory that matters: sessions are rows in Postgres and the sign-in challenge is a signed cookie, so any instance can serve any request. To run more than one instance, put a reverse proxy in front:
+
+```nginx
+upstream gadat_api {
+    server 127.0.0.1:3000;
+    server 127.0.0.1:3001;   # a second instance, if you run one
+}
+
+server {
+    listen 443 ssl;
+    server_name app.example.com;
+
+    location /api/ {
+        proxy_pass http://gadat_api;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Metrics are for your Prometheus server only, never the public internet.
+    location = /api/metrics { allow 10.0.0.0/8; deny all; proxy_pass http://gadat_api; }
+
+    location / {
+        root /var/www/gadat;              # client/dist/client/browser
+        try_files $uri /index.html;
+    }
+}
+```
+
+- Set `TRUST_PROXY=1` so rate limits and logs see the real client IP.
+- Point the load balancer's health check at `/api/health/ready`. It returns 503 when the database is down, so the instance is taken out of rotation.
+- On `SIGTERM` the API stops accepting connections, finishes in-flight requests and closes the database pool, so rolling restarts do not drop requests.
+- **Rate limits are per instance.** The limiter counts in memory, so with N instances the real limit is N times higher (the 10 per minute sign-in limit becomes up to 10N). That is fine for one instance. Before running several, move the limiter to a shared store such as Redis.
+- Set `DB_POOL_MAX` so that instances times pool size stays under Postgres `max_connections`.
+- Look at the p95 latency and Postgres CPU (see Metrics above) before adding instances. Indexes and query tuning come first.
 
 ### Logging and monitoring
 
