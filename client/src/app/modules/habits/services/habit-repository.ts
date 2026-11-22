@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import type { CheckIn, Habit, NewHabit } from '@infrastructure/models/api-models';
+import type { CheckIn, Habit, NewHabit } from '@shared/models/api-models';
 
 export abstract class HabitRepository {
   abstract listHabits(): Observable<Habit[]>;

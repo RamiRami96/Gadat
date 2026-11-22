@@ -1,4 +1,4 @@
-import type { Habit } from '@infrastructure/models/api-models';
+import type { Habit } from '@shared/models/api-models';
 import { addDays, daysInMonth, isoWeekday, toIso } from '@shared/utils/dates';
 
 export type CheckInSet = ReadonlySet<string>;

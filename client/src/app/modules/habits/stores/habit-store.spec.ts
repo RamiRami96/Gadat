@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { ToastService } from '@shared/services/toast-service';
-import type { CheckIn, Habit } from '@infrastructure/models/api-models';
+import type { CheckIn, Habit } from '@shared/models/api-models';
 import { HabitRepository } from '../services/habit-repository';
 import { HabitStore } from './habit-store';
 

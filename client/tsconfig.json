@@ -4,7 +4,6 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "@infrastructure/*": ["./src/app/infrastructure/*"],
       "@modules/*": ["./src/app/modules/*"],
       "@shared/*": ["./src/app/shared/*"]
     },

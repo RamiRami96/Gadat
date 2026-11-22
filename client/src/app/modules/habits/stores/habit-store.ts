@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ToastService } from '@shared/services/toast-service';
-import type { Habit, NewHabit } from '@infrastructure/models/api-models';
+import type { Habit, NewHabit } from '@shared/models/api-models';
 import {
   addDays,
   diffDays,

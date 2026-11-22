@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import type { Habit } from '@infrastructure/models/api-models';
+import type { Habit } from '@shared/models/api-models';
 import { checkKey } from '@modules/habits';
 import type { DayCell } from '../../models/calendar-models';
 import { buildCalendar } from '../../utils/calendar-days';

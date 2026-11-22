@@ -1,4 +1,4 @@
-import type { Habit } from '@infrastructure/models/api-models';
+import type { Habit } from '@shared/models/api-models';
 import type { CheckInSet, RingStatus } from '@modules/habits';
 
 export interface DayCell {

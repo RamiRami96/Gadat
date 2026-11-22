@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { api } from '@shared/services/api-service';
-import type { CheckIn, Habit, NewHabit } from '@infrastructure/models/api-models';
+import type { CheckIn, Habit, NewHabit } from '@shared/models/api-models';
 import { HabitRepository } from './habit-repository';
 
 @Injectable()

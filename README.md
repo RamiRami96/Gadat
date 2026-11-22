@@ -22,10 +22,6 @@ The client is split into modules by feature. A module is a folder that owns ever
 
 ```
 client/src/app/
-├── infrastructure/
-│   ├── models/              api-models.ts: Habit, CheckIn, NewHabit (the API contract)
-│   └── theme/               tokens.css (colours, radii, fonts), base.css, animations.css (Tailwind theme animations), overlay.css
-│
 ├── modules/
 │   ├── auth/                unlock, set up, recovery
 │   │   ├── components/      auth-shell, fingerprint-circle, recovery-code-box, unlock-page, setup-page
@@ -57,12 +53,14 @@ client/src/app/
     ├── stores/              app-store.ts (is the user signed in)
     ├── services/            api-service.ts, http-interceptors.ts, session-service.ts, toast-service.ts
     ├── utils/               dates.ts, route-guards.ts
-    ├── constants/  models/
+    ├── models/              api-models.ts (Habit, CheckIn, NewHabit: the API contract), shared-models.ts
+    ├── theme/               tokens.css (colours, radii, fonts), base.css, animations.css (Tailwind theme animations), overlay.css
+    ├── constants/
 ```
 
-Rules: each component lives in its own folder as `index.ts` (plus `index.html` when it has a template); modules import each other only through the other module's `index.ts` (`@modules/habits`); `shared/` and `infrastructure/` never import from `modules/`. Path aliases `@infrastructure/*`, `@modules/*` and `@shared/*` are set in `client/tsconfig.json`.
+Rules: each component lives in its own folder as `index.ts` (plus `index.html` when it has a template); modules import each other only through the other module's `index.ts` (`@modules/habits`); `shared/` never imports from `modules/`. Path aliases `@modules/*` and `@shared/*` are set in `client/tsconfig.json`.
 
-There is no root `package.json`. `client/` and `server/` are installed and run on their own, and share no code. The API contract below is mirrored by hand in `client/src/app/infrastructure/models/api-models.ts`.
+There is no root `package.json`. `client/` and `server/` are installed and run on their own, and share no code. The API contract below is mirrored by hand in `client/src/app/shared/models/api-models.ts`.
 
 ## Run it locally
 
@@ -263,7 +261,7 @@ Content-Security-Policy:
 16. **Today** follows the device's local clock, checked every minute and when the tab becomes visible again, so the app moves to the next day at midnight without a reload.
 17. **Backup link.** The home footer has a "Download a backup of your habits" link to `GET /api/export` (a small addition; the spec only lists the endpoint).
 18. **Fonts.** Space Grotesk has no Cyrillic glyphs, so it cannot draw the ӓ. The logo is set in Inter, which has U+04D3, and the heading font stack falls back to Inter per glyph. Fonts load from Google Fonts as specified; self-hosting them would let `style-src` and `font-src` drop the Google hosts.
-19. **Module layout.** The client follows a folder-per-module layout (infrastructure, modules, shared) rather than Angular NgModules. Auth sits in its own module; the home screen is the `dashboard` module, which composes `habits` and `calendar`.
+19. **Module layout.** The client follows a folder-per-module layout (modules, shared) rather than Angular NgModules. Auth sits in its own module; the home screen is the `dashboard` module, which composes `habits` and `calendar`.
 20. **Dev proxy and cookies.** Cookies are scoped to `Path=/api`, which is where all API calls go, including through the dev proxy.
 
 ## What was and was not verified
