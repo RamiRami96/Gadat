@@ -138,7 +138,7 @@ The API address is `apiBase` in `client/src/environments/environment.extension.t
 | `RP_NAME` | `Gӓdӓt` | Name shown in the fingerprint prompt |
 | `ORIGIN` | `http://localhost:4200` | Full front-end URL. Used for CORS and for WebAuthn origin checks |
 | `PORT` | `3000` | API port |
-| `NODE_ENV` | `development` | `production` turns on `Secure` cookies and refuses to seed |
+| `NODE_ENV` | `development` | Anything other than `development` or `test` (including unset) is treated as production: `Secure` cookies and the strong-`COOKIE_SECRET` check. `production` also makes the seed refuse to run |
 | `TRUST_PROXY` | `1` (optional) | Number of reverse-proxy hops to trust, so rate limits see the real client IP. Default 0 |
 
 Secrets only ever come from the environment. `.env` is git-ignored; `.env.example` is committed.

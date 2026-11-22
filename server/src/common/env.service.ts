@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 const PLACEHOLDER = 'change-me';
+const RELAXED_ENVS = new Set(['development', 'test']);
 
 function required(name: string, source: NodeJS.ProcessEnv): string {
   const value = source[name];
@@ -29,8 +30,9 @@ export class EnvService {
   public readonly trustProxy: number;
 
   constructor(source: NodeJS.ProcessEnv = process.env) {
-    this.nodeEnv = source.NODE_ENV ?? 'development';
-    this.isProduction = this.nodeEnv === 'production';
+    // Fail closed: only an explicit development/test value relaxes the production safeguards.
+    this.nodeEnv = source.NODE_ENV ?? 'production';
+    this.isProduction = !RELAXED_ENVS.has(this.nodeEnv);
     this.port = Number(source.PORT ?? 3000);
     this.cookieSecret = required('COOKIE_SECRET', source);
     this.rpId = required('RP_ID', source);

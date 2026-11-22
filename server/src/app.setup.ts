@@ -18,7 +18,6 @@ export function configureApp(app: INestApplication): void {
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type'],
-    exposedHeaders: ['Content-Disposition'],
   });
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
