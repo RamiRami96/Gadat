@@ -16,7 +16,12 @@ interface ErrorBody {
 
 function isBodyParserError(error: unknown): error is { status: number; type: string } {
   const { status, type } = (error ?? {}) as { status?: unknown; type?: unknown };
-  return typeof type === 'string' && typeof status === 'number' && status >= 400 && status < 500;
+  return (
+    typeof type === 'string' &&
+    typeof status === 'number' &&
+    status >= HttpStatus.BAD_REQUEST &&
+    status < HttpStatus.INTERNAL_SERVER_ERROR
+  );
 }
 
 @Catch()
@@ -26,7 +31,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   public catch(exception: unknown, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse<Response>();
     const body = this.toBody(exception);
-    if (body.statusCode >= 500) {
+    if (body.statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.error(
         exception instanceof Error ? (exception.stack ?? exception.message) : String(exception),
       );
