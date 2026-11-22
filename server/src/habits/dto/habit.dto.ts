@@ -25,7 +25,7 @@ export class CreateHabitDto {
   @Transform(trim)
   @IsString()
   @Length(1, 40)
-  public name!: string;
+  public name: string;
 
   @IsOptional()
   @Transform(trimOrNull)
@@ -44,7 +44,7 @@ export class CreateHabitDto {
   public days?: number[];
 
   @IsIsoDate({ allowFuture: false })
-  public startDate!: string;
+  public startDate: string;
 }
 
 export class UpdateHabitDto {
@@ -73,5 +73,5 @@ export class UpdateHabitDto {
 
 export class ArchiveHabitQuery {
   @IsIsoDate({ allowFuture: false })
-  public date!: string;
+  public date: string;
 }

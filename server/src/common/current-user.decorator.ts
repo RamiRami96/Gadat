@@ -2,7 +2,7 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import type { Request } from 'express';
 
 export class SessionUser {
-  public id!: string;
+  public id: string;
 }
 
 export const CurrentUser = createParamDecorator(

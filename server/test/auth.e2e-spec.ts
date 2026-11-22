@@ -83,7 +83,7 @@ describe('Auth (e2e)', () => {
       .expect(200);
     expect(first.body.recoveryCode).toMatch(/^[A-Z2-9]{4}(-[A-Z2-9]{4}){3}$/);
     expect(first.body.recoveryCode).not.toBe(user.recoveryCode);
-    const session = cookiesOf(first).find((c) => c.startsWith('session='))!;
+    const session = cookiesOf(first).find((c) => c.startsWith('session='));
     expect(session).toMatch(/HttpOnly/);
     expect(session).toMatch(/SameSite=Lax/);
 

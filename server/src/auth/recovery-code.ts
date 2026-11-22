@@ -7,7 +7,7 @@ export const RECOVERY_CODE_LENGTH = 16;
 export function generateRecoveryCode(): string {
   const bytes = randomBytes(RECOVERY_CODE_LENGTH);
   const raw = Array.from(bytes, (byte) => ALPHABET[byte % 32]).join('');
-  return raw.match(/.{4}/g)!.join('-');
+  return raw.replace(/(.{4})(?=.)/g, '$1-');
 }
 
 export function normalizeRecoveryCode(input: string): string {
