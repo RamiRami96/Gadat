@@ -15,15 +15,8 @@ interface ErrorBody {
 }
 
 function isBodyParserError(error: unknown): error is { status: number; type: string } {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'status' in error &&
-    'type' in error &&
-    typeof (error as { status: unknown }).status === 'number' &&
-    (error as { status: number }).status >= 400 &&
-    (error as { status: number }).status < 500
-  );
+  const { status, type } = (error ?? {}) as { status?: unknown; type?: unknown };
+  return typeof type === 'string' && typeof status === 'number' && status >= 400 && status < 500;
 }
 
 @Catch()
