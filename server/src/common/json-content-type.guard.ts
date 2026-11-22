@@ -10,7 +10,7 @@ const MUTATING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 @Injectable()
 export class JsonContentTypeGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean {
+  public canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
     if (!MUTATING.has(request.method)) return true;
     const type = (request.headers['content-type'] ?? '').split(';')[0]?.trim().toLowerCase();

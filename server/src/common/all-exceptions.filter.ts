@@ -30,7 +30,7 @@ function isBodyParserError(error: unknown): error is { status: number; type: str
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger('Exceptions');
 
-  catch(exception: unknown, host: ArgumentsHost): void {
+  public catch(exception: unknown, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse<Response>();
     const body = this.toBody(exception);
     if (body.statusCode >= 500) {

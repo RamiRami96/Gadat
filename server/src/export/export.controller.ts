@@ -12,7 +12,10 @@ export class ExportController {
 
   @Get()
   @Header('Cache-Control', 'no-store')
-  async download(@CurrentUser() user: SessionUser, @Res({ passthrough: true }) res: Response) {
+  public async download(
+    @CurrentUser() user: SessionUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const now = new Date();
     res.setHeader(
       'Content-Disposition',

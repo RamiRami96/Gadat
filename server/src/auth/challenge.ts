@@ -26,7 +26,7 @@ export class ChallengeCookie {
     };
   }
 
-  set(res: Response, state: ChallengeState): void {
+  public set(res: Response, state: ChallengeState): void {
     res.cookie(COOKIE, JSON.stringify(state), {
       ...this.options(),
       signed: true,
@@ -34,7 +34,7 @@ export class ChallengeCookie {
     });
   }
 
-  take(req: Request, res: Response, kind: ChallengeKind): ChallengeState | null {
+  public take(req: Request, res: Response, kind: ChallengeKind): ChallengeState | null {
     const raw: unknown = req.signedCookies?.[COOKIE];
     res.clearCookie(COOKIE, this.options());
     if (typeof raw !== 'string') return null;

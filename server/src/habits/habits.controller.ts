@@ -21,23 +21,27 @@ export class HabitsController {
   constructor(private readonly habits: HabitsService) {}
 
   @Get()
-  list(@CurrentUser() user: SessionUser) {
+  public list(@CurrentUser() user: SessionUser) {
     return this.habits.list(user.id);
   }
 
   @Post()
-  create(@CurrentUser() user: SessionUser, @Body() dto: CreateHabitDto) {
+  public create(@CurrentUser() user: SessionUser, @Body() dto: CreateHabitDto) {
     return this.habits.create(user.id, dto);
   }
 
   @Patch(':id')
-  update(@CurrentUser() user: SessionUser, @Param('id') id: string, @Body() dto: UpdateHabitDto) {
+  public update(
+    @CurrentUser() user: SessionUser,
+    @Param('id') id: string,
+    @Body() dto: UpdateHabitDto,
+  ) {
     return this.habits.update(user.id, id, dto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  async archive(
+  public async archive(
     @CurrentUser() user: SessionUser,
     @Param('id') id: string,
     @Query() query: ArchiveHabitQuery,

@@ -20,7 +20,7 @@ const SELECT = {
 export class HabitsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  list(userId: string) {
+  public list(userId: string) {
     return this.prisma.habit.findMany({
       where: { userId },
       select: SELECT,
@@ -28,7 +28,7 @@ export class HabitsService {
     });
   }
 
-  create(userId: string, dto: CreateHabitDto) {
+  public create(userId: string, dto: CreateHabitDto) {
     return this.prisma.$transaction(async (tx) => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${userId}))`;
       const active = await tx.habit.count({ where: { userId, endDate: null } });
@@ -48,7 +48,7 @@ export class HabitsService {
     });
   }
 
-  async update(userId: string, id: string, dto: UpdateHabitDto) {
+  public async update(userId: string, id: string, dto: UpdateHabitDto) {
     await this.findOwned(userId, id);
     return this.prisma.habit.update({
       where: { id, userId },
@@ -61,13 +61,13 @@ export class HabitsService {
     });
   }
 
-  async archive(userId: string, id: string, date: string): Promise<void> {
+  public async archive(userId: string, id: string, date: string): Promise<void> {
     const habit = await this.findOwned(userId, id);
     if (habit.endDate !== null) return;
     await this.prisma.habit.update({ where: { id, userId }, data: { endDate: addDays(date, -1) } });
   }
 
-  async findOwned(userId: string, id: string) {
+  public async findOwned(userId: string, id: string) {
     const habit = await this.prisma.habit.findFirst({ where: { id, userId }, select: SELECT });
     if (!habit) throw new NotFoundException('Habit not found');
     return habit;

@@ -25,7 +25,7 @@ export class AuthService {
     private readonly env: EnvService,
   ) {}
 
-  async startRegistration(): Promise<{
+  public async startRegistration(): Promise<{
     options: PublicKeyCredentialCreationOptionsJSON;
     state: ChallengeState;
   }> {
@@ -40,7 +40,7 @@ export class AuthService {
     return { options, state: { kind: 'register', challenge: options.challenge, userId: user.id } };
   }
 
-  async finishRegistration(
+  public async finishRegistration(
     state: ChallengeState,
     body: Record<string, unknown>,
   ): Promise<{ userId: string; recoveryCode: string }> {
@@ -61,7 +61,7 @@ export class AuthService {
     return { userId, recoveryCode };
   }
 
-  async startLogin(): Promise<{
+  public async startLogin(): Promise<{
     options: PublicKeyCredentialRequestOptionsJSON;
     state: ChallengeState;
   }> {
@@ -72,7 +72,7 @@ export class AuthService {
     return { options, state: { kind: 'login', challenge: options.challenge } };
   }
 
-  async finishLogin(
+  public async finishLogin(
     state: ChallengeState,
     body: Record<string, unknown>,
   ): Promise<{ userId: string }> {
@@ -108,7 +108,7 @@ export class AuthService {
     return { userId: stored.userId };
   }
 
-  async useRecoveryCode(code: string): Promise<{ userId: string; recoveryCode: string }> {
+  public async useRecoveryCode(code: string): Promise<{ userId: string; recoveryCode: string }> {
     const hash = hashRecoveryCode(code);
     const row = await this.prisma.recoveryCode.findFirst({ where: { hash } });
     if (!row || !hashesMatch(row.hash, hash)) {
@@ -123,7 +123,7 @@ export class AuthService {
     return { userId: row.userId, recoveryCode };
   }
 
-  async startAddCredential(userId: string): Promise<{
+  public async startAddCredential(userId: string): Promise<{
     options: PublicKeyCredentialCreationOptionsJSON;
     state: ChallengeState;
   }> {
@@ -135,7 +135,7 @@ export class AuthService {
     return { options, state: { kind: 'add', challenge: options.challenge, userId } };
   }
 
-  async finishAddCredential(
+  public async finishAddCredential(
     userId: string,
     state: ChallengeState,
     body: Record<string, unknown>,

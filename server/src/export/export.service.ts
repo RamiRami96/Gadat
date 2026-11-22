@@ -9,7 +9,7 @@ export class ExportService {
     private readonly checkIns: CheckInsService,
   ) {}
 
-  async build(userId: string, now: Date) {
+  public async build(userId: string, now: Date) {
     const [habits, checkIns] = await Promise.all([
       this.habits.list(userId),
       this.checkIns.listAll(userId),

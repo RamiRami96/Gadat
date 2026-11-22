@@ -25,13 +25,13 @@ export class CreateHabitDto {
   @Transform(trim)
   @IsString()
   @Length(1, 40)
-  name!: string;
+  public name!: string;
 
   @IsOptional()
   @Transform(trimOrNull)
   @IsString()
   @MaxLength(60)
-  note?: string | null;
+  public note?: string | null;
 
   @IsOptional()
   @IsArray()
@@ -41,10 +41,10 @@ export class CreateHabitDto {
   @IsInt({ each: true })
   @Min(1, { each: true })
   @Max(7, { each: true })
-  days?: number[];
+  public days?: number[];
 
   @IsIsoDate({ allowFuture: false })
-  startDate!: string;
+  public startDate!: string;
 }
 
 export class UpdateHabitDto {
@@ -52,13 +52,13 @@ export class UpdateHabitDto {
   @Transform(trim)
   @IsString()
   @Length(1, 40)
-  name?: string;
+  public name?: string;
 
   @IsOptional()
   @Transform(trimOrNull)
   @IsString()
   @MaxLength(60)
-  note?: string | null;
+  public note?: string | null;
 
   @IsOptional()
   @IsArray()
@@ -68,10 +68,10 @@ export class UpdateHabitDto {
   @IsInt({ each: true })
   @Min(1, { each: true })
   @Max(7, { each: true })
-  days?: number[];
+  public days?: number[];
 }
 
 export class ArchiveHabitQuery {
   @IsIsoDate({ allowFuture: false })
-  date!: string;
+  public date!: string;
 }

@@ -29,7 +29,7 @@ export class SessionService {
     };
   }
 
-  async create(userId: string): Promise<string> {
+  public async create(userId: string): Promise<string> {
     const token = randomBytes(TOKEN_BYTES).toString('base64url');
     await this.prisma.session.deleteMany({ where: { expiresAt: { lt: new Date() } } });
     await this.prisma.session.create({
@@ -38,19 +38,19 @@ export class SessionService {
     return token;
   }
 
-  async start(res: Response, userId: string): Promise<void> {
+  public async start(res: Response, userId: string): Promise<void> {
     const token = await this.create(userId);
     res.cookie(SESSION_COOKIE, token, { ...this.cookieOptions(), maxAge: SESSION_MS });
   }
 
-  async end(res: Response, token: unknown): Promise<void> {
+  public async end(res: Response, token: unknown): Promise<void> {
     if (typeof token === 'string' && token.length > 0) {
       await this.prisma.session.deleteMany({ where: { id: hashToken(token) } });
     }
     res.clearCookie(SESSION_COOKIE, this.cookieOptions());
   }
 
-  async verify(token: unknown): Promise<string | null> {
+  public async verify(token: unknown): Promise<string | null> {
     if (typeof token !== 'string' || token.length === 0) return null;
     const session = await this.prisma.session.findFirst({
       where: { id: hashToken(token), expiresAt: { gt: new Date() } },

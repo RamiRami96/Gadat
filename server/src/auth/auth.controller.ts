@@ -35,7 +35,7 @@ export class AuthController {
 
   @Post('register/options')
   @HttpCode(200)
-  async registerOptions(@Res({ passthrough: true }) res: Response) {
+  public async registerOptions(@Res({ passthrough: true }) res: Response) {
     const { options, state } = await this.auth.startRegistration();
     this.challenges.set(res, state);
     return options;
@@ -43,7 +43,7 @@ export class AuthController {
 
   @Post('register/verify')
   @HttpCode(200)
-  async registerVerify(
+  public async registerVerify(
     @Body() body: WebAuthnResponseDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -56,7 +56,7 @@ export class AuthController {
 
   @Post('login/options')
   @HttpCode(200)
-  async loginOptions(@Res({ passthrough: true }) res: Response) {
+  public async loginOptions(@Res({ passthrough: true }) res: Response) {
     const { options, state } = await this.auth.startLogin();
     this.challenges.set(res, state);
     return options;
@@ -64,7 +64,7 @@ export class AuthController {
 
   @Post('login/verify')
   @HttpCode(200)
-  async loginVerify(
+  public async loginVerify(
     @Body() body: WebAuthnResponseDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -77,7 +77,7 @@ export class AuthController {
 
   @Post('recovery')
   @HttpCode(200)
-  async recovery(@Body() body: RecoveryDto, @Res({ passthrough: true }) res: Response) {
+  public async recovery(@Body() body: RecoveryDto, @Res({ passthrough: true }) res: Response) {
     const { userId, recoveryCode } = await this.auth.useRecoveryCode(body.code);
     await this.sessions.start(res, userId);
     return { recoveryCode };
@@ -86,7 +86,7 @@ export class AuthController {
   @Post('credentials/options')
   @HttpCode(200)
   @UseGuards(SessionGuard)
-  async credentialOptions(
+  public async credentialOptions(
     @CurrentUser() user: SessionUser,
     @Res({ passthrough: true }) res: Response,
   ) {
@@ -98,7 +98,7 @@ export class AuthController {
   @Post('credentials/verify')
   @HttpCode(200)
   @UseGuards(SessionGuard)
-  async credentialVerify(
+  public async credentialVerify(
     @CurrentUser() user: SessionUser,
     @Body() body: WebAuthnResponseDto,
     @Req() req: Request,
@@ -111,14 +111,17 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(SessionGuard)
-  me(@CurrentUser() user: SessionUser) {
+  public me(@CurrentUser() user: SessionUser) {
     return { id: user.id };
   }
 
   @Post('logout')
   @HttpCode(204)
   @UseGuards(SessionGuard)
-  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<void> {
+  public async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
     await this.sessions.end(res, req.cookies?.[SESSION_COOKIE]);
   }
 }

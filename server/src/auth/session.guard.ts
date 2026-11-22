@@ -6,7 +6,7 @@ import { SESSION_COOKIE, SessionService } from './session.service.js';
 export class SessionGuard implements CanActivate {
   constructor(private readonly sessions: SessionService) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request & { user?: { id: string } }>();
     const userId = await this.sessions.verify(request.cookies?.[SESSION_COOKIE]);
     if (!userId) throw new UnauthorizedException('Not signed in');

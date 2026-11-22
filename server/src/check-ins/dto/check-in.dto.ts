@@ -3,17 +3,17 @@ import { IsIsoDate } from '../../common/is-iso-date.decorator.js';
 
 export class RangeQuery {
   @IsIsoDate()
-  from!: string;
+  public from!: string;
 
   @IsIsoDate()
-  to!: string;
+  public to!: string;
 }
 
 export class CheckInParams {
   @IsString()
   @MaxLength(64)
-  id!: string;
+  public id!: string;
 
   @IsIsoDate({ allowFuture: false })
-  date!: string;
+  public date!: string;
 }

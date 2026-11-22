@@ -27,6 +27,10 @@ export default defineConfig([
       'no-void': ['error', { allowAsStatement: true }],
       'no-console': ['warn', { allow: ['error', 'warn'] }],
       '@typescript-eslint/no-unsafe-enum-comparison': 'off',
+      '@typescript-eslint/explicit-member-accessibility': [
+        'error',
+        { accessibility: 'explicit', overrides: { constructors: 'no-public' } },
+      ],
     },
   },
   {

@@ -12,21 +12,21 @@ function required(name: string, source: NodeJS.ProcessEnv): string {
 
 @Injectable()
 export class EnvService {
-  readonly nodeEnv: string;
+  public readonly nodeEnv: string;
 
-  readonly isProduction: boolean;
+  public readonly isProduction: boolean;
 
-  readonly port: number;
+  public readonly port: number;
 
-  readonly cookieSecret: string;
+  public readonly cookieSecret: string;
 
-  readonly rpId: string;
+  public readonly rpId: string;
 
-  readonly rpName: string;
+  public readonly rpName: string;
 
-  readonly origin: string;
+  public readonly origin: string;
 
-  readonly trustProxy: number;
+  public readonly trustProxy: number;
 
   constructor(source: NodeJS.ProcessEnv = process.env) {
     this.nodeEnv = source.NODE_ENV ?? 'development';
