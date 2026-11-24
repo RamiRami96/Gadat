@@ -41,6 +41,16 @@ model Session {
   @@index([expiresAt])
 }
 
+model Challenge {
+  id        String   @id // random id carried in the signed cookie; the row is deleted on first use
+  kind      String
+  challenge String
+  userId    String?
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
+
 model RecoveryCode {
   userId String @id
   hash   String // SHA-256 of the code; the code itself is never stored

@@ -32,8 +32,12 @@ export class AuthController {
     private readonly metrics: MetricsService,
   ) {}
 
-  private takeChallenge(req: Request, res: Response, kind: ChallengeKind): ChallengeState {
-    const state = this.challenges.take(req, res, kind);
+  private async takeChallenge(
+    req: Request,
+    res: Response,
+    kind: ChallengeKind,
+  ): Promise<ChallengeState> {
+    const state = await this.challenges.take(req, res, kind);
     if (!state) throw new BadRequestException('The fingerprint request expired. Please try again.');
     return state;
   }
@@ -42,7 +46,7 @@ export class AuthController {
   @HttpCode(200)
   public async registerOptions(@Res({ passthrough: true }) res: Response) {
     const { options, state } = await this.auth.startRegistration();
-    this.challenges.set(res, state);
+    await this.challenges.set(res, state);
     return options;
   }
 
@@ -53,7 +57,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const state = this.takeChallenge(req, res, 'register');
+    const state = await this.takeChallenge(req, res, 'register');
     const { userId, recoveryCode } = await this.auth.finishRegistration(state, body.response);
     await this.sessions.start(res, userId);
     return { recoveryCode };
@@ -63,7 +67,7 @@ export class AuthController {
   @HttpCode(200)
   public async loginOptions(@Res({ passthrough: true }) res: Response) {
     const { options, state } = await this.auth.startLogin();
-    this.challenges.set(res, state);
+    await this.challenges.set(res, state);
     return options;
   }
 
@@ -74,7 +78,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const state = this.takeChallenge(req, res, 'login');
+    const state = await this.takeChallenge(req, res, 'login');
     const { userId } = await this.auth.finishLogin(state, body.response);
     await this.sessions.start(res, userId);
     return { id: userId };
@@ -98,7 +102,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const { options, state } = await this.auth.startAddCredential(user.id);
-    this.challenges.set(res, state);
+    await this.challenges.set(res, state);
     return options;
   }
 
@@ -111,7 +115,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const state = this.takeChallenge(req, res, 'add');
+    const state = await this.takeChallenge(req, res, 'add');
     await this.auth.finishAddCredential(user.id, state, body.response);
     return { ok: true };
   }

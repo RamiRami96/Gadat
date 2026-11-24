@@ -91,7 +91,7 @@ server/src/
 
 ### Data model
 
-`User` has many `Credential`s (passkeys), `Session`s and `Habit`s, and one `RecoveryCode`. A `Habit` has many `CheckIn`s, with one row per habit per day enforced by the primary key. Deleting a user cascades to everything it owns.
+`User` has many `Credential`s (passkeys), `Session`s and `Habit`s, and one `RecoveryCode`. A short-lived `Challenge` row holds each pending passkey challenge until it is used once or expires. A `Habit` has many `CheckIn`s, with one row per habit per day enforced by the primary key. Deleting a user cascades to everything it owns.
 
 ## 🧠 How it works
 
@@ -100,6 +100,8 @@ server/src/
 1. **First visit.** The server creates a user and sends passkey options. The browser asks for your fingerprint, and the server saves the public key, starts a session and shows a recovery code once.
 2. **Next visits.** The browser offers the saved passkey, the server verifies the signature, and a session starts.
 3. **Lost device.** Enter the recovery code. It works once, then the server replaces it with a new one.
+
+**Challenges.** The passkey challenge is stored on the server, and the signed cookie only carries its id. The row is deleted the first time it is read, so a captured cookie cannot be replayed.
 
 **Sessions.** A random 256-bit token in an `HttpOnly`, `SameSite=Lax` cookie for 30 days. Only its SHA-256 hash is stored, so a leaked database cannot be used to sign in. Logging out deletes the row.
 
@@ -162,7 +164,7 @@ Set these in `server/.env` (`.env.example` has working defaults).
 | `ORIGIN` | `http://localhost:4200` | Front-end URL (CORS and passkey check) |
 | `NODE_ENV` | `development` | Anything else counts as production |
 
-Optional: `PORT`, `RP_NAME`, `TRUST_PROXY`, `DB_POOL_MAX`, `LOG_LEVEL`, `METRICS_TOKEN`.
+Optional: `PORT`, `RP_NAME`, `TRUST_PROXY`, `DB_POOL_MAX`, `LOG_LEVEL`, `METRICS_TOKEN`. The server refuses to start on a bad `PORT` or `TRUST_PROXY`, and in production on a weak `COOKIE_SECRET` or `METRICS_TOKEN` (under 32 characters, or a `dev-` placeholder).
 
 ### 🧪 Scripts
 
@@ -199,6 +201,10 @@ ORIGIN=chrome-extension://dddeldmgddfmcoobmdgaboaeobapcebo
 6. Serve `client/dist/client/browser` as static files, falling back to `index.html`. Cache hashed files for a year and send `no-cache` for `index.html`.
 
 The rate limiter counts in memory, so with more than one API instance the limits multiply. Move it to a shared store such as Redis before scaling out.
+
+## ✅ CI
+
+`.github/workflows/ci.yml` runs on every push to `main` and every pull request. The server job lints, builds, runs the unit and e2e tests against a PostgreSQL service and audits production dependencies. The client job lints, tests, builds the app and the extension, and audits production dependencies.
 
 ## 📈 Operations
 

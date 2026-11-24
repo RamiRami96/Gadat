@@ -72,6 +72,46 @@ describe('Auth (e2e)', () => {
       .expect(400);
   });
 
+  it('a challenge cookie works once: replaying it is rejected', async () => {
+    const options = await api(ctx).post('/api/auth/login/options').send({}).expect(200);
+    const chal = cookiesOf(options)
+      .find((c) => c.startsWith('chal='))
+      ?.split(';')[0];
+    expect(chal).toBeDefined();
+    expect(await ctx.prisma.challenge.count()).toBeGreaterThan(0);
+
+    await api(ctx, chal)
+      .post('/api/auth/login/verify')
+      .send({ response: { id: 'x' } })
+      .expect(401);
+    const replay = await api(ctx, chal)
+      .post('/api/auth/login/verify')
+      .send({ response: { id: 'x' } })
+      .expect(400);
+    expect(replay.body.message).toMatch(/expired/);
+  });
+
+  it('a challenge cookie is rejected on the wrong endpoint and after it expires', async () => {
+    const options = await api(ctx).post('/api/auth/login/options').send({}).expect(200);
+    const chal = cookiesOf(options)
+      .find((c) => c.startsWith('chal='))
+      ?.split(';')[0];
+    await api(ctx, chal)
+      .post('/api/auth/register/verify')
+      .send({ response: { id: 'x' } })
+      .expect(400);
+
+    const again = await api(ctx).post('/api/auth/login/options').send({}).expect(200);
+    const second = cookiesOf(again)
+      .find((c) => c.startsWith('chal='))
+      ?.split(';')[0];
+    await ctx.prisma.challenge.updateMany({ data: { expiresAt: new Date(Date.now() - 1000) } });
+    await api(ctx, second)
+      .post('/api/auth/login/verify')
+      .send({ response: { id: 'x' } })
+      .expect(400);
+  });
+
   it('validates bodies', async () => {
     await api(ctx).post('/api/auth/login/verify').send({}).expect(400);
     await api(ctx).post('/api/auth/recovery').send({ code: 'abc' }).expect(400);
