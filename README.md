@@ -170,7 +170,7 @@ Optional: `PORT`, `RP_NAME`, `TRUST_PROXY`, `DB_POOL_MAX`, `LOG_LEVEL`, `METRICS
 | --- | --- | --- |
 | server | `npm run start:dev` | API in watch mode |
 | server | `npm test` | Unit tests |
-| server | `npm run test:e2e` | End-to-end tests against the database |
+| server | `npm run test:e2e` | End-to-end tests against a separate `<database>_test` database, created and migrated automatically (override with `TEST_DATABASE_URL`) |
 | server | `npm run lint` | ESLint and Prettier |
 | client | `npm start` | Dev server with the `/api` proxy |
 | client | `npm test` | Unit tests |

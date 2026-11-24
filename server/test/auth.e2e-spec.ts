@@ -47,6 +47,20 @@ describe('Auth (e2e)', () => {
     expect(await ctx.prisma.user.count({ where: { id: userId } })).toBe(1);
   });
 
+  it('register/options removes old abandoned signups but keeps users who have a recovery code', async () => {
+    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+    const abandoned = await ctx.prisma.user.create({ data: { createdAt: twoHoursAgo } });
+    const seedLike = await ctx.signIn();
+    await ctx.prisma.user.update({ where: { id: seedLike.id }, data: { createdAt: twoHoursAgo } });
+    ctx.userIds.push(abandoned.id);
+
+    const res = await api(ctx).post('/api/auth/register/options').send({}).expect(200);
+    ctx.userIds.push(Buffer.from(res.body.user.id, 'base64url').toString());
+
+    expect(await ctx.prisma.user.count({ where: { id: abandoned.id } })).toBe(0);
+    expect(await ctx.prisma.user.count({ where: { id: seedLike.id } })).toBe(1);
+  });
+
   it('verify endpoints reject a missing or tampered challenge cookie with 400', async () => {
     await api(ctx)
       .post('/api/auth/login/verify')

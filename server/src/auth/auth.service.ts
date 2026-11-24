@@ -33,6 +33,7 @@ export class AuthService {
       where: {
         createdAt: { lt: new Date(Date.now() - ABANDONED_SIGNUP_MS) },
         credentials: { none: {} },
+        recovery: null,
       },
     });
     const user = await this.prisma.user.create({ data: {} });

@@ -34,6 +34,10 @@ export default defineConfig([
     },
   },
   {
+    files: ['test/prepare-db.ts'],
+    rules: { 'no-console': 'off', 'n/no-sync': 'off' },
+  },
+  {
     files: ['prisma/seed.ts'],
     rules: {
       'no-bitwise': 'off',

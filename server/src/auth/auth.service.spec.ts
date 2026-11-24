@@ -65,6 +65,13 @@ describe('AuthService', () => {
       const { options, state } = await service.startRegistration();
 
       expect(prisma.user.create).toHaveBeenCalledTimes(1);
+      expect(prisma.user.deleteMany).toHaveBeenCalledWith({
+        where: {
+          createdAt: { lt: expect.any(Date) },
+          credentials: { none: {} },
+          recovery: null,
+        },
+      });
       expect(generateRegistrationOptions).toHaveBeenCalledWith(
         expect.objectContaining({
           rpName: 'Gӓdӓt',
