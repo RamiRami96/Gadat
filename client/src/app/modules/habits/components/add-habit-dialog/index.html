@@ -1,4 +1,5 @@
 <form
+  animate.enter="anim-sheet-in"
   [formGroup]="form"
   (ngSubmit)="submit()"
   class="flex max-h-[92dvh] flex-col overflow-y-auto rounded-t-[24px] bg-surface p-5 shadow-xl sm:rounded-[24px] sm:p-6"
@@ -82,7 +83,11 @@
   </div>
 
   @if (serverError()) {
-    <p role="alert" class="mt-4 rounded-xl bg-error-bg px-3 py-2 text-sm font-medium text-error">
+    <p
+      role="alert"
+      animate.enter="anim-fade-up"
+      class="mt-4 rounded-xl bg-error-bg px-3 py-2 text-sm font-medium text-error"
+    >
       {{ serverError() }}
     </p>
   }

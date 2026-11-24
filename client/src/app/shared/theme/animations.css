@@ -20,6 +20,77 @@
   }
 }
 
+/*
+ * Enter/leave motion, wired up with Angular's `animate.enter` / `animate.leave`.
+ * Only defined when the user hasn't asked for reduced motion: with no animation
+ * applied, Angular removes leaving elements immediately.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .anim-fade-up {
+    animation: fade-up 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .anim-fade-out {
+    animation: fade-out 160ms ease-in both;
+  }
+  .anim-slide-up {
+    animation: slide-up 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .anim-slide-down-out {
+    animation: slide-down-out 180ms ease-in both;
+  }
+  .anim-pop {
+    animation: pop 280ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .anim-sheet-in {
+    animation: sheet-in 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .anim-page-in {
+    animation: fade-up 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes slide-down-out {
+  to {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+}
+
 @utility skeleton {
   @apply animate-shimmer bg-[length:200%_100%] bg-[linear-gradient(90deg,var(--track)_25%,#eef2ed_50%,var(--track)_75%)] motion-reduce:animate-none;
 }

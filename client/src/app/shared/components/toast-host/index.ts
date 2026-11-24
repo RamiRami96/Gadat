@@ -11,6 +11,8 @@ import { ToastService } from '../../services/toast-service';
     >
       @for (toast of toasts.toasts(); track toast.id) {
         <div
+          animate.enter="anim-slide-up"
+          animate.leave="anim-slide-down-out"
           class="pointer-events-auto flex max-w-md items-center gap-3 rounded-2xl bg-ink px-4 py-3 text-sm font-medium text-white shadow-lg"
         >
           <span>{{ toast.message }}</span>

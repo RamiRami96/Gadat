@@ -40,19 +40,27 @@ import { HabitRow } from '../habit-row';
         @switch (store.status()) {
           @case (Status.Ready) {
             @if (store.habits().length === 0) {
-              <div class="rounded-[16px] border border-dashed border-control px-4 py-8 text-center">
+              <div
+                animate.enter="anim-fade-up"
+                class="rounded-[16px] border border-dashed border-control px-4 py-8 text-center"
+              >
                 <h3 class="text-xl">No habits yet</h3>
                 <p class="mx-auto mt-1 max-w-xs text-sm text-muted">
                   Add the first thing you want to do regularly. You can pick the days it repeats on.
                 </p>
               </div>
             } @else if (store.todayHabits().length === 0) {
-              <p class="rounded-[16px] bg-page px-4 py-6 text-center text-sm text-muted">
+              <p
+                animate.enter="anim-fade-up"
+                class="rounded-[16px] bg-page px-4 py-6 text-center text-sm text-muted"
+              >
                 Nothing is scheduled for today.
               </p>
             }
             @for (habit of store.todayHabits(); track habit.id) {
               <app-habit-row
+                animate.enter="anim-fade-up"
+                animate.leave="anim-fade-out"
                 [name]="habit.name"
                 [note]="habit.note"
                 [checked]="store.isChecked(habit.id, store.today())"
@@ -72,7 +80,11 @@ import { HabitRow } from '../habit-row';
             </button>
           }
           @case (Status.Error) {
-            <div role="alert" class="rounded-[16px] bg-error-bg px-4 py-5 text-center text-error">
+            <div
+              role="alert"
+              animate.enter="anim-fade-up"
+              class="rounded-[16px] bg-error-bg px-4 py-5 text-center text-error"
+            >
               <p class="font-semibold">Couldn’t load your habits.</p>
               <button
                 appButton

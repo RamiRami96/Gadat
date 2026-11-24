@@ -24,7 +24,9 @@ import { Icon } from '@shared/components/icon';
         "
         aria-hidden="true"
       >
-        <app-icon name="check" [size]="26" />
+        @if (checked()) {
+          <app-icon animate.enter="anim-pop" name="check" [size]="26" />
+        }
       </span>
       <span class="min-w-0 flex-1">
         <span class="block truncate text-[17px] font-semibold leading-snug">{{ name() }}</span>

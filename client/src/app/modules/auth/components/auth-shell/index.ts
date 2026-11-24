@@ -8,7 +8,7 @@ import { Logo } from '@shared/components/logo';
     <main class="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 py-10">
       <app-logo />
       <section
-        class="w-full max-w-[440px] rounded-[24px] border border-line bg-surface p-6 shadow-sm sm:p-8"
+        class="anim-page-in w-full max-w-[440px] rounded-[24px] border border-line bg-surface p-6 shadow-sm sm:p-8"
       >
         <ng-content />
       </section>
