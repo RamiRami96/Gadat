@@ -201,13 +201,3 @@ ORIGIN=chrome-extension://dddeldmgddfmcoobmdgaboaeobapcebo
 6. Serve `client/dist/client/browser` as static files, falling back to `index.html`. Cache hashed files for a year and send `no-cache` for `index.html`.
 
 The rate limiter counts in memory, so with more than one API instance the limits multiply. Move it to a shared store such as Redis before scaling out.
-
-## ✅ CI
-
-`.github/workflows/ci.yml` runs on every push to `main` and every pull request. The server job lints, builds, runs the unit and e2e tests against a PostgreSQL service and audits production dependencies. The client job lints, tests, builds the app and the extension, and audits production dependencies.
-
-## 📈 Operations
-
-- 🩺 `/api/health` is liveness. `/api/health/ready` also checks the database and returns 503 if it is down.
-- 📝 Logs are JSON on stdout (pino), one line per request, each with an `X-Request-Id`.
-- 📊 `/api/metrics` serves Prometheus metrics and needs `Authorization: Bearer <METRICS_TOKEN>`. It is off when the token is unset, so keep it off the public internet.
